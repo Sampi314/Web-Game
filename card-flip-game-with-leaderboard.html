@@ -1,0 +1,3605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just a Card Flip Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .icon-selector {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .dimension-selector {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sound-settings {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sound-settings h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .volume-control {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .volume-control label {
+            color: white;
+            font-weight: bold;
+            min-width: 100px;
+        }
+
+        .volume-control input[type="range"] {
+            width: 200px;
+            cursor: pointer;
+        }
+
+        .volume-control span {
+            color: white;
+            font-weight: bold;
+            min-width: 40px;
+        }
+
+        .dimension-selector h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .dimension-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .dimension-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .dimension-input label {
+            color: white;
+            font-weight: bold;
+        }
+
+        .dimension-input input {
+            width: 60px;
+            padding: 8px;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-size: 1em;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .apply-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1em;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .apply-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .icon-selector h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .icon-sets {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .icon-set-btn {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .icon-set-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .icon-set-btn.active {
+            background: white;
+            color: #667eea;
+        }
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .custom-icons input {
+            padding: 8px 15px;
+            border: 2px solid white;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1em;
+            width: 300px;
+        }
+
+        .custom-icons button {
+            padding: 8px 20px;
+            font-size: 0.9em;
+        }
+
+        .icon-hint {
+            color: white;
+            font-size: 0.85em;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+
+        .settings-toggle {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .settings-toggle:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .music-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+        }
+
+        .music-toggle:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        .music-toggle.playing {
+            background: rgba(255, 215, 0, 0.4);
+        }
+
+        .settings-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .settings-panel.open {
+            max-height: 800px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .mode-selector label {
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .mode-dropdown {
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .info-panel {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px 25px;
+            border-radius: 10px;
+            color: white;
+            font-size: 1em;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-box span {
+            font-weight: bold;
+            font-size: 1.4em;
+        }
+
+        .info-box.score {
+            background: rgba(255, 215, 0, 0.3);
+        }
+
+        .info-box.combo {
+            background: rgba(255, 100, 100, 0.3);
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        .info-box.combo.active {
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        .combo-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            pointer-events: none;
+            opacity: 0;
+            z-index: 1000;
+            animation: comboPopup 1s ease-out;
+        }
+
+        @keyframes comboPopup {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -60%) scale(1);
+            }
+        }
+
+        .game-board {
+            display: grid;
+            gap: 15px;
+            max-width: min(90vw, 600px);
+            margin: 0 auto 30px;
+            perspective: 1000px;
+            transition: transform 0.8s ease-in-out;
+            position: relative;
+        }
+
+        .card {
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .card.animating {
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 10;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            cursor: default;
+        }
+
+        /* Theme-specific matched card glow effects */
+        body.theme-ocean .card.matched {
+            box-shadow: 0 0 20px rgba(27, 255, 255, 0.6);
+        }
+
+        body.theme-sunset .card.matched {
+            box-shadow: 0 0 20px rgba(255, 217, 61, 0.6);
+        }
+
+        body.theme-forest .card.matched {
+            box-shadow: 0 0 20px rgba(113, 178, 128, 0.6);
+        }
+
+        body.theme-midnight .card.matched {
+            box-shadow: 0 0 20px rgba(100, 181, 246, 0.6);
+        }
+
+        body.theme-candy .card.matched {
+            box-shadow: 0 0 20px rgba(252, 70, 107, 0.6);
+        }
+
+        body.theme-purple .card.matched {
+            box-shadow: 0 0 20px rgba(118, 75, 162, 0.6);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            font-size: 3em;
+            transition: transform 0.8s ease-in-out;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .card-back::after {
+            content: "?";
+            font-size: 3em;
+            color: white;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .win-message {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .win-message.show {
+            display: block;
+        }
+
+        .win-message h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+        }
+
+        .win-message p {
+            color: #555;
+            font-size: 1.3em;
+        }
+
+        @media (max-width: 600px) {
+            .game-board {
+                gap: 10px;
+            }
+            
+            .card-face {
+                font-size: 2em;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+
+        /* Leaderboard Styles */
+        .leaderboard-toggle {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .leaderboard-toggle:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .leaderboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .leaderboard-container.show {
+            display: block;
+        }
+
+        .leaderboard-container h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .leaderboard-tab {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-tab:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+
+        .leaderboard-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .leaderboard-list {
+            list-style: none;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+        }
+
+        .leaderboard-item.new-record {
+            background: rgba(255, 215, 0, 0.3);
+            border: 2px solid #ffd700;
+        }
+
+        .leaderboard-rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 40px;
+        }
+
+        .leaderboard-rank.gold { color: #ffd700; }
+        .leaderboard-rank.silver { color: #c0c0c0; }
+        .leaderboard-rank.bronze { color: #cd7f32; }
+
+        .leaderboard-info {
+            flex-grow: 1;
+            padding: 0 15px;
+        }
+
+        .leaderboard-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .leaderboard-score {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .leaderboard-details {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .no-scores {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        /* Name input modal */
+        .name-input-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1001;
+            transition: transform 0.3s;
+            text-align: center;
+            min-width: 400px;
+            max-width: 90vw;
+        }
+
+        .name-input-modal.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .name-input-modal h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .name-input-modal input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .name-input-modal input:focus {
+            outline: none;
+            border-color: #764ba2;
+        }
+
+        .name-input-modal button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .name-input-modal button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-overlay.show {
+            display: block;
+        }
+
+        /* Game Statistics Styles */
+        .stats-toggle {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-toggle:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .stats-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px auto;
+            max-width: 700px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .stats-container.show {
+            display: block;
+        }
+
+        .stats-container h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-card-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card-subtext {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .stats-section {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stats-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .stats-row:last-child {
+            border-bottom: none;
+        }
+
+        .stats-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .stats-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .reset-stats-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: block;
+            margin: 20px auto 0;
+        }
+
+        .reset-stats-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* Theme Selector Styles */
+        .theme-selector {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .theme-selector h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .theme-btn {
+            padding: 12px 25px;
+            border: 2px solid white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .theme-btn.active {
+            border-width: 3px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .theme-btn.purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .theme-btn.ocean {
+            background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+        }
+
+        .theme-btn.sunset {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+
+        .theme-btn.forest {
+            background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);
+        }
+
+        .theme-btn.midnight {
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+        }
+
+        .theme-btn.candy {
+            background: linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%);
+        }
+
+        /* Theme-specific body backgrounds */
+        body.theme-purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body.theme-ocean {
+            background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+        }
+
+        body.theme-sunset {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+
+        body.theme-forest {
+            background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);
+        }
+
+        body.theme-midnight {
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+        }
+
+        body.theme-candy {
+            background: linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%);
+        }
+
+        /* Theme-specific stat cards */
+        body.theme-ocean .stat-card {
+            background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+        }
+
+        body.theme-sunset .stat-card {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+        }
+
+        body.theme-forest .stat-card {
+            background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);
+        }
+
+        body.theme-midnight .stat-card {
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+        }
+
+        body.theme-candy .stat-card {
+            background: linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%);
+        }
+
+        /* Theme-specific accent colors */
+        body.theme-ocean .leaderboard-rank,
+        body.theme-ocean .leaderboard-score,
+        body.theme-ocean .leaderboard-tab.active,
+        body.theme-ocean .stats-value {
+            background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.theme-sunset .leaderboard-rank,
+        body.theme-sunset .leaderboard-score,
+        body.theme-sunset .leaderboard-tab.active,
+        body.theme-sunset .stats-value {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.theme-forest .leaderboard-rank,
+        body.theme-forest .leaderboard-score,
+        body.theme-forest .leaderboard-tab.active,
+        body.theme-forest .stats-value {
+            background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.theme-midnight .leaderboard-rank,
+        body.theme-midnight .leaderboard-score,
+        body.theme-midnight .leaderboard-tab.active,
+        body.theme-midnight .stats-value {
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.theme-candy .leaderboard-rank,
+        body.theme-candy .leaderboard-score,
+        body.theme-candy .leaderboard-tab.active,
+        body.theme-candy .stats-value {
+            background: linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Keep medal colors for ranks regardless of theme */
+        .leaderboard-rank.gold { 
+            color: #ffd700 !important;
+            -webkit-text-fill-color: #ffd700 !important;
+        }
+        .leaderboard-rank.silver { 
+            color: #c0c0c0 !important;
+            -webkit-text-fill-color: #c0c0c0 !important;
+        }
+        .leaderboard-rank.bronze { 
+            color: #cd7f32 !important;
+            -webkit-text-fill-color: #cd7f32 !important;
+        }
+
+        /* Theme-specific card backs */
+        body.theme-purple .card-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid white;
+        }
+
+        body.theme-ocean .card-back {
+            background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+            border: 3px solid rgba(255, 255, 255, 0.9);
+        }
+
+        body.theme-sunset .card-back {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+            border: 3px solid rgba(255, 255, 255, 0.9);
+        }
+
+        body.theme-forest .card-back {
+            background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);
+            border: 3px solid rgba(255, 255, 255, 0.9);
+        }
+
+        body.theme-midnight .card-back {
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+            border: 3px solid rgba(100, 200, 255, 0.8);
+        }
+
+        body.theme-candy .card-back {
+            background: linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%);
+            border: 3px solid rgba(255, 255, 255, 0.9);
+        }
+
+        /* Theme-specific card fronts */
+        body.theme-ocean .card-front {
+            background: linear-gradient(135deg, #e0f7ff 0%, #ffffff 100%);
+            border: 3px solid #1BFFFF;
+        }
+
+        body.theme-sunset .card-front {
+            background: linear-gradient(135deg, #fff5e6 0%, #ffffff 100%);
+            border: 3px solid #FFD93D;
+        }
+
+        body.theme-forest .card-front {
+            background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
+            border: 3px solid #71B280;
+        }
+
+        body.theme-midnight .card-front {
+            background: linear-gradient(135deg, #1a2332 0%, #2d3e50 100%);
+            border: 3px solid #64b5f6;
+            color: #ffffff;
+        }
+
+        body.theme-candy .card-front {
+            background: linear-gradient(135deg, #ffe6f0 0%, #ffffff 100%);
+            border: 3px solid #FC466B;
+        }
+
+        /* Achievements System Styles */
+        .achievements-toggle {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .achievements-toggle:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .achievements-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .achievements-container.show {
+            display: block;
+        }
+
+        .achievements-container h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .achievements-progress {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .achievements-progress h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .achievements-progress p {
+            opacity: 0.9;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .achievement-card {
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-card.unlocked {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .achievement-card.unlocked::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .achievement-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            filter: grayscale(100%);
+            opacity: 0.5;
+        }
+
+        .achievement-card.unlocked .achievement-icon {
+            filter: grayscale(0%);
+            opacity: 1;
+            animation: unlockBounce 0.6s ease;
+        }
+
+        @keyframes unlockBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .achievement-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .achievement-card.unlocked .achievement-name {
+            color: #667eea;
+        }
+
+        .achievement-description {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .achievement-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .achievement-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+
+        .achievement-progress-text {
+            font-size: 0.75em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        /* Achievement notification popup */
+        .achievement-notification {
+            position: fixed;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 2000;
+            transition: top 0.5s ease;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .achievement-notification.show {
+            top: 20px;
+        }
+
+        .achievement-notification-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .achievement-notification-title {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .achievement-notification-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .achievement-notification-desc {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        /* Peek Mode Styles */
+        .peek-overlay {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 2em;
+            font-weight: bold;
+            z-index: 2000;
+            text-align: center;
+            display: none;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .peek-overlay.show {
+            display: block;
+            animation: peekPulse 1s infinite;
+        }
+
+        @keyframes peekPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.05); }
+        }
+
+        .peek-message {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .peek-timer {
+            font-size: 1.5em;
+            color: #ffd700;
+        }
+
+        /* Memory Fade Mode Styles */
+        .card.fading {
+            opacity: 0.3;
+            filter: blur(2px);
+            transition: opacity 3s ease, filter 3s ease;
+        }
+
+        .card.fading .card-front,
+        .card.fading .card-back {
+            opacity: 0.3;
+            filter: blur(2px);
+        }
+
+        /* Fortune Teller Mode Styles */
+        .card.hint-glow {
+            animation: hintGlow 1.5s ease-in-out;
+        }
+
+        @keyframes hintGlow {
+            0%, 100% {
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 50px rgba(255, 215, 0, 0.5);
+                transform: scale(1.05);
+            }
+        }
+
+        .fortune-message {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            z-index: 1500;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .fortune-message.show {
+            opacity: 1;
+        }
+
+        /* Color Chaos Mode Styles */
+        .card.color-shift {
+            transition: background 2s ease;
+        }
+
+        .card.color-shift .card-back {
+            transition: background 2s ease, border-color 2s ease;
+        }
+    </style>
+</head>
+<body class="theme-purple">
+    <button class="music-toggle" id="musicToggle" onclick="toggleMusic()">🔇</button>
+    
+    <div class="container">
+        <h1>🎴 Just a Card Flip Game</h1>
+        
+        <button class="settings-toggle" onclick="toggleSettings()">⚙️ Settings</button>
+        <button class="leaderboard-toggle" onclick="toggleLeaderboard()">🏆 Leaderboard</button>
+        <button class="stats-toggle" onclick="toggleStats()">📊 Statistics</button>
+        <button class="achievements-toggle" onclick="toggleAchievements()">🏅 Achievements</button>
+        
+        <div class="settings-panel" id="settingsPanel">
+            <div class="dimension-selector">
+                <h3>Board Size:</h3>
+                <div class="dimension-inputs">
+                    <div class="dimension-input">
+                        <label>Width:</label>
+                        <input type="number" id="boardWidth" value="4" min="2">
+                    </div>
+                    <div class="dimension-input">
+                        <label>Height:</label>
+                        <input type="number" id="boardHeight" value="4" min="2">
+                    </div>
+                    <button class="apply-btn" onclick="applyDimensions()">Apply</button>
+                </div>
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+            
+            <div class="icon-selector">
+                <h3>Choose Icon Set:</h3>
+                <div class="icon-sets">
+                    <button class="icon-set-btn active" onclick="setIconSet('gaming')">🎮 Gaming</button>
+                    <button class="icon-set-btn" onclick="setIconSet('animals')">🐶 Animals</button>
+                    <button class="icon-set-btn" onclick="setIconSet('food')">🍕 Food</button>
+                    <button class="icon-set-btn" onclick="setIconSet('sports')">⚽ Sports</button>
+                    <button class="icon-set-btn" onclick="setIconSet('nature')">🌸 Nature</button>
+                    <button class="icon-set-btn" onclick="setIconSet('numbers')">1️⃣ Numbers</button>
+                    <button class="icon-set-btn" onclick="setIconSet('horoscope')">♈ Horoscope</button>
+                    <button class="icon-set-btn" onclick="setIconSet('custom')">✏️ Custom</button>
+                </div>
+                <div class="custom-icons" id="customInput" style="display: none;">
+                    <input type="text" id="customEmojis" placeholder="Enter 8 emojis separated by spaces (e.g., 🎨 🎭 🎪 🎯 🎸 🎺 🎹 🎲)">
+                    <button onclick="applyCustomIcons()">Apply</button>
+                </div>
+                <div class="icon-hint">Icons will repeat if board size exceeds available unique icons</div>
+            </div>
+
+            <div class="sound-settings">
+                <h3>Sound Settings:</h3>
+                <div class="volume-control">
+                    <label>Music Volume:</label>
+                    <input type="range" id="musicVolume" min="0" max="100" value="50" oninput="updateMusicVolume(this.value)">
+                    <span id="musicVolumeDisplay">50%</span>
+                </div>
+                <div class="volume-control">
+                    <label>SFX Volume:</label>
+                    <input type="range" id="sfxVolume" min="0" max="100" value="70" oninput="updateSFXVolume(this.value)">
+                    <span id="sfxVolumeDisplay">70%</span>
+                </div>
+            </div>
+
+            <div class="theme-selector">
+                <h3>🎨 Choose Theme:</h3>
+                <div class="theme-options">
+                    <button class="theme-btn purple active" onclick="setTheme('purple')">Purple Dream</button>
+                    <button class="theme-btn ocean" onclick="setTheme('ocean')">Ocean Blue</button>
+                    <button class="theme-btn sunset" onclick="setTheme('sunset')">Sunset Orange</button>
+                    <button class="theme-btn forest" onclick="setTheme('forest')">Forest Green</button>
+                    <button class="theme-btn midnight" onclick="setTheme('midnight')">Midnight</button>
+                    <button class="theme-btn candy" onclick="setTheme('candy')">Candy Pop</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mode-selector">
+            <label>Game Mode:</label>
+            <select class="mode-dropdown" id="modeSelect" onchange="setMode(this.value)">
+                <option value="normal">🎮 Normal Mode</option>
+                <option value="peek">👁️ Peek Mode</option>
+                <option value="fade">🌫️ Memory Fade</option>
+                <option value="fortune">🔮 Fortune Teller</option>
+                <option value="color">🌈 Color Chaos</option>
+                <option value="chaos">🌀 Chaos Mode</option>
+                <option value="swap">🔄 Swap Mode</option>
+                <option value="rotate">🔃 Rotate Mode</option>
+            </select>
+        </div>
+        
+        <div class="info-panel">
+            <div class="info-box score">
+                Score: <span id="score">0</span>
+            </div>
+            <div class="info-box combo" id="comboBox">
+                Combo: <span id="combo">0</span>x
+            </div>
+            <div class="info-box">
+                Moves: <span id="moves">0</span>
+            </div>
+            <div class="info-box">
+                Time: <span id="timer">0</span>s
+            </div>
+        </div>
+
+        <!-- Name Input Modal -->
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="name-input-modal" id="nameInputModal">
+            <h3>🎉 Congratulations!</h3>
+            <p style="color: #666; margin-bottom: 20px;">Enter your name for the leaderboard:</p>
+            <input type="text" id="playerNameInput" placeholder="Enter your name" maxlength="20" />
+            <button onclick="submitScore()">Submit Score</button>
+        </div>
+
+        <!-- Leaderboard Panel -->
+        <div id="leaderboardPanel" class="leaderboard-container">
+            <h2>🏆 High Scores</h2>
+            <div class="leaderboard-tabs">
+                <button class="leaderboard-tab active" onclick="showLeaderboardTab('4x4')">4x4</button>
+                <button class="leaderboard-tab" onclick="showLeaderboardTab('6x6')">6x6</button>
+                <button class="leaderboard-tab" onclick="showLeaderboardTab('8x8')">8x8</button>
+                <button class="leaderboard-tab" onclick="showLeaderboardTab('all')">All Sizes</button>
+            </div>
+            <ul id="leaderboardList" class="leaderboard-list"></ul>
+        </div>
+
+        <!-- Statistics Panel -->
+        <div id="statsPanel" class="stats-container">
+            <h2>📊 Game Statistics</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-label">Games Played</div>
+                    <div class="stat-card-value" id="statGamesPlayed">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Average Score</div>
+                    <div class="stat-card-value" id="statAvgScore">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Best Score</div>
+                    <div class="stat-card-value" id="statBestScore">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Total Playtime</div>
+                    <div class="stat-card-value" id="statTotalTime">0m</div>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h3>⚡ Performance Stats</h3>
+                <div class="stats-row">
+                    <span class="stats-label">Average Time per Game</span>
+                    <span class="stats-value" id="statAvgTime">0s</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Average Moves per Game</span>
+                    <span class="stats-value" id="statAvgMoves">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Best Time</span>
+                    <span class="stats-value" id="statBestTime">--</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Fewest Moves</span>
+                    <span class="stats-value" id="statBestMoves">--</span>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h3>🎯 Accuracy</h3>
+                <div class="stats-row">
+                    <span class="stats-label">Total Matches</span>
+                    <span class="stats-value" id="statTotalMatches">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Total Attempts</span>
+                    <span class="stats-value" id="statTotalAttempts">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Match Accuracy</span>
+                    <span class="stats-value" id="statAccuracy">0%</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Best Combo Streak</span>
+                    <span class="stats-value" id="statBestCombo">0</span>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h3>🎮 Current Session</h3>
+                <div class="stats-row">
+                    <span class="stats-label">Games This Session</span>
+                    <span class="stats-value" id="statSessionGames">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Win Streak</span>
+                    <span class="stats-value" id="statWinStreak">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Best Win Streak</span>
+                    <span class="stats-value" id="statBestStreak">0</span>
+                </div>
+            </div>
+
+            <button class="reset-stats-btn" onclick="resetStatistics()">Reset All Statistics</button>
+        </div>
+
+        <!-- Achievements Panel -->
+        <div id="achievementsPanel" class="achievements-container">
+            <h2>🏅 Achievements</h2>
+            
+            <div class="achievements-progress">
+                <h3><span id="achievementsUnlocked">0</span> / <span id="achievementsTotal">0</span></h3>
+                <p>Achievements Unlocked</p>
+            </div>
+
+            <div class="achievements-grid" id="achievementsGrid">
+                <!-- Achievements will be dynamically generated here -->
+            </div>
+        </div>
+
+        <!-- Achievement Notification -->
+        <div id="achievementNotification" class="achievement-notification">
+            <div class="achievement-notification-icon" id="notifIcon">🏆</div>
+            <div class="achievement-notification-title">Achievement Unlocked!</div>
+            <div class="achievement-notification-name" id="notifName"></div>
+            <div class="achievement-notification-desc" id="notifDesc"></div>
+        </div>
+
+        <!-- Peek Mode Overlay -->
+        <div id="peekOverlay" class="peek-overlay">
+            <div class="peek-message">👁️ Memorize the cards!</div>
+            <div class="peek-timer" id="peekTimer">5</div>
+        </div>
+
+        <!-- Fortune Teller Message -->
+        <div id="fortuneMessage" class="fortune-message"></div>
+
+        <div class="win-message" id="winMessage">
+            <h2>🎉 You Won!</h2>
+            <p>Score: <span id="finalScore"></span></p>
+            <p>Moves: <span id="finalMoves"></span> | Time: <span id="finalTime"></span>s</p>
+        </div>
+
+        <div class="game-board" id="gameBoard"></div>
+
+        <button onclick="resetGame()">Play Again</button>
+    </div>
+
+    <script>
+        const iconSets = {
+            gaming: ['🎮', '🎨', '🎭', '🎪', '🎯', '🎸', '🎺', '🎹', '🎲', '🎰', '🎳', '🏆', '🎖️', '🥇', '🥈', '🥉', '🎬', '🎤', '🎧', '🎼', '🎵', '🎶', '🎻', '🎷', '🥁', '🎹', '🎺', '🪕', '🎸', '🪗', '🎚️', '🎛️'],
+            animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'],
+            food: ['🍕', '🍔', '🍟', '🌭', '🍿', '🧁', '🍩', '🍪', '🍰', '🎂', '🍦', '🍨', '🍧', '🥤', '🍹', '🍫', '🍬', '🍭', '🍮', '🍯', '🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭'],
+            sports: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🥊', '🥋', '⛳', '🎯', '🏹', '🥏', '🪃', '🛹', '🛼', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤸', '🤺', '⛹️', '🤾', '🏇', '🧗', '🚴', '🏊'],
+            nature: ['🌸', '🌺', '🌻', '🌷', '🌹', '🌼', '🌴', '🌵', '🍀', '🌿', '🍁', '🍂', '🌾', '🌲', '🌳', '🏵️', '🌱', '🪴', '🌾', '💐', '🥀', '🏔️', '⛰️', '🌋', '🗻', '🏕️', '🏖️', '🏜️', '🏝️', '🌊', '🌬️', '🌈'],
+            numbers: ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', '🔢', '#️⃣', '*️⃣', '➕', '➖', '✖️', '➗', '🟰', '💯', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫', '⚪', '🟥', '🟧', '🟨'],
+            horoscope: ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '⭐', '🌟', '✨', '💫', '🌙', '☀️', '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '⚡']
+        };
+        
+        let currentIconSet = 'gaming';
+        let boardWidth = 4;
+        let boardHeight = 4;
+        let emojis = [...iconSets.gaming].slice(0, 8);
+        let cards = [...emojis, ...emojis];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let timer = 0;
+        let timerInterval;
+        let canFlip = true;
+        let gameMode = 'normal';
+        let cardRevealTimes = new Map(); // Track when cards were revealed for fade mode
+        let colorShiftInterval = null; // Track color shift for Color Chaos mode
+        
+        // Leaderboard
+        let leaderboard = [];
+        let currentLeaderboardTab = '4x4';
+        let lastGameResult = null;
+
+        // Game Statistics
+        let gameStats = {
+            gamesPlayed: 0,
+            totalScore: 0,
+            totalTime: 0,
+            totalMoves: 0,
+            totalMatches: 0,
+            totalAttempts: 0,
+            bestScore: 0,
+            bestTime: null,
+            bestMoves: null,
+            bestCombo: 0,
+            currentStreak: 0,
+            bestStreak: 0,
+            sessionGames: 0
+        };
+
+        // Current theme
+        let currentTheme = 'purple';
+
+        // Achievements System
+        let achievements = {
+            firstWin: { 
+                id: 'firstWin',
+                name: 'First Victory', 
+                description: 'Win your first game', 
+                icon: '🎉',
+                unlocked: false,
+                progress: 0,
+                target: 1
+            },
+            speedDemon: { 
+                id: 'speedDemon',
+                name: 'Speed Demon', 
+                description: 'Complete a 4x4 game in under 30 seconds', 
+                icon: '⚡',
+                unlocked: false,
+                progress: 0,
+                target: 1
+            },
+            perfectGame: { 
+                id: 'perfectGame',
+                name: 'Perfect Memory', 
+                description: 'Remember every card - complete in ≤16 moves (4x4)', 
+                icon: '🧠',
+                unlocked: false,
+                progress: 0,
+                target: 1
+            },
+            veteran: { 
+                id: 'veteran',
+                name: 'Veteran Player', 
+                description: 'Play 10 games', 
+                icon: '🎮',
+                unlocked: false,
+                progress: 0,
+                target: 10
+            },
+            centurion: { 
+                id: 'centurion',
+                name: 'Centurion', 
+                description: 'Play 100 games', 
+                icon: '💯',
+                unlocked: false,
+                progress: 0,
+                target: 100
+            },
+            comboMaster: { 
+                id: 'comboMaster',
+                name: 'Combo Master', 
+                description: 'Achieve a 5x combo streak', 
+                icon: '🔥',
+                unlocked: false,
+                progress: 0,
+                target: 5
+            },
+            winStreak3: { 
+                id: 'winStreak3',
+                name: 'On a Roll', 
+                description: 'Win 3 games in a row', 
+                icon: '🎯',
+                unlocked: false,
+                progress: 0,
+                target: 3
+            },
+            winStreak10: { 
+                id: 'winStreak10',
+                name: 'Unstoppable', 
+                description: 'Win 10 games in a row', 
+                icon: '👑',
+                unlocked: false,
+                progress: 0,
+                target: 10
+            },
+            highScorer: { 
+                id: 'highScorer',
+                name: 'High Scorer', 
+                description: 'Score over 10,000 points in one game', 
+                icon: '🌟',
+                unlocked: false,
+                progress: 0,
+                target: 10000
+            },
+            sharpshooter: { 
+                id: 'sharpshooter',
+                name: 'Sharpshooter', 
+                description: 'Achieve 90% match accuracy', 
+                icon: '🎯',
+                unlocked: false,
+                progress: 0,
+                target: 90
+            },
+            gridMaster: { 
+                id: 'gridMaster',
+                name: 'Grid Master', 
+                description: 'Complete a game on each grid size', 
+                icon: '📐',
+                unlocked: false,
+                progress: 0,
+                target: 3,
+                gridSizes: new Set()
+            },
+            marathoner: { 
+                id: 'marathoner',
+                name: 'Marathoner', 
+                description: 'Play for 60 minutes total', 
+                icon: '⏰',
+                unlocked: false,
+                progress: 0,
+                target: 3600
+            },
+            themeCollector: { 
+                id: 'themeCollector',
+                name: 'Theme Collector', 
+                description: 'Try all 6 themes', 
+                icon: '🎨',
+                unlocked: false,
+                progress: 0,
+                target: 6,
+                themesUsed: new Set(['purple'])
+            },
+            iconExplorer: { 
+                id: 'iconExplorer',
+                name: 'Icon Explorer', 
+                description: 'Play with 5 different icon sets', 
+                icon: '🎭',
+                unlocked: false,
+                progress: 0,
+                target: 5,
+                iconSetsUsed: new Set(['gaming'])
+            },
+            dedication: { 
+                id: 'dedication',
+                name: 'Dedication', 
+                description: 'Win 50 games', 
+                icon: '🏆',
+                unlocked: false,
+                progress: 0,
+                target: 50
+            },
+            modeExplorer: { 
+                id: 'modeExplorer',
+                name: 'Mode Explorer', 
+                description: 'Try all 8 game modes', 
+                icon: '🎮',
+                unlocked: false,
+                progress: 0,
+                target: 8,
+                modesUsed: new Set(['normal'])
+            },
+            peekMaster: { 
+                id: 'peekMaster',
+                name: 'Quick Learner', 
+                description: 'Win a game in Peek Mode', 
+                icon: '👁️',
+                unlocked: false,
+                progress: 0,
+                target: 1
+            },
+            fadeWarrior: { 
+                id: 'fadeWarrior',
+                name: 'Fade Warrior', 
+                description: 'Win a game in Memory Fade mode', 
+                icon: '🌫️',
+                unlocked: false,
+                progress: 0,
+                target: 1
+            },
+            fortuneSeeker: { 
+                id: 'fortuneSeeker',
+                name: 'Fortune Seeker', 
+                description: 'Win a game in Fortune Teller mode', 
+                icon: '🔮',
+                unlocked: false,
+                progress: 0,
+                target: 1
+            },
+            chaosSurvivor: { 
+                id: 'chaosSurvivor',
+                name: 'Chaos Survivor', 
+                description: 'Win a game in Chaos Mode', 
+                icon: '🌀',
+                unlocked: false,
+                progress: 0,
+                target: 1
+            },
+            colorMaster: { 
+                id: 'colorMaster',
+                name: 'Color Master', 
+                description: 'Win a game in Color Chaos mode', 
+                icon: '🌈',
+                unlocked: false,
+                progress: 0,
+                target: 1
+            }
+        };
+        let currentRotation = 0;
+        let score = 0;
+        let combo = 0;
+        let audioContext;
+        let musicPlaying = false;
+        let musicInterval;
+        let musicGainNode;
+        let sfxGainNode;
+        let musicVolume = 0.5;
+        let sfxVolume = 0.7;
+        let backgroundOscillators = [];
+        const comboMessages = [
+            '',
+            'Nice!',
+            'Good Job!',
+            'Great!',
+            'Awesome!',
+            'Fantastic!',
+            'Amazing!',
+            'Incredible!',
+            'Unbelievable!',
+            'Spectacular!',
+            'Phenomenal!',
+            'Legendary!',
+            'Godlike!',
+            'UNSTOPPABLE!',
+            'MONSTER!',
+            'BEYOND GODLIKE!'
+        ];
+
+        function applyDimensions() {
+            const width = parseInt(document.getElementById('boardWidth').value);
+            const height = parseInt(document.getElementById('boardHeight').value);
+            const errorMsg = document.getElementById('errorMessage');
+            
+            if (width < 2 || height < 2) {
+                errorMsg.textContent = 'Width and height must be at least 2!';
+                errorMsg.classList.add('show');
+                return;
+            }
+            
+            const totalCards = width * height;
+            
+            // Check if total cards is odd
+            if (totalCards % 2 !== 0) {
+                errorMsg.textContent = 'Width × Height must be an even number for matching pairs!';
+                errorMsg.classList.add('show');
+                return;
+            }
+            
+            errorMsg.classList.remove('show');
+            boardWidth = width;
+            boardHeight = height;
+            
+            const pairsNeeded = totalCards / 2;
+            const availableIcons = iconSets[currentIconSet];
+            
+            // Create pairs - reuse icons if needed
+            emojis = [];
+            for (let i = 0; i < pairsNeeded; i++) {
+                emojis.push(availableIcons[i % availableIcons.length]);
+            }
+            
+            resetGame();
+        }
+
+        function setIconSet(setName) {
+            currentIconSet = setName;
+            
+            const buttons = document.querySelectorAll('.icon-set-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            const activeIndex = ['gaming', 'animals', 'food', 'sports', 'nature', 'numbers', 'horoscope', 'custom'].indexOf(setName);
+            if (activeIndex >= 0) {
+                buttons[activeIndex].classList.add('active');
+            }
+            
+            const customInput = document.getElementById('customInput');
+            if (setName === 'custom') {
+                customInput.style.display = 'flex';
+            } else {
+                customInput.style.display = 'none';
+                const pairsNeeded = (boardWidth * boardHeight) / 2;
+                const availableIcons = iconSets[setName];
+                
+                // Create pairs - reuse icons if needed
+                emojis = [];
+                for (let i = 0; i < pairsNeeded; i++) {
+                    emojis.push(availableIcons[i % availableIcons.length]);
+                }
+                
+                resetGame();
+            }
+        }
+
+        function applyCustomIcons() {
+            const input = document.getElementById('customEmojis').value.trim();
+            const customEmojis = input.split(/\s+/).filter(e => e.length > 0);
+            
+            const pairsNeeded = (boardWidth * boardHeight) / 2;
+            
+            if (customEmojis.length < pairsNeeded) {
+                alert(`Please enter at least ${pairsNeeded} different emojis for a ${boardWidth}×${boardHeight} board!`);
+                return;
+            }
+            
+            emojis = customEmojis.slice(0, pairsNeeded);
+            resetGame();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function createBoard() {
+            const board = document.getElementById('gameBoard');
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${boardWidth}, 1fr)`;
+            
+            cards = [...emojis, ...emojis];
+            cards = shuffle(cards);
+            
+            cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.emoji = emoji;
+                card.dataset.index = index;
+                card.innerHTML = `
+                    <div class="card-face card-back"></div>
+                    <div class="card-face card-front">${emoji}</div>
+                `;
+                card.addEventListener('click', flipCard);
+                board.appendChild(card);
+            });
+        }
+
+        function flipCard() {
+            if (!canFlip) return;
+            if (this.classList.contains('flipped') || this.classList.contains('matched')) return;
+            if (flippedCards.length >= 2) return;
+            if (flippedCards.includes(this)) return;
+
+            playFlipSound();
+            
+            this.classList.add('flipped');
+            flippedCards.push(this);
+            
+            // Track reveal time for Memory Fade mode
+            if (gameMode === 'fade' && !cardRevealTimes.has(this)) {
+                cardRevealTimes.set(this, Date.now());
+                startCardFade(this);
+            }
+
+            // Fortune Teller Mode - Show hint on first card
+            if (gameMode === 'fortune' && flippedCards.length === 1) {
+                showFortuneHint(this);
+            }
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('moves').textContent = moves;
+                checkMatch();
+            }
+        }
+
+        function showFortuneHint(firstCard) {
+            const firstEmoji = firstCard.dataset.emoji;
+            
+            // Find the matching card
+            const allCards = Array.from(document.querySelectorAll('.card'));
+            const matchingCard = allCards.find(card => 
+                card !== firstCard && 
+                card.dataset.emoji === firstEmoji && 
+                !card.classList.contains('matched')
+            );
+            
+            if (!matchingCard) return;
+            
+            // Get positions
+            const firstIndex = allCards.indexOf(firstCard);
+            const matchIndex = allCards.indexOf(matchingCard);
+            
+            // Calculate distance (in terms of grid positions)
+            const firstRow = Math.floor(firstIndex / boardWidth);
+            const firstCol = firstIndex % boardWidth;
+            const matchRow = Math.floor(matchIndex / boardWidth);
+            const matchCol = matchIndex % boardWidth;
+            
+            const rowDiff = Math.abs(matchRow - firstRow);
+            const colDiff = Math.abs(matchCol - firstCol);
+            const distance = Math.max(rowDiff, colDiff); // Chebyshev distance
+            
+            // Show hint based on distance
+            let hintMessage = '';
+            if (distance <= 1) {
+                hintMessage = '🔮 The spirits whisper: "Very close, right beside you..."';
+                matchingCard.classList.add('hint-glow');
+                setTimeout(() => matchingCard.classList.remove('hint-glow'), 1500);
+            } else if (distance <= 2) {
+                hintMessage = '🔮 The spirits whisper: "Nearby, within reach..."';
+            } else if (distance <= 3) {
+                hintMessage = '🔮 The spirits whisper: "Not too far, search around..."';
+            } else {
+                hintMessage = '🔮 The spirits whisper: "Far across the realm..."';
+            }
+            
+            // Show message
+            const messageEl = document.getElementById('fortuneMessage');
+            messageEl.textContent = hintMessage;
+            messageEl.classList.add('show');
+            
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 2000);
+        }
+
+        function startCardFade(card) {
+            // Start fading after 3 seconds of being revealed
+            setTimeout(() => {
+                if (!card.classList.contains('matched')) {
+                    card.classList.add('fading');
+                }
+            }, 3000);
+        }
+
+        function showComboMessage(message) {
+            // Remove any existing combo message
+            const existingMsg = document.querySelector('.combo-message');
+            if (existingMsg) {
+                existingMsg.remove();
+            }
+            
+            // Create and show new message
+            const msgElement = document.createElement('div');
+            msgElement.className = 'combo-message';
+            msgElement.textContent = message;
+            document.body.appendChild(msgElement);
+            
+            // Remove after animation
+            setTimeout(() => {
+                msgElement.remove();
+            }, 1000);
+        }
+
+        function checkMatch() {
+            canFlip = false;
+            const [card1, card2] = flippedCards;
+            const emoji1 = card1.dataset.emoji;
+            const emoji2 = card2.dataset.emoji;
+
+            // Track attempt
+            gameStats.totalAttempts++;
+
+            if (emoji1 === emoji2) {
+                setTimeout(() => {
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    card1.classList.remove('fading'); // Remove fade effect on match
+                    card2.classList.remove('fading');
+                    matchedPairs++;
+                    
+                    // Track match
+                    gameStats.totalMatches++;
+                    
+                    // Increase combo and calculate score
+                    combo++;
+                    const points = 100 * combo;
+                    score += points;
+                    
+                    // Track best combo
+                    if (combo > gameStats.bestCombo) {
+                        gameStats.bestCombo = combo;
+                    }
+                    
+                    // Update displays
+                    document.getElementById('score').textContent = score;
+                    document.getElementById('combo').textContent = combo;
+                    
+                    // Show combo message
+                    if (combo >= 2 && combo < comboMessages.length) {
+                        showComboMessage(comboMessages[combo]);
+                    } else if (combo >= comboMessages.length) {
+                        showComboMessage(comboMessages[comboMessages.length - 1]);
+                    }
+                    
+                    // Add pulse animation to combo box
+                    const comboBox = document.getElementById('comboBox');
+                    if (combo > 1) {
+                        comboBox.classList.add('active');
+                    }
+                    
+                    flippedCards = [];
+                    canFlip = true;
+
+                    const totalPairs = (boardWidth * boardHeight) / 2;
+                    if (matchedPairs === totalPairs) {
+                        winGame();
+                    }
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    // Only remove fading in fade mode if it's not time yet
+                    if (gameMode !== 'fade') {
+                        card1.classList.remove('fading');
+                        card2.classList.remove('fading');
+                    }
+                    
+                    // Reset combo on miss
+                    combo = 0;
+                    document.getElementById('combo').textContent = combo;
+                    document.getElementById('comboBox').classList.remove('active');
+                    
+                    if (gameMode === 'chaos') {
+                        randomizeCards();
+                    } else if (gameMode === 'swap') {
+                        swapCards(card1, card2);
+                    } else if (gameMode === 'rotate') {
+                        rotateDeck();
+                    }
+                    
+                    flippedCards = [];
+                    canFlip = true;
+                }, 1000);
+            }
+        }
+
+        function randomizeCards() {
+            const board = document.getElementById('gameBoard');
+            const allCards = Array.from(document.querySelectorAll('.card'));
+            
+            playShuffleSound();
+            
+            const unmatchedData = [];
+            
+            allCards.forEach((card, index) => {
+                if (!card.classList.contains('matched')) {
+                    unmatchedData.push({
+                        index: index,
+                        emoji: cards[index],
+                        card: card
+                    });
+                }
+            });
+            
+            const shuffledEmojis = shuffle([...unmatchedData.map(d => d.emoji)]);
+            
+            const movements = [];
+            unmatchedData.forEach((data, i) => {
+                const oldIndex = data.index;
+                const oldEmoji = data.emoji;
+                const newEmoji = shuffledEmojis[i];
+                
+                const sourceIndex = unmatchedData.find(d => d.emoji === newEmoji).index;
+                
+                movements.push({
+                    card: data.card,
+                    oldIndex: oldIndex,
+                    sourceIndex: sourceIndex,
+                    newEmoji: newEmoji
+                });
+            });
+            
+            const positions = allCards.map(card => {
+                const rect = card.getBoundingClientRect();
+                return { x: rect.left, y: rect.top };
+            });
+            
+            movements.forEach(movement => {
+                const deltaX = positions[movement.sourceIndex].x - positions[movement.oldIndex].x;
+                const deltaY = positions[movement.sourceIndex].y - positions[movement.oldIndex].y;
+                
+                movement.card.classList.add('animating');
+                movement.card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            });
+            
+            setTimeout(() => {
+                movements.forEach(movement => {
+                    cards[movement.oldIndex] = movement.newEmoji;
+                    const front = movement.card.querySelector('.card-front');
+                    front.textContent = movement.newEmoji;
+                    movement.card.dataset.emoji = movement.newEmoji;
+                    
+                    movement.card.classList.remove('animating');
+                    movement.card.style.transform = '';
+                });
+            }, 800);
+        }
+
+        function swapCards(card1, card2) {
+            playSwapSound();
+            
+            const allCards = document.querySelectorAll('.card');
+            const index1 = Array.from(allCards).indexOf(card1);
+            const index2 = Array.from(allCards).indexOf(card2);
+            
+            [cards[index1], cards[index2]] = [cards[index2], cards[index1]];
+            
+            const front1 = card1.querySelector('.card-front');
+            const front2 = card2.querySelector('.card-front');
+            
+            front1.textContent = cards[index1];
+            front2.textContent = cards[index2];
+            
+            card1.dataset.emoji = cards[index1];
+            card2.dataset.emoji = cards[index2];
+        }
+
+        function rotateDeck() {
+            playRotateSound();
+            
+            const board = document.getElementById('gameBoard');
+            const allCards = document.querySelectorAll('.card');
+            
+            // Check if board is very rectangular (aspect ratio around 1:2 or 2:1)
+            const aspectRatio = boardWidth / boardHeight;
+            const isVeryRectangular = aspectRatio <= 0.6 || aspectRatio >= 1.7;
+            
+            // If very rectangular, only allow 180 and 360 degree rotations
+            const rotations = isVeryRectangular ? [180, 360] : [90, 180, 270, 360];
+            
+            const direction = Math.random() < 0.5 ? 1 : -1;
+            const rotationAmount = rotations[Math.floor(Math.random() * rotations.length)];
+            
+            currentRotation += (rotationAmount * direction);
+            board.style.transform = `rotate(${currentRotation}deg)`;
+            
+            allCards.forEach(card => {
+                const faces = card.querySelectorAll('.card-face');
+                faces.forEach(face => {
+                    face.style.transform = face.classList.contains('card-front') 
+                        ? `rotateY(180deg) rotate(${-currentRotation}deg)`
+                        : `rotate(${-currentRotation}deg)`;
+                });
+            });
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timer++;
+                document.getElementById('timer').textContent = timer;
+            }, 1000);
+        }
+
+        function winGame() {
+            clearInterval(timerInterval);
+            
+            // Calculate time bonus
+            const totalPairs = (boardWidth * boardHeight) / 2;
+            const averageTimePerPair = timer / totalPairs;
+            let timeBonus = 0;
+            
+            // Faster completion = higher bonus
+            if (averageTimePerPair < 2) {
+                timeBonus = 5000; // Lightning fast!
+            } else if (averageTimePerPair < 3) {
+                timeBonus = 3000; // Very fast
+            } else if (averageTimePerPair < 5) {
+                timeBonus = 2000; // Fast
+            } else if (averageTimePerPair < 8) {
+                timeBonus = 1000; // Good
+            } else if (averageTimePerPair < 12) {
+                timeBonus = 500; // Decent
+            }
+            
+            const finalScore = score + timeBonus;
+            
+            // Update statistics
+            gameStats.gamesPlayed++;
+            gameStats.totalScore += finalScore;
+            gameStats.sessionGames++;
+            gameStats.totalTime += timer;
+            gameStats.totalMoves += moves;
+            gameStats.currentStreak++;
+            
+            // Update best stats
+            if (finalScore > gameStats.bestScore) {
+                gameStats.bestScore = finalScore;
+            }
+            if (gameStats.bestTime === null || timer < gameStats.bestTime) {
+                gameStats.bestTime = timer;
+            }
+            if (gameStats.bestMoves === null || moves < gameStats.bestMoves) {
+                gameStats.bestMoves = moves;
+            }
+            if (gameStats.currentStreak > gameStats.bestStreak) {
+                gameStats.bestStreak = gameStats.currentStreak;
+            }
+            
+            // Check achievement-specific conditions
+            const gridSize = `${boardWidth}x${boardHeight}`;
+            
+            // Speed Demon achievement
+            if (gridSize === '4x4' && timer < 30) {
+                achievements.speedDemon.progress = 1;
+                checkAchievement('speedDemon');
+            }
+            
+            // Perfect Memory achievement - Complete with realistic perfect play
+            // Perfect play means: remember every card you see and never make the same mistake twice
+            // This requires approximately 2x the number of pairs (discovering + matching)
+            const totalCards = boardWidth * boardHeight;
+            const perfectMoveCount = totalCards; // 16 for 4x4, 36 for 6x6, 64 for 8x8
+            
+            if (moves <= perfectMoveCount) {
+                achievements.perfectGame.progress = 1;
+                checkAchievement('perfectGame');
+            }
+            
+            // High Scorer achievement
+            if (finalScore >= 10000) {
+                achievements.highScorer.progress = finalScore;
+                checkAchievement('highScorer');
+            }
+            
+            // Grid Master achievement
+            achievements.gridMaster.gridSizes.add(gridSize);
+            achievements.gridMaster.progress = achievements.gridMaster.gridSizes.size;
+            checkAchievement('gridMaster');
+            
+            // Icon Explorer achievement
+            achievements.iconExplorer.iconSetsUsed.add(currentIconSet);
+            achievements.iconExplorer.progress = achievements.iconExplorer.iconSetsUsed.size;
+            checkAchievement('iconExplorer');
+            
+            // Mode Explorer achievement
+            achievements.modeExplorer.modesUsed.add(gameMode);
+            achievements.modeExplorer.progress = achievements.modeExplorer.modesUsed.size;
+            checkAchievement('modeExplorer');
+            
+            // Specific mode achievements
+            if (gameMode === 'peek') {
+                achievements.peekMaster.progress = 1;
+                checkAchievement('peekMaster');
+            } else if (gameMode === 'fade') {
+                achievements.fadeWarrior.progress = 1;
+                checkAchievement('fadeWarrior');
+            } else if (gameMode === 'fortune') {
+                achievements.fortuneSeeker.progress = 1;
+                checkAchievement('fortuneSeeker');
+            } else if (gameMode === 'chaos') {
+                achievements.chaosSurvivor.progress = 1;
+                checkAchievement('chaosSurvivor');
+            } else if (gameMode === 'color') {
+                achievements.colorMaster.progress = 1;
+                checkAchievement('colorMaster');
+            }
+            
+            // Check all other achievements
+            checkAllAchievements();
+            
+            // Store game result temporarily
+            lastGameResult = {
+                score: finalScore,
+                time: timer,
+                moves: moves,
+                gridSize: gridSize,
+                gameMode: gameMode,
+                totalCards: boardWidth * boardHeight,
+                date: new Date().toISOString(),
+                timeBonus: timeBonus
+            };
+            
+            // Show name input modal
+            document.getElementById('modalOverlay').classList.add('show');
+            document.getElementById('nameInputModal').classList.add('show');
+            document.getElementById('playerNameInput').value = '';
+            document.getElementById('playerNameInput').focus();
+            
+            // Allow Enter key to submit
+            document.getElementById('playerNameInput').onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    submitScore();
+                }
+            };
+        }
+
+        function submitScore() {
+            const nameInput = document.getElementById('playerNameInput');
+            let playerName = nameInput.value.trim();
+            
+            // Default name if empty
+            if (!playerName) {
+                playerName = 'Anonymous';
+            }
+            
+            // Add name to the game result
+            lastGameResult.name = playerName;
+            
+            // Add to leaderboard
+            addToLeaderboard(lastGameResult);
+            
+            // Hide name input modal
+            document.getElementById('modalOverlay').classList.remove('show');
+            document.getElementById('nameInputModal').classList.remove('show');
+            
+            // Show win message
+            document.getElementById('finalScore').textContent = lastGameResult.score + (lastGameResult.timeBonus > 0 ? ` (+ ${lastGameResult.timeBonus} time bonus!)` : '');
+            document.getElementById('finalMoves').textContent = lastGameResult.moves;
+            document.getElementById('finalTime').textContent = lastGameResult.time;
+            document.getElementById('winMessage').classList.add('show');
+        }
+
+        function addToLeaderboard(result) {
+            leaderboard.push(result);
+            
+            // Sort by score (descending), then by time (ascending)
+            leaderboard.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return a.time - b.time;
+            });
+            
+            // Keep only top 50 scores
+            leaderboard = leaderboard.slice(0, 50);
+        }
+
+        function toggleLeaderboard() {
+            const panel = document.getElementById('leaderboardPanel');
+            const isShowing = panel.classList.contains('show');
+            
+            // Close all other panels
+            document.getElementById('settingsPanel').classList.remove('open');
+            document.getElementById('statsPanel').classList.remove('show');
+            document.getElementById('achievementsPanel').classList.remove('show');
+            
+            // Toggle this panel
+            panel.classList.toggle('show');
+            if (!isShowing) {
+                displayLeaderboard();
+            }
+        }
+
+        function showLeaderboardTab(tab) {
+            currentLeaderboardTab = tab;
+            document.querySelectorAll('.leaderboard-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            displayLeaderboard();
+        }
+
+        function displayLeaderboard() {
+            const listEl = document.getElementById('leaderboardList');
+            listEl.innerHTML = '';
+            
+            let filteredScores = leaderboard;
+            
+            // Filter by grid size if not "all"
+            if (currentLeaderboardTab !== 'all') {
+                filteredScores = leaderboard.filter(score => score.gridSize === currentLeaderboardTab);
+            }
+            
+            // Limit to top 10
+            filteredScores = filteredScores.slice(0, 10);
+            
+            if (filteredScores.length === 0) {
+                listEl.innerHTML = '<div class="no-scores">No scores yet. Play a game to get on the leaderboard!</div>';
+                return;
+            }
+            
+            filteredScores.forEach((scoreData, index) => {
+                const li = document.createElement('li');
+                li.className = 'leaderboard-item';
+                
+                // Highlight if this is the most recent game
+                if (lastGameResult && 
+                    scoreData.date === lastGameResult.date && 
+                    scoreData.score === lastGameResult.score) {
+                    li.classList.add('new-record');
+                }
+                
+                const rank = index + 1;
+                let rankClass = '';
+                if (rank === 1) rankClass = 'gold';
+                else if (rank === 2) rankClass = 'silver';
+                else if (rank === 3) rankClass = 'bronze';
+                
+                const date = new Date(scoreData.date);
+                const timeAgo = getTimeAgo(date);
+                
+                // Get mode icon
+                const modeIcons = {
+                    'normal': '🎮',
+                    'peek': '👁️',
+                    'fade': '🌫️',
+                    'fortune': '🔮',
+                    'color': '🌈',
+                    'chaos': '🌀',
+                    'swap': '🔄',
+                    'rotate': '🔃'
+                };
+                const modeIcon = scoreData.gameMode ? modeIcons[scoreData.gameMode] || '🎮' : '🎮';
+                
+                li.innerHTML = `
+                    <div class="leaderboard-rank ${rankClass}">#${rank}</div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${scoreData.name}</div>
+                        <div class="leaderboard-score">${scoreData.score} pts</div>
+                        <div class="leaderboard-details">
+                            ${modeIcon} ${scoreData.gridSize} • ${scoreData.time}s • ${scoreData.moves} moves • ${timeAgo}
+                        </div>
+                    </div>
+                `;
+                
+                listEl.appendChild(li);
+            });
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            return `${Math.floor(seconds / 86400)}d ago`;
+        }
+
+        // Statistics Functions
+        function toggleStats() {
+            const panel = document.getElementById('statsPanel');
+            const isShowing = panel.classList.contains('show');
+            
+            // Close all other panels
+            document.getElementById('settingsPanel').classList.remove('open');
+            document.getElementById('leaderboardPanel').classList.remove('show');
+            document.getElementById('achievementsPanel').classList.remove('show');
+            
+            // Toggle this panel
+            panel.classList.toggle('show');
+            if (!isShowing) {
+                updateStatisticsDisplay();
+            }
+        }
+
+        function updateStatisticsDisplay() {
+            // Main stats cards
+            document.getElementById('statGamesPlayed').textContent = gameStats.gamesPlayed;
+            
+            const avgScore = gameStats.gamesPlayed > 0 
+                ? Math.round(gameStats.totalScore / gameStats.gamesPlayed) 
+                : 0;
+            document.getElementById('statAvgScore').textContent = avgScore;
+            
+            document.getElementById('statBestScore').textContent = gameStats.bestScore;
+            
+            const totalMinutes = Math.floor(gameStats.totalTime / 60);
+            document.getElementById('statTotalTime').textContent = totalMinutes + 'm';
+            
+            // Performance stats
+            const avgTime = gameStats.gamesPlayed > 0 
+                ? Math.round(gameStats.totalTime / gameStats.gamesPlayed) 
+                : 0;
+            document.getElementById('statAvgTime').textContent = avgTime + 's';
+            
+            const avgMoves = gameStats.gamesPlayed > 0 
+                ? Math.round(gameStats.totalMoves / gameStats.gamesPlayed) 
+                : 0;
+            document.getElementById('statAvgMoves').textContent = avgMoves;
+            
+            document.getElementById('statBestTime').textContent = 
+                gameStats.bestTime !== null ? gameStats.bestTime + 's' : '--';
+            
+            document.getElementById('statBestMoves').textContent = 
+                gameStats.bestMoves !== null ? gameStats.bestMoves : '--';
+            
+            // Accuracy stats
+            document.getElementById('statTotalMatches').textContent = gameStats.totalMatches;
+            document.getElementById('statTotalAttempts').textContent = gameStats.totalAttempts;
+            
+            const accuracy = gameStats.totalAttempts > 0 
+                ? Math.round((gameStats.totalMatches / gameStats.totalAttempts) * 100) 
+                : 0;
+            document.getElementById('statAccuracy').textContent = accuracy + '%';
+            
+            document.getElementById('statBestCombo').textContent = gameStats.bestCombo;
+            
+            // Session stats
+            document.getElementById('statSessionGames').textContent = gameStats.sessionGames;
+            document.getElementById('statWinStreak').textContent = gameStats.currentStreak;
+            document.getElementById('statBestStreak').textContent = gameStats.bestStreak;
+        }
+
+        function resetStatistics() {
+            if (confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
+                gameStats = {
+                    gamesPlayed: 0,
+                    totalScore: 0,
+                    totalTime: 0,
+                    totalMoves: 0,
+                    totalMatches: 0,
+                    totalAttempts: 0,
+                    bestScore: 0,
+                    bestTime: null,
+                    bestMoves: null,
+                    bestCombo: 0,
+                    currentStreak: 0,
+                    bestStreak: 0,
+                    sessionGames: 0
+                };
+                updateStatisticsDisplay();
+            }
+        }
+
+        // Theme Functions
+        function setTheme(theme) {
+            // Remove all theme classes
+            document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+            
+            // Add new theme class
+            document.body.classList.add('theme-' + theme);
+            
+            // Update button states
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentTheme = theme;
+            
+            // Track theme for achievement
+            achievements.themeCollector.themesUsed.add(theme);
+            achievements.themeCollector.progress = achievements.themeCollector.themesUsed.size;
+            checkAchievement('themeCollector');
+        }
+
+        // Achievements Functions
+        function toggleAchievements() {
+            const panel = document.getElementById('achievementsPanel');
+            const isShowing = panel.classList.contains('show');
+            
+            // Close all other panels
+            document.getElementById('settingsPanel').classList.remove('open');
+            document.getElementById('leaderboardPanel').classList.remove('show');
+            document.getElementById('statsPanel').classList.remove('show');
+            
+            // Toggle this panel
+            panel.classList.toggle('show');
+            if (!isShowing) {
+                displayAchievements();
+            }
+        }
+
+        function displayAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = '';
+            
+            let unlockedCount = 0;
+            const totalCount = Object.keys(achievements).length;
+            
+            for (const key in achievements) {
+                const achievement = achievements[key];
+                if (achievement.unlocked) unlockedCount++;
+                
+                const card = document.createElement('div');
+                card.className = 'achievement-card' + (achievement.unlocked ? ' unlocked' : '');
+                
+                let progressBar = '';
+                if (!achievement.unlocked && achievement.target > 1) {
+                    const percentage = Math.min(100, (achievement.progress / achievement.target) * 100);
+                    progressBar = `
+                        <div class="achievement-progress-bar">
+                            <div class="achievement-progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <div class="achievement-progress-text">${achievement.progress} / ${achievement.target}</div>
+                    `;
+                }
+                
+                card.innerHTML = `
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-description">${achievement.description}</div>
+                    ${progressBar}
+                `;
+                
+                grid.appendChild(card);
+            }
+            
+            document.getElementById('achievementsUnlocked').textContent = unlockedCount;
+            document.getElementById('achievementsTotal').textContent = totalCount;
+        }
+
+        function checkAchievement(achievementId) {
+            const achievement = achievements[achievementId];
+            
+            if (!achievement || achievement.unlocked) return;
+            
+            // Check if achievement criteria is met
+            let shouldUnlock = false;
+            
+            if (achievement.progress >= achievement.target) {
+                shouldUnlock = true;
+            }
+            
+            if (shouldUnlock) {
+                unlockAchievement(achievementId);
+            }
+        }
+
+        function unlockAchievement(achievementId) {
+            const achievement = achievements[achievementId];
+            
+            if (!achievement || achievement.unlocked) return;
+            
+            achievement.unlocked = true;
+            
+            // Show notification
+            showAchievementNotification(achievement);
+            
+            // Update display if panel is open
+            if (document.getElementById('achievementsPanel').classList.contains('show')) {
+                displayAchievements();
+            }
+        }
+
+        function showAchievementNotification(achievement) {
+            const notification = document.getElementById('achievementNotification');
+            document.getElementById('notifIcon').textContent = achievement.icon;
+            document.getElementById('notifName').textContent = achievement.name;
+            document.getElementById('notifDesc').textContent = achievement.description;
+            
+            notification.classList.add('show');
+            
+            // Play a celebratory sound
+            playCelebrationSound();
+            
+            // Hide after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        function playCelebrationSound() {
+            if (sfxVolume === 0) return;
+            initAudio();
+            const now = audioContext.currentTime;
+            
+            // Play ascending notes
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                const osc = audioContext.createOscillator();
+                osc.frequency.value = freq;
+                osc.type = 'sine';
+                
+                const gainNode = audioContext.createGain();
+                gainNode.gain.setValueAtTime(0.15, now + i * 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
+                
+                osc.connect(gainNode);
+                gainNode.connect(sfxGainNode);
+                
+                osc.start(now + i * 0.1);
+                osc.stop(now + i * 0.1 + 0.3);
+            });
+        }
+
+        function checkAllAchievements() {
+            // Check various achievements after game events
+            
+            // First Win
+            if (gameStats.gamesPlayed >= 1) {
+                achievements.firstWin.progress = 1;
+                checkAchievement('firstWin');
+            }
+            
+            // Veteran & Centurion
+            achievements.veteran.progress = gameStats.gamesPlayed;
+            checkAchievement('veteran');
+            achievements.centurion.progress = gameStats.gamesPlayed;
+            checkAchievement('centurion');
+            
+            // Dedication
+            achievements.dedication.progress = gameStats.gamesPlayed;
+            checkAchievement('dedication');
+            
+            // Win Streaks
+            achievements.winStreak3.progress = gameStats.currentStreak;
+            checkAchievement('winStreak3');
+            achievements.winStreak10.progress = gameStats.currentStreak;
+            checkAchievement('winStreak10');
+            
+            // Combo Master
+            if (gameStats.bestCombo >= 5) {
+                achievements.comboMaster.progress = gameStats.bestCombo;
+                checkAchievement('comboMaster');
+            }
+            
+            // Sharpshooter
+            if (gameStats.totalAttempts > 0) {
+                const accuracy = (gameStats.totalMatches / gameStats.totalAttempts) * 100;
+                achievements.sharpshooter.progress = Math.round(accuracy);
+                checkAchievement('sharpshooter');
+            }
+            
+            // Marathoner
+            achievements.marathoner.progress = gameStats.totalTime;
+            checkAchievement('marathoner');
+        }
+
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            const isOpen = panel.classList.contains('open');
+            
+            // Close all other panels
+            document.getElementById('leaderboardPanel').classList.remove('show');
+            document.getElementById('statsPanel').classList.remove('show');
+            document.getElementById('achievementsPanel').classList.remove('show');
+            
+            // Toggle this panel
+            panel.classList.toggle('open');
+        }
+
+        // Music System
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create master gain nodes
+                musicGainNode = audioContext.createGain();
+                sfxGainNode = audioContext.createGain();
+                
+                musicGainNode.gain.value = musicVolume;
+                sfxGainNode.gain.value = sfxVolume;
+                
+                musicGainNode.connect(audioContext.destination);
+                sfxGainNode.connect(audioContext.destination);
+            }
+        }
+
+        function updateMusicVolume(value) {
+            musicVolume = value / 100;
+            document.getElementById('musicVolumeDisplay').textContent = value + '%';
+            if (musicGainNode) {
+                musicGainNode.gain.value = musicVolume;
+            }
+            
+            // Auto-start music if volume is turned up from 0
+            if (value > 0 && !musicPlaying) {
+                startMusic();
+            } else if (value == 0 && musicPlaying) {
+                stopMusic();
+            }
+        }
+
+        function updateSFXVolume(value) {
+            sfxVolume = value / 100;
+            document.getElementById('sfxVolumeDisplay').textContent = value + '%';
+            if (sfxGainNode) {
+                sfxGainNode.gain.value = sfxVolume;
+            }
+        }
+
+        function playFlipSound() {
+            if (sfxVolume === 0) return;
+            initAudio();
+            const now = audioContext.currentTime;
+            
+            const osc = audioContext.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.15, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            
+            osc.connect(gainNode);
+            gainNode.connect(sfxGainNode);
+            
+            osc.start(now);
+            osc.stop(now + 0.15);
+        }
+
+        function playShuffleSound() {
+            if (sfxVolume === 0) return;
+            initAudio();
+            const now = audioContext.currentTime;
+            
+            // Create a "whoosh" sound for shuffling
+            for (let i = 0; i < 5; i++) {
+                const osc = audioContext.createOscillator();
+                osc.type = 'sine';
+                const startFreq = 400 + Math.random() * 400;
+                osc.frequency.setValueAtTime(startFreq, now + i * 0.05);
+                osc.frequency.exponentialRampToValueAtTime(200, now + i * 0.05 + 0.1);
+                
+                const gainNode = audioContext.createGain();
+                gainNode.gain.setValueAtTime(0.08, now + i * 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.1);
+                
+                osc.connect(gainNode);
+                gainNode.connect(sfxGainNode);
+                
+                osc.start(now + i * 0.05);
+                osc.stop(now + i * 0.05 + 0.1);
+            }
+        }
+
+        function playSwapSound() {
+            if (sfxVolume === 0) return;
+            initAudio();
+            const now = audioContext.currentTime;
+            
+            // Create a "switch" sound - two tones crossing paths
+            const osc1 = audioContext.createOscillator();
+            const osc2 = audioContext.createOscillator();
+            
+            osc1.type = 'sine';
+            osc2.type = 'sine';
+            
+            // First tone goes from high to low
+            osc1.frequency.setValueAtTime(800, now);
+            osc1.frequency.exponentialRampToValueAtTime(400, now + 0.2);
+            
+            // Second tone goes from low to high
+            osc2.frequency.setValueAtTime(400, now);
+            osc2.frequency.exponentialRampToValueAtTime(800, now + 0.2);
+            
+            const gainNode1 = audioContext.createGain();
+            const gainNode2 = audioContext.createGain();
+            
+            gainNode1.gain.setValueAtTime(0.1, now);
+            gainNode1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            
+            gainNode2.gain.setValueAtTime(0.1, now);
+            gainNode2.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            
+            osc1.connect(gainNode1);
+            osc2.connect(gainNode2);
+            gainNode1.connect(sfxGainNode);
+            gainNode2.connect(sfxGainNode);
+            
+            osc1.start(now);
+            osc2.start(now);
+            osc1.stop(now + 0.25);
+            osc2.stop(now + 0.25);
+        }
+
+        function playRotateSound() {
+            if (sfxVolume === 0) return;
+            initAudio();
+            const now = audioContext.currentTime;
+            
+            // Create a spinning/whoosh sound with multiple oscillators
+            const frequencies = [300, 450, 600, 750];
+            
+            frequencies.forEach((freq, i) => {
+                const osc = audioContext.createOscillator();
+                osc.type = 'sine';
+                
+                const delay = i * 0.08;
+                osc.frequency.setValueAtTime(freq, now + delay);
+                osc.frequency.exponentialRampToValueAtTime(freq * 0.7, now + delay + 0.3);
+                
+                const gainNode = audioContext.createGain();
+                gainNode.gain.setValueAtTime(0, now + delay);
+                gainNode.gain.linearRampToValueAtTime(0.08, now + delay + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.3);
+                
+                // Add panning for rotation effect
+                const panner = audioContext.createStereoPanner();
+                panner.pan.setValueAtTime(-1 + (i / frequencies.length) * 2, now + delay);
+                panner.pan.linearRampToValueAtTime(1 - (i / frequencies.length) * 2, now + delay + 0.3);
+                
+                osc.connect(gainNode);
+                gainNode.connect(panner);
+                panner.connect(sfxGainNode);
+                
+                osc.start(now + delay);
+                osc.stop(now + delay + 0.3);
+            });
+        }
+
+        function createBackgroundDrone() {
+            // Removed - no background drone, just melody
+        }
+
+        function playMarimbaTone(frequency, duration, delay = 0) {
+            initAudio();
+            const now = audioContext.currentTime + delay;
+            
+            // Create oscillators for rich marimba-like sound
+            const osc1 = audioContext.createOscillator();
+            const osc2 = audioContext.createOscillator();
+            const osc3 = audioContext.createOscillator();
+            
+            osc1.type = 'sine';
+            osc2.type = 'sine';
+            osc3.type = 'sine';
+            osc1.frequency.value = frequency;
+            osc2.frequency.value = frequency * 2; // Octave
+            osc3.frequency.value = frequency * 3; // Fifth
+            
+            const gainNode1 = audioContext.createGain();
+            const gainNode2 = audioContext.createGain();
+            const gainNode3 = audioContext.createGain();
+            
+            // Softer attack and decay
+            gainNode1.gain.setValueAtTime(0, now);
+            gainNode1.gain.linearRampToValueAtTime(0.08, now + 0.05);
+            gainNode1.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            
+            gainNode2.gain.setValueAtTime(0, now);
+            gainNode2.gain.linearRampToValueAtTime(0.04, now + 0.05);
+            gainNode2.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            
+            gainNode3.gain.setValueAtTime(0, now);
+            gainNode3.gain.linearRampToValueAtTime(0.02, now + 0.05);
+            gainNode3.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            
+            // Add a low-pass filter for smoothness
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 3000;
+            filter.Q.value = 1;
+            
+            osc1.connect(gainNode1);
+            osc2.connect(gainNode2);
+            osc3.connect(gainNode3);
+            
+            gainNode1.connect(filter);
+            gainNode2.connect(filter);
+            gainNode3.connect(filter);
+            filter.connect(musicGainNode);
+            
+            osc1.start(now);
+            osc2.start(now);
+            osc3.start(now);
+            osc1.stop(now + duration);
+            osc2.stop(now + duration);
+            osc3.stop(now + duration);
+        }
+
+        function playPercussion(delay = 0) {
+            initAudio();
+            const now = audioContext.currentTime + delay;
+            
+            const osc = audioContext.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(80, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.05, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            
+            osc.connect(gainNode);
+            gainNode.connect(musicGainNode);
+            
+            osc.start(now);
+            osc.stop(now + 0.08);
+        }
+
+        function playMusicLoop() {
+            if (!musicPlaying) return;
+            
+            const bpm = 95;
+            const beatDuration = 60 / bpm; // ~0.632 seconds per beat
+            const barDuration = beatDuration * 4;
+            
+            // INTRO - 4 bars (Cm pad → Ab pad with arpeggio)
+            // Pad: Cm chord (C-Eb-G)
+            playPadChord([261.63, 311.13, 392.00], 1.5, 0, barDuration * 2);
+            // Pad: Ab chord (Ab-C-Eb)
+            playPadChord([415.30, 261.63, 311.13], 1.5, barDuration * 2, barDuration * 2);
+            
+            // Lead arpeggio over intro
+            const introArp = [523.25, 622.25, 783.99, 932.33, 1046.50, 932.33, 783.99, 622.25]; // C5 Eb5 G5 Bb5 C6 Bb5 G5 Eb5
+            introArp.forEach((note, i) => {
+                playLeadNote(note, 0.5, i * beatDuration * 0.5);
+            });
+            
+            // Bass notes (intro)
+            playBassNote(130.81, 0.5, 0);                    // C2
+            playBassNote(130.81, 0.5, beatDuration);          // C2
+            playBassNote(155.56, 0.5, beatDuration * 2);     // Eb2
+            playBassNote(116.54, 0.5, beatDuration * 3);     // Bb1
+            
+            // MAIN LOOP - 8 bars (starting at bar 5)
+            const mainStart = barDuration * 4;
+            
+            // Chords: Cm - Ab - Eb - Bb | Cm - Gm - Ab - Bb
+            const chords = [
+                { notes: [261.63, 311.13, 392.00], delay: mainStart },                     // Cm
+                { notes: [415.30, 261.63, 311.13], delay: mainStart + barDuration },       // Ab
+                { notes: [311.13, 392.00, 466.16], delay: mainStart + barDuration * 2 },   // Eb
+                { notes: [466.16, 293.66, 349.23], delay: mainStart + barDuration * 3 },   // Bb
+                { notes: [261.63, 311.13, 392.00], delay: mainStart + barDuration * 4 },   // Cm
+                { notes: [392.00, 233.08, 293.66], delay: mainStart + barDuration * 5 },   // Gm
+                { notes: [415.30, 261.63, 311.13], delay: mainStart + barDuration * 6 },   // Ab
+                { notes: [466.16, 293.66, 349.23], delay: mainStart + barDuration * 7 }    // Bb
+            ];
+            
+            chords.forEach(chord => {
+                playPadChord(chord.notes, 1.0, chord.delay, barDuration);
+            });
+            
+            // Melody pattern
+            const melody = [
+                523.25, 622.25, 783.99, 830.61,  // C5 Eb5 G5 Ab5
+                932.33, 830.61, 783.99, 622.25,  // Bb5 Ab5 G5 Eb5
+                523.25, 783.99, 830.61, 932.33,  // C5 G5 Ab5 Bb5
+                783.99, 698.46, 622.25, 523.25   // G5 F5 Eb5 C5
+            ];
+            
+            melody.forEach((note, i) => {
+                playLeadNote(note, 0.35, mainStart + i * beatDuration * 0.5);
+            });
+            
+            // Bass pattern (root-root-5th-root)
+            const bassPattern = [
+                { note: 130.81, beats: [0, 1, 3] },      // Cm: C-C-G-C
+                { note: 207.65, beats: [0, 1, 3] },      // Ab: Ab-Ab-Eb-Ab
+                { note: 155.56, beats: [0, 1, 3] },      // Eb
+                { note: 233.08, beats: [0, 1, 3] },      // Bb
+                { note: 130.81, beats: [0, 1, 3] },      // Cm
+                { note: 196.00, beats: [0, 1, 3] },      // Gm
+                { note: 207.65, beats: [0, 1, 3] },      // Ab
+                { note: 233.08, beats: [0, 1, 3] }       // Bb
+            ];
+            
+            bassPattern.forEach((pattern, bar) => {
+                pattern.beats.forEach(beat => {
+                    const delay = mainStart + bar * barDuration + beat * beatDuration;
+                    playBassNote(pattern.note, 0.4, delay);
+                });
+                // 5th on beat 2
+                playBassNote(pattern.note * 1.5, 0.4, mainStart + bar * barDuration + 2 * beatDuration);
+            });
+            
+            // Drums
+            for (let i = 0; i < 8; i++) {
+                const barStart = mainStart + i * barDuration;
+                // Kick on 1 & 3
+                playKick(barStart);
+                playKick(barStart + beatDuration * 2);
+                // Snare on 2 & 4
+                playSnare(barStart + beatDuration);
+                playSnare(barStart + beatDuration * 3);
+                // Hi-hat every 1/8 note
+                for (let j = 0; j < 8; j++) {
+                    playHiHat(barStart + j * beatDuration * 0.5);
+                }
+            }
+        }
+
+        function playPadChord(frequencies, volume, delay, duration) {
+            if (!musicPlaying) return;
+            initAudio();
+            const now = audioContext.currentTime + delay;
+            
+            frequencies.forEach(freq => {
+                const osc = audioContext.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                
+                const gainNode = audioContext.createGain();
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(volume * 0.02, now + 0.1);
+                gainNode.gain.setValueAtTime(volume * 0.02, now + duration - 0.2);
+                gainNode.gain.linearRampToValueAtTime(0.001, now + duration);
+                
+                const filter = audioContext.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 2000;
+                
+                osc.connect(gainNode);
+                gainNode.connect(filter);
+                filter.connect(musicGainNode);
+                
+                osc.start(now);
+                osc.stop(now + duration);
+            });
+        }
+
+        function playLeadNote(frequency, duration, delay) {
+            if (!musicPlaying) return;
+            initAudio();
+            const now = audioContext.currentTime + delay;
+            
+            const osc = audioContext.createOscillator();
+            osc.type = 'square';
+            osc.frequency.value = frequency;
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.04, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 3000;
+            
+            osc.connect(gainNode);
+            gainNode.connect(filter);
+            filter.connect(musicGainNode);
+            
+            osc.start(now);
+            osc.stop(now + duration);
+        }
+
+        function playBassNote(frequency, duration, delay) {
+            if (!musicPlaying) return;
+            initAudio();
+            const now = audioContext.currentTime + delay;
+            
+            const osc = audioContext.createOscillator();
+            osc.type = 'triangle';
+            osc.frequency.value = frequency;
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.08, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 400;
+            
+            osc.connect(gainNode);
+            gainNode.connect(filter);
+            filter.connect(musicGainNode);
+            
+            osc.start(now);
+            osc.stop(now + duration);
+        }
+
+        function playKick(delay) {
+            if (!musicPlaying) return;
+            initAudio();
+            const now = audioContext.currentTime + delay;
+            
+            const osc = audioContext.createOscillator();
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.15, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            
+            osc.connect(gainNode);
+            gainNode.connect(musicGainNode);
+            
+            osc.start(now);
+            osc.stop(now + 0.15);
+        }
+
+        function playSnare(delay) {
+            if (!musicPlaying) return;
+            initAudio();
+            const now = audioContext.currentTime + delay;
+            
+            const noise = audioContext.createBufferSource();
+            const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.1, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < data.length; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            noise.buffer = buffer;
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.08, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = 1000;
+            
+            noise.connect(gainNode);
+            gainNode.connect(filter);
+            filter.connect(musicGainNode);
+            
+            noise.start(now);
+        }
+
+        function playHiHat(delay) {
+            if (!musicPlaying) return;
+            initAudio();
+            const now = audioContext.currentTime + delay;
+            
+            const noise = audioContext.createBufferSource();
+            const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.05, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < data.length; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            noise.buffer = buffer;
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.02, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+            
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = 5000;
+            
+            noise.connect(gainNode);
+            gainNode.connect(filter);
+            filter.connect(musicGainNode);
+            
+            noise.start(now);
+        }
+
+        function startMusic() {
+            if (musicPlaying || musicVolume === 0) return;
+            
+            initAudio();
+            musicPlaying = true;
+            
+            // Play immediately and loop every 10 seconds for natural breathing
+            playMusicLoop();
+            musicInterval = setInterval(() => {
+                if (musicPlaying) {
+                    playMusicLoop();
+                }
+            }, 10000);
+        }
+
+        function stopMusic() {
+            musicPlaying = false;
+            clearInterval(musicInterval);
+        }
+
+        function toggleMusic() {
+            if (musicPlaying) {
+                stopMusic();
+            } else {
+                startMusic();
+            }
+        }
+
+        function setMode(mode) {
+            gameMode = mode;
+            document.getElementById('modeSelect').value = mode;
+            // Reset game to apply new mode
+            resetGame();
+        }
+
+        function resetGame() {
+            clearInterval(timerInterval);
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            timer = 0;
+            canFlip = true;
+            currentRotation = 0;
+            score = 0;
+            combo = 0;
+            cardRevealTimes.clear(); // Clear fade tracking
+            
+            document.getElementById('moves').textContent = '0';
+            document.getElementById('timer').textContent = '0';
+            document.getElementById('score').textContent = '0';
+            document.getElementById('combo').textContent = '0';
+            document.getElementById('comboBox').classList.remove('active');
+            document.getElementById('winMessage').classList.remove('show');
+            
+            const board = document.getElementById('gameBoard');
+            board.style.transform = 'rotate(0deg)';
+            
+            createBoard();
+            
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(card => {
+                const faces = card.querySelectorAll('.card-face');
+                faces.forEach(face => {
+                    if (face.classList.contains('card-front')) {
+                        face.style.transform = 'rotateY(180deg)';
+                    } else {
+                        face.style.transform = 'rotate(0deg)';
+                    }
+                });
+                card.classList.remove('fading'); // Remove any fade effects
+            });
+            
+            // Stop color chaos if running
+            stopColorChaos();
+            
+            // Check if Peek Mode is active
+            if (gameMode === 'peek') {
+                startPeekMode();
+            } else {
+                startTimer();
+                
+                // Start color chaos if in that mode
+                if (gameMode === 'color') {
+                    startColorChaos();
+                }
+            }
+            
+            // Auto-start music if volume is set
+            if (musicVolume > 0 && !musicPlaying) {
+                startMusic();
+            }
+        }
+
+        function startPeekMode() {
+            // Show all cards face-up
+            canFlip = false;
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(card => {
+                card.classList.add('flipped');
+            });
+            
+            // Show peek overlay with countdown
+            const overlay = document.getElementById('peekOverlay');
+            const timerEl = document.getElementById('peekTimer');
+            overlay.classList.add('show');
+            
+            let peekTime = 5;
+            timerEl.textContent = peekTime;
+            
+            const peekInterval = setInterval(() => {
+                peekTime--;
+                timerEl.textContent = peekTime;
+                
+                if (peekTime <= 0) {
+                    clearInterval(peekInterval);
+                    endPeekMode();
+                }
+            }, 1000);
+        }
+
+        function endPeekMode() {
+            // Hide overlay
+            document.getElementById('peekOverlay').classList.remove('show');
+            
+            // Flip all cards back
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(card => {
+                if (!card.classList.contains('matched')) {
+                    card.classList.remove('flipped');
+                }
+            });
+            
+            // Enable clicking and start timer
+            canFlip = true;
+            startTimer();
+        }
+
+        function startColorChaos() {
+            // Change card back colors every 5 seconds
+            colorShiftInterval = setInterval(() => {
+                const allCards = document.querySelectorAll('.card');
+                allCards.forEach(card => {
+                    if (!card.classList.contains('matched')) {
+                        card.classList.add('color-shift');
+                        shiftCardColor(card);
+                    }
+                });
+            }, 5000);
+        }
+
+        function shiftCardColor(card) {
+            const colors = [
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+                'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                'linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)'
+            ];
+            
+            const borderColors = [
+                'white',
+                'rgba(255, 255, 255, 0.9)',
+                'rgba(255, 215, 0, 0.8)',
+                'rgba(100, 255, 218, 0.8)',
+                'rgba(255, 182, 193, 0.9)'
+            ];
+            
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomBorder = borderColors[Math.floor(Math.random() * borderColors.length)];
+            
+            const cardBack = card.querySelector('.card-back');
+            if (cardBack) {
+                cardBack.style.background = randomColor;
+                cardBack.style.borderColor = randomBorder;
+            }
+        }
+
+        function stopColorChaos() {
+            if (colorShiftInterval) {
+                clearInterval(colorShiftInterval);
+                colorShiftInterval = null;
+            }
+        }
+
+        createBoard();
+        startTimer();
+        
+        // Auto-start music if volume is set
+        if (musicVolume > 0) {
+            startMusic();
+        }
+    </script>
+</body>
+</html>
