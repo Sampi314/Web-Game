@@ -1685,6 +1685,76 @@
         
         // Leaderboard
         let leaderboard = [];
+        let isLoadingLeaderboard = false;
+        let isSavingLeaderboard = false;
+        
+        // ==================== GITHUB GIST CONFIGURATION ====================
+        // IMPORTANT: Replace these values with your own!
+        const GIST_ID = '9ff2459cc1563b3b454ceffd23af7856'; // e.g., 'abc123def456...'
+        const GITHUB_TOKEN = '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'; // Your personal access token
+        const GIST_FILENAME = 'leaderboard.json';
+        // ===================================================================
+        
+        // Load leaderboard from GitHub Gist
+        async function loadLeaderboard() {
+            if (isLoadingLeaderboard) return;
+            isLoadingLeaderboard = true;
+            
+            try {
+                const response = await fetch(`https://api.github.com/gists/${GIST_ID}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load leaderboard: ${response.status}`);
+                }
+                
+                const gist = await response.json();
+                const content = gist.files[GIST_FILENAME].content;
+                leaderboard = JSON.parse(content);
+                
+                console.log('✅ Leaderboard loaded from GitHub Gist');
+                displayLeaderboard();
+            } catch (e) {
+                console.error('❌ Error loading leaderboard:', e);
+                // Fall back to empty leaderboard
+                leaderboard = [];
+            } finally {
+                isLoadingLeaderboard = false;
+            }
+        }
+        
+        // Save leaderboard to GitHub Gist
+        async function saveLeaderboard() {
+            if (isSavingLeaderboard) return;
+            isSavingLeaderboard = true;
+            
+            try {
+                const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        files: {
+                            [GIST_FILENAME]: {
+                                content: JSON.stringify(leaderboard, null, 2)
+                            }
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to save leaderboard: ${response.status}`);
+                }
+                
+                console.log('✅ Leaderboard saved to GitHub Gist');
+            } catch (e) {
+                console.error('❌ Error saving leaderboard:', e);
+                alert('Failed to save score to global leaderboard. Please check your internet connection.');
+            } finally {
+                isSavingLeaderboard = false;
+            }
+        }
         let currentLeaderboardTab = '4x4';
         let lastGameResult = null;
 
@@ -2523,6 +2593,9 @@
             
             // Keep only top 50 scores
             leaderboard = leaderboard.slice(0, 50);
+            
+            // Save to GitHub Gist
+            saveLeaderboard();
         }
 
         function toggleLeaderboard() {
@@ -3595,6 +3668,9 @@
 
         createBoard();
         startTimer();
+        
+        // Load leaderboard from GitHub Gist
+        loadLeaderboard();
         
         // Auto-start music if volume is set
         if (musicVolume > 0) {
