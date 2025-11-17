@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4 in a Row - Connect Four Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .player-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .player-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .red {
+            background: linear-gradient(135deg, #ff6b6b, #c92a2a);
+        }
+
+        .yellow {
+            background: linear-gradient(135deg, #ffd93d, #f9ca24);
+        }
+
+        .score-board {
+            display: flex;
+            gap: 20px;
+            font-size: 1.1em;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .board {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 15px;
+            padding: 20px;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin: 0 auto;
+            display: block;
+            width: fit-content;
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 70px);
+            grid-template-rows: repeat(6, 70px);
+            gap: 10px;
+        }
+
+        .cell {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .cell.disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .disc {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            top: -500px;
+            left: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            animation: drop 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes drop {
+            0% {
+                top: -500px;
+            }
+            60% {
+                top: 5px;
+            }
+            80% {
+                top: -5px;
+            }
+            100% {
+                top: 0;
+            }
+        }
+
+        .disc.red {
+            background: linear-gradient(135deg, #ff6b6b, #c92a2a);
+            border: 3px solid #a61e1e;
+        }
+
+        .disc.yellow {
+            background: linear-gradient(135deg, #ffd93d, #f9ca24);
+            border: 3px solid #d4a017;
+        }
+
+        .winning-disc {
+            animation: winning-glow 1s infinite alternate;
+        }
+
+        @keyframes winning-glow {
+            0% {
+                box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.5);
+                transform: scale(1);
+            }
+            100% {
+                box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.9);
+                transform: scale(1.1);
+            }
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+
+        .winner-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 20px auto;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .column-indicator {
+            display: grid;
+            grid-template-columns: repeat(7, 70px);
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 0 20px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .column-arrow {
+            width: 70px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .column-arrow.active {
+            opacity: 1;
+            animation: bounce 0.6s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .board-grid {
+                grid-template-columns: repeat(7, 50px);
+                grid-template-rows: repeat(6, 50px);
+                gap: 8px;
+            }
+
+            .cell {
+                width: 50px;
+                height: 50px;
+            }
+
+            .column-indicator {
+                grid-template-columns: repeat(7, 50px);
+                gap: 8px;
+            }
+
+            .column-arrow {
+                width: 50px;
+                font-size: 1.5em;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .game-info {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        .stats-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stats-panel h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎮 4 in a Row 🎮</h1>
+
+        <div class="game-info">
+            <div class="player-indicator">
+                <div class="player-circle" id="currentPlayerCircle"></div>
+                <span id="currentPlayerText">Red's Turn</span>
+            </div>
+
+            <div class="score-board">
+                <div class="score-item">
+                    <div>🔴 Red</div>
+                    <span class="score-value" id="redScore">0</span>
+                </div>
+                <div class="score-item">
+                    <div>🟡 Yellow</div>
+                    <span class="score-value" id="yellowScore">0</span>
+                </div>
+                <div class="score-item">
+                    <div>🤝 Draws</div>
+                    <span class="score-value" id="drawScore">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="column-indicator" id="columnIndicator"></div>
+
+        <div class="board">
+            <div class="board-grid" id="board"></div>
+        </div>
+
+        <div class="controls">
+            <button onclick="resetGame()">🔄 New Game</button>
+            <button onclick="resetScores()">📊 Reset Scores</button>
+            <button onclick="toggleStats()">📈 Statistics</button>
+        </div>
+
+        <div class="stats-panel" id="statsPanel" style="display: none;">
+            <h3>📊 Game Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Total Games</div>
+                    <div class="stat-value" id="totalGames">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Red Win Rate</div>
+                    <div class="stat-value" id="redWinRate">0%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Yellow Win Rate</div>
+                    <div class="stat-value" id="yellowWinRate">0%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Longest Streak</div>
+                    <div class="stat-value" id="longestStreak">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <h2 id="winMessage">🎉 Winner! 🎉</h2>
+            <div class="winner-circle" id="winnerCircle"></div>
+            <p id="winDetails"></p>
+            <button onclick="closeModal()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const ROWS = 6;
+        const COLS = 7;
+        const PLAYERS = {
+            RED: 'red',
+            YELLOW: 'yellow'
+        };
+
+        let board = [];
+        let currentPlayer = PLAYERS.RED;
+        let gameActive = true;
+        let scores = {
+            red: 0,
+            yellow: 0,
+            draws: 0
+        };
+        let stats = {
+            totalGames: 0,
+            redWins: 0,
+            yellowWins: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            streakPlayer: null
+        };
+
+        // Initialize game
+        function initGame() {
+            // Load scores from localStorage
+            const savedScores = localStorage.getItem('fourInARowScores');
+            const savedStats = localStorage.getItem('fourInARowStats');
+
+            if (savedScores) {
+                scores = JSON.parse(savedScores);
+                updateScoreDisplay();
+            }
+
+            if (savedStats) {
+                stats = JSON.parse(savedStats);
+            }
+
+            createBoard();
+            createColumnIndicators();
+            updatePlayerIndicator();
+        }
+
+        // Create the game board
+        function createBoard() {
+            board = Array(ROWS).fill().map(() => Array(COLS).fill(null));
+            const boardElement = document.getElementById('board');
+            boardElement.innerHTML = '';
+
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.col = col;
+                    cell.addEventListener('click', () => handleCellClick(col));
+                    cell.addEventListener('mouseenter', () => showColumnIndicator(col));
+                    cell.addEventListener('mouseleave', () => hideColumnIndicator(col));
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        // Create column indicators
+        function createColumnIndicators() {
+            const indicatorContainer = document.getElementById('columnIndicator');
+            indicatorContainer.innerHTML = '';
+
+            for (let col = 0; col < COLS; col++) {
+                const arrow = document.createElement('div');
+                arrow.className = 'column-arrow';
+                arrow.id = `arrow-${col}`;
+                arrow.textContent = '▼';
+                indicatorContainer.appendChild(arrow);
+            }
+        }
+
+        // Show column indicator
+        function showColumnIndicator(col) {
+            if (!gameActive) return;
+            const arrow = document.getElementById(`arrow-${col}`);
+            if (arrow && canDropInColumn(col)) {
+                arrow.classList.add('active');
+            }
+        }
+
+        // Hide column indicator
+        function hideColumnIndicator(col) {
+            const arrow = document.getElementById(`arrow-${col}`);
+            if (arrow) {
+                arrow.classList.remove('active');
+            }
+        }
+
+        // Check if can drop in column
+        function canDropInColumn(col) {
+            return board[0][col] === null;
+        }
+
+        // Handle cell click
+        function handleCellClick(col) {
+            if (!gameActive) return;
+
+            const row = getAvailableRow(col);
+            if (row === -1) return; // Column is full
+
+            // Update board state
+            board[row][col] = currentPlayer;
+
+            // Add disc to UI
+            const cellIndex = row * COLS + col;
+            const cells = document.querySelectorAll('.cell');
+            const cell = cells[cellIndex];
+
+            const disc = document.createElement('div');
+            disc.className = `disc ${currentPlayer}`;
+            cell.appendChild(disc);
+
+            // Check for winner
+            if (checkWinner(row, col)) {
+                gameActive = false;
+                setTimeout(() => showWinModal(currentPlayer), 500);
+                updateStats(currentPlayer);
+                return;
+            }
+
+            // Check for draw
+            if (isBoardFull()) {
+                gameActive = false;
+                setTimeout(() => showDrawModal(), 500);
+                updateStats('draw');
+                return;
+            }
+
+            // Switch player
+            currentPlayer = currentPlayer === PLAYERS.RED ? PLAYERS.YELLOW : PLAYERS.RED;
+            updatePlayerIndicator();
+        }
+
+        // Get available row in column
+        function getAvailableRow(col) {
+            for (let row = ROWS - 1; row >= 0; row--) {
+                if (board[row][col] === null) {
+                    return row;
+                }
+            }
+            return -1;
+        }
+
+        // Check if board is full
+        function isBoardFull() {
+            return board[0].every(cell => cell !== null);
+        }
+
+        // Check for winner
+        function checkWinner(row, col) {
+            const directions = [
+                [[0, 1], [0, -1]],   // Horizontal
+                [[1, 0], [-1, 0]],   // Vertical
+                [[1, 1], [-1, -1]],  // Diagonal /
+                [[1, -1], [-1, 1]]   // Diagonal \
+            ];
+
+            for (let direction of directions) {
+                const count = 1 + countDirection(row, col, direction[0]) + countDirection(row, col, direction[1]);
+                if (count >= 4) {
+                    highlightWinningCells(row, col, direction);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Count consecutive pieces in a direction
+        function countDirection(row, col, [dRow, dCol]) {
+            let count = 0;
+            let r = row + dRow;
+            let c = col + dCol;
+
+            while (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === currentPlayer) {
+                count++;
+                r += dRow;
+                c += dCol;
+            }
+
+            return count;
+        }
+
+        // Highlight winning cells
+        function highlightWinningCells(row, col, directions) {
+            const cells = document.querySelectorAll('.cell');
+            const winningCells = [[row, col]];
+
+            for (let [dRow, dCol] of directions) {
+                let r = row + dRow;
+                let c = col + dCol;
+
+                while (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === currentPlayer) {
+                    winningCells.push([r, c]);
+                    r += dRow;
+                    c += dCol;
+                }
+            }
+
+            winningCells.forEach(([r, c]) => {
+                const cellIndex = r * COLS + c;
+                const disc = cells[cellIndex].querySelector('.disc');
+                if (disc) {
+                    disc.classList.add('winning-disc');
+                }
+            });
+        }
+
+        // Update player indicator
+        function updatePlayerIndicator() {
+            const circle = document.getElementById('currentPlayerCircle');
+            const text = document.getElementById('currentPlayerText');
+
+            circle.className = `player-circle ${currentPlayer}`;
+            text.textContent = currentPlayer === PLAYERS.RED ? "Red's Turn" : "Yellow's Turn";
+        }
+
+        // Show win modal
+        function showWinModal(winner) {
+            scores[winner]++;
+            updateScoreDisplay();
+            saveScores();
+
+            const modal = document.getElementById('winModal');
+            const message = document.getElementById('winMessage');
+            const circle = document.getElementById('winnerCircle');
+            const details = document.getElementById('winDetails');
+
+            message.textContent = winner === PLAYERS.RED ? '🎉 Red Wins! 🎉' : '🎉 Yellow Wins! 🎉';
+            circle.className = `winner-circle ${winner}`;
+            details.textContent = `${winner === PLAYERS.RED ? 'Red' : 'Yellow'} has won the game!`;
+
+            modal.classList.add('active');
+        }
+
+        // Show draw modal
+        function showDrawModal() {
+            scores.draws++;
+            updateScoreDisplay();
+            saveScores();
+
+            const modal = document.getElementById('winModal');
+            const message = document.getElementById('winMessage');
+            const circle = document.getElementById('winnerCircle');
+            const details = document.getElementById('winDetails');
+
+            message.textContent = '🤝 Draw! 🤝';
+            circle.style.display = 'none';
+            details.textContent = 'The board is full with no winner!';
+
+            modal.classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('winModal');
+            modal.classList.remove('active');
+            resetGame();
+        }
+
+        // Reset game
+        function resetGame() {
+            gameActive = true;
+            currentPlayer = PLAYERS.RED;
+            createBoard();
+            updatePlayerIndicator();
+
+            const modal = document.getElementById('winModal');
+            modal.classList.remove('active');
+
+            const circle = document.getElementById('winnerCircle');
+            circle.style.display = 'block';
+        }
+
+        // Update score display
+        function updateScoreDisplay() {
+            document.getElementById('redScore').textContent = scores.red;
+            document.getElementById('yellowScore').textContent = scores.yellow;
+            document.getElementById('drawScore').textContent = scores.draws;
+        }
+
+        // Save scores to localStorage
+        function saveScores() {
+            localStorage.setItem('fourInARowScores', JSON.stringify(scores));
+            localStorage.setItem('fourInARowStats', JSON.stringify(stats));
+        }
+
+        // Reset scores
+        function resetScores() {
+            if (confirm('Are you sure you want to reset all scores and statistics?')) {
+                scores = { red: 0, yellow: 0, draws: 0 };
+                stats = {
+                    totalGames: 0,
+                    redWins: 0,
+                    yellowWins: 0,
+                    currentStreak: 0,
+                    longestStreak: 0,
+                    streakPlayer: null
+                };
+                updateScoreDisplay();
+                updateStatsDisplay();
+                saveScores();
+            }
+        }
+
+        // Update statistics
+        function updateStats(result) {
+            stats.totalGames++;
+
+            if (result === PLAYERS.RED) {
+                stats.redWins++;
+                if (stats.streakPlayer === PLAYERS.RED) {
+                    stats.currentStreak++;
+                } else {
+                    stats.currentStreak = 1;
+                    stats.streakPlayer = PLAYERS.RED;
+                }
+            } else if (result === PLAYERS.YELLOW) {
+                stats.yellowWins++;
+                if (stats.streakPlayer === PLAYERS.YELLOW) {
+                    stats.currentStreak++;
+                } else {
+                    stats.currentStreak = 1;
+                    stats.streakPlayer = PLAYERS.YELLOW;
+                }
+            } else {
+                stats.currentStreak = 0;
+                stats.streakPlayer = null;
+            }
+
+            if (stats.currentStreak > stats.longestStreak) {
+                stats.longestStreak = stats.currentStreak;
+            }
+
+            updateStatsDisplay();
+            saveScores();
+        }
+
+        // Toggle statistics panel
+        function toggleStats() {
+            const panel = document.getElementById('statsPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            if (panel.style.display === 'block') {
+                updateStatsDisplay();
+            }
+        }
+
+        // Update statistics display
+        function updateStatsDisplay() {
+            document.getElementById('totalGames').textContent = stats.totalGames;
+
+            const redWinRate = stats.totalGames > 0 ? ((stats.redWins / stats.totalGames) * 100).toFixed(1) : 0;
+            const yellowWinRate = stats.totalGames > 0 ? ((stats.yellowWins / stats.totalGames) * 100).toFixed(1) : 0;
+
+            document.getElementById('redWinRate').textContent = redWinRate + '%';
+            document.getElementById('yellowWinRate').textContent = yellowWinRate + '%';
+            document.getElementById('longestStreak').textContent = stats.longestStreak;
+        }
+
+        // Initialize game on load
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
