@@ -153,7 +153,7 @@
         }
 
         .disc.dropping {
-            animation: drop 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            animation: drop 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
         @keyframes drop {
@@ -182,7 +182,7 @@
         }
 
         .winning-disc {
-            animation: winning-glow 1s infinite alternate;
+            animation: winning-glow 0.6s infinite alternate;
         }
 
         @keyframes winning-glow {
@@ -583,12 +583,12 @@
             // Remove dropping class after animation completes to prevent conflict with winning-glow
             setTimeout(() => {
                 disc.classList.remove('dropping');
-            }, 500);
+            }, 300);
 
             // Check for winner
             if (checkWinner(row, col)) {
                 gameActive = false;
-                setTimeout(() => showWinModal(currentPlayer), 500);
+                setTimeout(() => showWinModal(currentPlayer), 300);
                 updateStats(currentPlayer);
                 return;
             }
@@ -596,7 +596,7 @@
             // Check for draw
             if (isBoardFull()) {
                 gameActive = false;
-                setTimeout(() => showDrawModal(), 500);
+                setTimeout(() => showDrawModal(), 300);
                 updateStats('draw');
                 return;
             }
