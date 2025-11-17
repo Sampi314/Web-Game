@@ -338,6 +338,9 @@
             updateAI();
             moveSnake(aiSnake);
 
+            // Check if AI hit player's tail
+            checkAIPlayerCollision();
+
             // Check apple collisions
             checkAppleCollisions();
 
@@ -381,8 +384,8 @@
             const dx = nearestApple.x - aiSnake.body[0].x;
             const dy = nearestApple.y - aiSnake.body[0].y;
 
-            // Randomly sometimes make suboptimal moves (80% optimal)
-            if (Math.random() > 0.2) {
+            // AI makes more mistakes now (65% optimal instead of 80%)
+            if (Math.random() > 0.35) {
                 if (Math.abs(dx) > Math.abs(dy)) {
                     if (dx > 0 && aiSnake.dx !== -1) {
                         aiSnake.dx = 1;
@@ -413,6 +416,65 @@
                     }
                 }
             }
+        }
+
+        function checkAIPlayerCollision() {
+            // Check if AI snake's head collides with any segment of player's body
+            const aiHead = aiSnake.body[0];
+
+            for (let i = 0; i < playerSnake.body.length; i++) {
+                if (aiHead.x === playerSnake.body[i].x && aiHead.y === playerSnake.body[i].y) {
+                    // AI hit player - respawn AI snake
+                    respawnAI();
+                    return;
+                }
+            }
+        }
+
+        function respawnAI() {
+            // Find a random position away from player
+            let newX, newY, safe;
+            let attempts = 0;
+
+            do {
+                safe = true;
+                newX = Math.floor(Math.random() * TILE_COUNT);
+                newY = Math.floor(Math.random() * TILE_COUNT);
+
+                // Make sure it's not too close to player (at least 10 tiles away)
+                const dist = Math.abs(newX - playerSnake.body[0].x) + Math.abs(newY - playerSnake.body[0].y);
+                if (dist < 10) {
+                    safe = false;
+                }
+
+                // Make sure it doesn't spawn on player
+                for (let segment of playerSnake.body) {
+                    if (segment.x === newX && segment.y === newY) {
+                        safe = false;
+                        break;
+                    }
+                }
+
+                attempts++;
+            } while (!safe && attempts < 100);
+
+            // Reset AI snake to new position
+            aiSnake.body = [{x: newX, y: newY}];
+            aiSnake.dx = Math.random() > 0.5 ? 1 : -1;
+            aiSnake.dy = 0;
+
+            // Reduce AI score slightly as penalty
+            aiScore = Math.max(0, aiScore - 1);
+            updateDisplay();
+
+            // Create particle effect at respawn location
+            createRespawnParticles(newX * GRID_SIZE + GRID_SIZE / 2, newY * GRID_SIZE + GRID_SIZE / 2);
+        }
+
+        function createRespawnParticles(x, y) {
+            // Visual feedback for AI respawn (optional - can be added later)
+            // For now, just a simple console message
+            console.log('AI respawned at', x, y);
         }
 
         function checkAppleCollisions() {

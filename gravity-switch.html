@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravity Switch - Endless Runner</title>
+    <title>Flappy Bird Style - Endless Runner</title>
     <style>
         * {
             margin: 0;
@@ -186,7 +186,7 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>🌀 Gravity Switch 🔄</h1>
+        <h1>🐦 Flappy Bird Style 🎮</h1>
 
         <div class="game-info">
             <div class="stat-box">
@@ -209,9 +209,9 @@
         </div>
 
         <div class="instructions">
-            <p>🎯 Press <span class="key-hint">SPACE</span> or <span class="key-hint">CLICK</span> to flip gravity!</p>
-            <p>🚀 Dodge obstacles and survive as long as possible</p>
-            <p>⭐ Your score increases the longer you survive</p>
+            <p>🎯 Press <span class="key-hint">SPACE</span> or <span class="key-hint">CLICK</span> to flap!</p>
+            <p>🚀 Fly through the pipes without crashing</p>
+            <p>⭐ Score points by passing through pipes</p>
         </div>
     </div>
 
@@ -233,15 +233,16 @@
         let highScore = parseInt(localStorage.getItem('gravityHighScore') || '0');
         let gameLoop = null;
 
-        // Player
+        // Player (Bird)
         let player = {
             x: 100,
             y: canvas.height / 2,
-            size: 20,
+            size: 25,
             velocityY: 0,
-            gravity: 0.5,
-            gravityDirection: 1, // 1 = down, -1 = up
-            color: '#4ade80'
+            gravity: 0.6,
+            jumpStrength: -8,
+            rotation: 0,
+            color: '#FFD700' // Golden bird
         };
 
         // Obstacles
@@ -286,7 +287,7 @@
             // Reset player
             player.y = canvas.height / 2;
             player.velocityY = 0;
-            player.gravityDirection = 1;
+            player.rotation = 0;
 
             // Clear obstacles
             obstacles = [];
@@ -302,16 +303,20 @@
         function update() {
             if (!gameActive) return;
 
-            // Update player physics
-            player.velocityY += player.gravity * player.gravityDirection;
+            // Update player physics (Flappy Bird style)
+            player.velocityY += player.gravity;
             player.y += player.velocityY;
 
+            // Update bird rotation based on velocity
+            player.rotation = Math.min(Math.max(player.velocityY * 3, -30), 90);
+
             // Check boundaries
-            if (player.gravityDirection === 1 && player.y + player.size > canvas.height) {
-                player.y = canvas.height - player.size;
-                player.velocityY = 0;
+            const groundHeight = 80;
+            if (player.y + player.size > canvas.height - groundHeight) {
+                endGame();
+                return;
             }
-            if (player.gravityDirection === -1 && player.y < 0) {
+            if (player.y < 0) {
                 player.y = 0;
                 player.velocityY = 0;
             }
@@ -358,51 +363,44 @@
         }
 
         function flipGravity() {
-            player.gravityDirection *= -1;
-            player.velocityY = 0;
+            // Flappy Bird style jump
+            player.velocityY = player.jumpStrength;
             createParticles(player.x + player.size / 2, player.y + player.size / 2);
         }
 
         function spawnObstacle() {
-            const types = ['gap', 'block'];
-            const type = types[Math.floor(Math.random() * types.length)];
+            // Flappy Bird style pipes
+            const groundHeight = 80;
+            const pipeWidth = 60;
+            const gapSize = 140;
+            const minPipeHeight = 50;
+            const maxPipeHeight = canvas.height - groundHeight - gapSize - minPipeHeight;
 
-            if (type === 'gap') {
-                const gapSize = 150;
-                const gapY = Math.random() * (canvas.height - gapSize);
+            const topPipeHeight = minPipeHeight + Math.random() * (maxPipeHeight - minPipeHeight);
 
-                // Top obstacle
-                obstacles.push({
-                    x: canvas.width,
-                    y: 0,
-                    width: 40,
-                    height: gapY,
-                    speed: 4,
-                    color: '#ff6b6b'
-                });
+            // Top pipe
+            obstacles.push({
+                x: canvas.width,
+                y: 0,
+                width: pipeWidth,
+                height: topPipeHeight,
+                speed: 3,
+                color: '#2ecc71', // Green like Flappy Bird pipes
+                type: 'pipe',
+                scored: false
+            });
 
-                // Bottom obstacle
-                obstacles.push({
-                    x: canvas.width,
-                    y: gapY + gapSize,
-                    width: 40,
-                    height: canvas.height - (gapY + gapSize),
-                    speed: 4,
-                    color: '#ff6b6b'
-                });
-            } else {
-                const height = 60 + Math.random() * 100;
-                const isTop = Math.random() > 0.5;
-
-                obstacles.push({
-                    x: canvas.width,
-                    y: isTop ? 0 : canvas.height - height,
-                    width: 40,
-                    height: height,
-                    speed: 4,
-                    color: '#ffd93d'
-                });
-            }
+            // Bottom pipe
+            obstacles.push({
+                x: canvas.width,
+                y: topPipeHeight + gapSize,
+                width: pipeWidth,
+                height: canvas.height - groundHeight - (topPipeHeight + gapSize),
+                speed: 3,
+                color: '#2ecc71',
+                type: 'pipe',
+                scored: false
+            });
         }
 
         function checkCollisions() {
@@ -443,52 +441,27 @@
         }
 
         function draw() {
-            // Clear canvas with gradient
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            if (player.gravityDirection === 1) {
-                gradient.addColorStop(0, '#0f0f1e');
-                gradient.addColorStop(1, '#1a1a2e');
-            } else {
-                gradient.addColorStop(0, '#1a1a2e');
-                gradient.addColorStop(1, '#0f0f1e');
-            }
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const groundHeight = 80;
 
-            // Draw gravity indicator lines
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < canvas.width; i += 20) {
-                ctx.beginPath();
-                ctx.moveTo(i, 0);
-                ctx.lineTo(i, canvas.height);
-                ctx.stroke();
+            // Draw sky background
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height - groundHeight);
+            skyGradient.addColorStop(0, '#87CEEB'); // Sky blue
+            skyGradient.addColorStop(1, '#E0F6FF'); // Light blue
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height - groundHeight);
+
+            // Draw simple clouds
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            const cloudOffset = (score % 200) * 2;
+            for (let i = 0; i < 5; i++) {
+                const x = (i * 200 - cloudOffset) % canvas.width;
+                const y = 50 + i * 30;
+                drawCloud(x, y);
             }
 
-            // Draw center line
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 5]);
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height / 2);
-            ctx.lineTo(canvas.width, canvas.height / 2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            // Draw obstacles
+            // Draw pipes (obstacles)
             for (let obstacle of obstacles) {
-                ctx.fillStyle = obstacle.color;
-                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-
-                // Add gradient effect
-                const grad = ctx.createLinearGradient(
-                    obstacle.x, obstacle.y,
-                    obstacle.x + obstacle.width, obstacle.y + obstacle.height
-                );
-                grad.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
-                grad.addColorStop(1, 'rgba(0, 0, 0, 0.2)');
-                ctx.fillStyle = grad;
-                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                drawPipe(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
             }
 
             // Draw particles
@@ -501,39 +474,115 @@
                 ctx.globalAlpha = 1;
             }
 
-            // Draw player
+            // Draw bird
+            drawBird();
+
+            // Draw ground
+            ctx.fillStyle = '#DEB887'; // Sandy brown
+            ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+
+            // Ground pattern
+            ctx.fillStyle = '#8B7355'; // Darker brown
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.fillRect(i, canvas.height - groundHeight, 20, 20);
+                ctx.fillRect(i + 20, canvas.height - groundHeight + 20, 20, 20);
+            }
+
+            // Grass on top of ground
+            ctx.fillStyle = '#7CFC00'; // Lawn green
+            ctx.fillRect(0, canvas.height - groundHeight, canvas.width, 10);
+
+            // Draw score
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 3;
+            ctx.font = 'bold 36px Arial';
+            ctx.textAlign = 'center';
+            const scoreText = Math.floor(score / 10).toString();
+            ctx.strokeText(scoreText, canvas.width / 2, 50);
+            ctx.fillText(scoreText, canvas.width / 2, 50);
+            ctx.textAlign = 'left';
+        }
+
+        function drawCloud(x, y) {
+            ctx.beginPath();
+            ctx.arc(x, y, 15, 0, Math.PI * 2);
+            ctx.arc(x + 15, y - 5, 20, 0, Math.PI * 2);
+            ctx.arc(x + 30, y, 15, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawPipe(x, y, width, height) {
+            // Main pipe body
+            ctx.fillStyle = '#2ecc71'; // Green
+            ctx.fillRect(x, y, width, height);
+
+            // Pipe border/outline
+            ctx.strokeStyle = '#27ae60'; // Darker green
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y, width, height);
+
+            // Pipe highlights
+            ctx.fillStyle = '#3ade71';
+            ctx.fillRect(x + 5, y, 8, height);
+
+            // Pipe cap (if it's top or bottom)
+            if (y === 0) {
+                // Top pipe cap at bottom
+                const capHeight = 25;
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillRect(x - 5, y + height - capHeight, width + 10, capHeight);
+                ctx.strokeStyle = '#27ae60';
+                ctx.strokeRect(x - 5, y + height - capHeight, width + 10, capHeight);
+            } else {
+                // Bottom pipe cap at top
+                const capHeight = 25;
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillRect(x - 5, y, width + 10, capHeight);
+                ctx.strokeStyle = '#27ae60';
+                ctx.strokeRect(x - 5, y, width + 10, capHeight);
+            }
+        }
+
+        function drawBird() {
             ctx.save();
             ctx.translate(player.x + player.size / 2, player.y + player.size / 2);
-            ctx.rotate(player.velocityY * 0.1);
+            ctx.rotate(player.rotation * Math.PI / 180);
 
-            // Player body
+            // Bird body (circle)
             ctx.fillStyle = player.color;
-            ctx.fillRect(-player.size / 2, -player.size / 2, player.size, player.size);
+            ctx.beginPath();
+            ctx.arc(0, 0, player.size / 2, 0, Math.PI * 2);
+            ctx.fill();
 
-            // Player highlight
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.fillRect(-player.size / 2 + 2, -player.size / 2 + 2, player.size - 8, player.size - 8);
+            // Bird wing
+            ctx.fillStyle = '#FFA500'; // Orange
+            ctx.beginPath();
+            ctx.ellipse(-5, 0, 8, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
 
-            // Gravity arrow
+            // Bird eye (white)
             ctx.fillStyle = 'white';
             ctx.beginPath();
-            if (player.gravityDirection === 1) {
-                ctx.moveTo(0, -5);
-                ctx.lineTo(-4, 0);
-                ctx.lineTo(4, 0);
-            } else {
-                ctx.moveTo(0, 5);
-                ctx.lineTo(-4, 0);
-                ctx.lineTo(4, 0);
-            }
+            ctx.arc(player.size / 4, -player.size / 6, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Bird pupil (black)
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(player.size / 4, -player.size / 6, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Bird beak
+            ctx.fillStyle = '#FF6347'; // Tomato red
+            ctx.beginPath();
+            ctx.moveTo(player.size / 2, 0);
+            ctx.lineTo(player.size / 2 + 8, -3);
+            ctx.lineTo(player.size / 2 + 8, 3);
+            ctx.closePath();
             ctx.fill();
 
             ctx.restore();
-
-            // Draw score
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText(`Score: ${Math.floor(score / 10)}`, 10, 30);
         }
 
         function updateDisplay() {
