@@ -3,6 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Play free browser games! Card Flip Memory, Connect Four, and Gomoku. No downloads required, 100% free, works on all devices.">
+    <meta name="keywords" content="browser games, free games, card flip, connect four, gomoku, memory game, strategy games">
+    <meta name="author" content="Web Games Collection">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Web Games Collection - Free Browser Games">
+    <meta property="og:description" content="Play 3 fun browser games for free! Card Flip Memory, 4 in a Row, and Gomoku. No downloads needed!">
+    <meta property="og:url" content="https://sampi314.github.io/Web-Game/">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Web Games Collection - Free Browser Games">
+    <meta name="twitter:description" content="Play 3 fun browser games for free! Card Flip Memory, 4 in a Row, and Gomoku.">
+
     <title>Web Games Collection - Fun Browser Games</title>
     <style>
         * {
@@ -284,6 +299,22 @@
             border-color: rgba(255, 255, 255, 0.5);
             transform: scale(1.05);
         }
+
+        .quick-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .quick-link:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -291,6 +322,10 @@
         <header>
             <h1>🎮 Web Games Collection 🎮</h1>
             <p class="subtitle">Fun, free browser games - No downloads required!</p>
+            <p style="margin-top: 15px; font-size: 1.1em; opacity: 0.85;">
+                Welcome to your one-stop destination for classic games reimagined for the web.
+                Play instantly in your browser with no installations, no accounts, and no ads!
+            </p>
         </header>
 
         <div class="stats-banner">
@@ -401,6 +436,12 @@
         </div>
 
         <footer>
+            <h3 style="margin-bottom: 15px; font-size: 1.5em;">Quick Links</h3>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                <a href="card-flip-game-with-leaderboard.html" class="quick-link">🎴 Card Flip</a>
+                <a href="four-in-a-row.html" class="quick-link">🔴 4 in a Row</a>
+                <a href="gomoku.html" class="quick-link">⚫ Gomoku</a>
+            </div>
             <p>All games are built with vanilla HTML, CSS, and JavaScript</p>
             <p>Play directly in your browser - no installation needed!</p>
             <a href="https://github.com/Sampi314/Web-Game" class="github-link" target="_blank">

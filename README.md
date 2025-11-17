@@ -4,7 +4,9 @@ A collection of fun, free browser games built with vanilla HTML, CSS, and JavaSc
 
 ## 🌐 Play Now
 
-**🏠 Main Hub:** [https://sampi314.github.io/Web-Game/](https://sampi314.github.io/Web-Game/)
+**🏠 Main Hub (index.html):** [https://sampi314.github.io/Web-Game/](https://sampi314.github.io/Web-Game/)
+
+Visit the landing page to browse all games in one place!
 
 ## 🎯 Available Games
 
@@ -52,8 +54,8 @@ Traditional strategy board game on a Go board!
 
 ## 🚀 Quick Start
 
-1. Visit the [game hub](https://sampi314.github.io/Web-Game/) or click any game link above
-2. Start playing instantly - no setup required!
+1. Visit the [game hub (index.html)](https://sampi314.github.io/Web-Game/) to see all available games
+2. Click on any game card to start playing instantly - no setup required!
 3. All progress and scores are saved locally in your browser
 
 ## 💻 Tech Stack
@@ -112,6 +114,6 @@ Built with ❤️ using vanilla web technologies - no frameworks, no build proce
 
 ---
 
-**Visit the game hub:** [https://sampi314.github.io/Web-Game/](https://sampi314.github.io/Web-Game/)
+**🎮 Start Playing:** Visit the [game hub (index.html)](https://sampi314.github.io/Web-Game/) to access all games!
 
 Enjoy playing! 🎉
