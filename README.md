@@ -136,7 +136,8 @@ All games feature:
 #### Features
 - **1-4 Players:** Mix human and AI players
 - **AI Opponents:** Configurable bot difficulty (0-3 bots)
-- **Dictionary Validation:** Built-in word checking
+- **Comprehensive Dictionary:** 370,000+ English words from Oxford-quality sources
+- **Dictionary Validation:** Built-in word checking with extensive vocabulary
 - **Point System:** Longer words = more points
 - **Elimination:** Last player standing wins
 - **Word History:** Track all submitted words
