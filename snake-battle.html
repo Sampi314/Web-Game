@@ -130,6 +130,61 @@
             font-size: 0.95em;
         }
 
+        .setup-screen {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .setup-options {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .setup-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .setup-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .setup-group select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+        }
+
+        .controls-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .controls-info h3 {
+            margin-bottom: 15px;
+        }
+
+        .controls-info p {
+            margin: 8px 0;
+            font-size: 1em;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -182,34 +237,58 @@
     <div class="game-container">
         <h1>🐍 Snake Battle ⚔️</h1>
 
-        <div class="game-info">
-            <div class="stat-box">
-                <div class="stat-label">⏰ Time</div>
-                <div class="stat-value" id="timeDisplay">60</div>
+        <!-- Setup Screen -->
+        <div id="setupScreen" class="setup-screen">
+            <h2>🎮 Game Setup</h2>
+            <div class="setup-options">
+                <div class="setup-group">
+                    <label>Number of Players (Human):</label>
+                    <select id="numPlayers" onchange="updatePlayerControls()">
+                        <option value="1" selected>1 Player</option>
+                        <option value="2">2 Players</option>
+                        <option value="3">3 Players</option>
+                        <option value="4">4 Players</option>
+                    </select>
+                </div>
+                <div class="setup-group">
+                    <label>Number of AI Bots:</label>
+                    <select id="numBots">
+                        <option value="0">0 Bots</option>
+                        <option value="1" selected>1 Bot</option>
+                        <option value="2">2 Bots</option>
+                        <option value="3">3 Bots</option>
+                    </select>
+                </div>
             </div>
-            <div class="stat-box">
-                <div class="stat-label">🟢 Your Score</div>
-                <div class="stat-value player-score" id="playerScore">0</div>
+            <div id="controlsInfo" class="controls-info">
+                <h3>Controls:</h3>
+                <p>Player 1: Arrow Keys (↑ ↓ ← →)</p>
+                <p style="opacity: 0.5;">Player 2: WASD</p>
+                <p style="opacity: 0.5;">Player 3: IJKL</p>
+                <p style="opacity: 0.5;">Player 4: Numpad 8456</p>
             </div>
-            <div class="stat-box">
-                <div class="stat-label">🔴 AI Score</div>
-                <div class="stat-value ai-score" id="aiScore">0</div>
-            </div>
+            <button onclick="startGameFromSetup()" style="margin-top: 20px; padding: 15px 40px; font-size: 1.2em;">🚀 Start Battle!</button>
         </div>
 
-        <div class="canvas-container">
-            <canvas id="gameCanvas" width="600" height="600"></canvas>
-        </div>
+        <!-- Game Screen -->
+        <div id="gameScreen" style="display: none;">
+            <div class="game-info" id="scoreBoard"></div>
 
-        <div class="controls">
-            <button onclick="startGame()">🎮 Start Game</button>
-            <button onclick="goHome()">🏠 Home</button>
-        </div>
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="600" height="600"></canvas>
+            </div>
 
-        <div class="instructions">
-            <p>🎯 Use Arrow Keys or WASD to move your green snake</p>
-            <p>🍎 Eat apples to grow and score points</p>
-            <p>⚔️ Race against the red AI snake for 60 seconds!</p>
+            <div class="controls">
+                <button onclick="surrenderGame()">🏳️ Surrender</button>
+                <button onclick="backToSetup()">⚙️ Setup</button>
+                <button onclick="goHome()">🏠 Home</button>
+            </div>
+
+            <div class="instructions">
+                <p>🍎 Eat apples to grow and score points</p>
+                <p>💀 Hit another snake's tail and you die - your score resets to 0!</p>
+                <p>🎁 Dead snakes drop special food (Golden 🟠 or Super 🔴)</p>
+            </div>
         </div>
     </div>
 
