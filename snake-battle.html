@@ -259,6 +259,13 @@
         // Apples
         let apples = [];
 
+        // Special food types
+        const FOOD_TYPES = {
+            normal: { color: '#ffd93d', points: 1, growth: 1 },
+            golden: { color: '#FFD700', points: 3, growth: 2 }, // Dropped when snake dies
+            super: { color: '#FF6347', points: 5, growth: 3 }   // Rare drop
+        };
+
         // Input handling
         let keys = {};
         document.addEventListener('keydown', (e) => {
@@ -340,6 +347,9 @@
 
             // Check if AI hit player's tail
             checkAIPlayerCollision();
+
+            // Check if player hit AI's tail
+            checkPlayerAICollision();
 
             // Check apple collisions
             checkAppleCollisions();
@@ -432,6 +442,9 @@
         }
 
         function respawnAI() {
+            // Spawn special food at death location
+            spawnSpecialFood(aiSnake.body[0].x, aiSnake.body[0].y);
+
             // Find a random position away from player
             let newX, newY, safe;
             let attempts = 0;
@@ -477,15 +490,94 @@
             console.log('AI respawned at', x, y);
         }
 
+        function checkPlayerAICollision() {
+            // Check if player snake's head collides with any segment of AI's body
+            const playerHead = playerSnake.body[0];
+
+            for (let i = 0; i < aiSnake.body.length; i++) {
+                if (playerHead.x === aiSnake.body[i].x && playerHead.y === aiSnake.body[i].y) {
+                    // Player hit AI - respawn player snake
+                    respawnPlayer();
+                    return;
+                }
+            }
+        }
+
+        function respawnPlayer() {
+            // Spawn special food at death location
+            spawnSpecialFood(playerSnake.body[0].x, playerSnake.body[0].y);
+
+            // Find a random position away from AI
+            let newX, newY, safe;
+            let attempts = 0;
+
+            do {
+                safe = true;
+                newX = Math.floor(Math.random() * TILE_COUNT);
+                newY = Math.floor(Math.random() * TILE_COUNT);
+
+                // Make sure it's not too close to AI (at least 10 tiles away)
+                const dist = Math.abs(newX - aiSnake.body[0].x) + Math.abs(newY - aiSnake.body[0].y);
+                if (dist < 10) {
+                    safe = false;
+                }
+
+                // Make sure it doesn't spawn on AI
+                for (let segment of aiSnake.body) {
+                    if (segment.x === newX && segment.y === newY) {
+                        safe = false;
+                        break;
+                    }
+                }
+
+                attempts++;
+            } while (!safe && attempts < 100);
+
+            // Reset player snake to new position
+            playerSnake.body = [{x: newX, y: newY}];
+            playerSnake.dx = 1;
+            playerSnake.dy = 0;
+            playerSnake.nextDx = 1;
+            playerSnake.nextDy = 0;
+
+            // Reduce player score slightly as penalty
+            playerScore = Math.max(0, playerScore - 1);
+            updateDisplay();
+        }
+
+        function spawnSpecialFood(x, y) {
+            // 70% chance golden, 30% chance super
+            const type = Math.random() < 0.7 ? 'golden' : 'super';
+
+            apples.push({
+                x: x,
+                y: y,
+                type: type
+            });
+        }
+
         function checkAppleCollisions() {
             // Check player
             for (let i = apples.length - 1; i >= 0; i--) {
                 if (apples[i].x === playerSnake.body[0].x &&
                     apples[i].y === playerSnake.body[0].y) {
-                    playerScore++;
-                    playerSnake.body.push({...playerSnake.body[playerSnake.body.length - 1]});
+                    const apple = apples[i];
+                    const foodType = FOOD_TYPES[apple.type || 'normal'];
+
+                    playerScore += foodType.points;
+
+                    // Grow snake based on food type
+                    for (let j = 0; j < foodType.growth; j++) {
+                        playerSnake.body.push({...playerSnake.body[playerSnake.body.length - 1]});
+                    }
+
                     apples.splice(i, 1);
-                    spawnApple();
+
+                    // Only spawn new apple if it was a normal one
+                    if (!apple.type || apple.type === 'normal') {
+                        spawnApple();
+                    }
+
                     updateDisplay();
                 }
             }
@@ -494,10 +586,23 @@
             for (let i = apples.length - 1; i >= 0; i--) {
                 if (apples[i].x === aiSnake.body[0].x &&
                     apples[i].y === aiSnake.body[0].y) {
-                    aiScore++;
-                    aiSnake.body.push({...aiSnake.body[aiSnake.body.length - 1]});
+                    const apple = apples[i];
+                    const foodType = FOOD_TYPES[apple.type || 'normal'];
+
+                    aiScore += foodType.points;
+
+                    // Grow snake based on food type
+                    for (let j = 0; j < foodType.growth; j++) {
+                        aiSnake.body.push({...aiSnake.body[aiSnake.body.length - 1]});
+                    }
+
                     apples.splice(i, 1);
-                    spawnApple();
+
+                    // Only spawn new apple if it was a normal one
+                    if (!apple.type || apple.type === 'normal') {
+                        spawnApple();
+                    }
+
                     updateDisplay();
                 }
             }
@@ -510,7 +615,8 @@
             while (!valid) {
                 apple = {
                     x: Math.floor(Math.random() * TILE_COUNT),
-                    y: Math.floor(Math.random() * TILE_COUNT)
+                    y: Math.floor(Math.random() * TILE_COUNT),
+                    type: 'normal'
                 };
 
                 valid = true;
@@ -564,13 +670,16 @@
             }
 
             // Draw apples
-            ctx.fillStyle = '#ffd93d';
             for (let apple of apples) {
+                const foodType = FOOD_TYPES[apple.type || 'normal'];
+                const radius = apple.type === 'normal' ? GRID_SIZE / 2 - 2 : GRID_SIZE / 2;
+
+                ctx.fillStyle = foodType.color;
                 ctx.beginPath();
                 ctx.arc(
                     apple.x * GRID_SIZE + GRID_SIZE / 2,
                     apple.y * GRID_SIZE + GRID_SIZE / 2,
-                    GRID_SIZE / 2 - 2,
+                    radius,
                     0,
                     Math.PI * 2
                 );
@@ -587,7 +696,21 @@
                     Math.PI * 2
                 );
                 ctx.fill();
-                ctx.fillStyle = '#ffd93d';
+
+                // Special indicator for golden/super food
+                if (apple.type !== 'normal') {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(
+                        apple.x * GRID_SIZE + GRID_SIZE / 2,
+                        apple.y * GRID_SIZE + GRID_SIZE / 2,
+                        radius + 3,
+                        0,
+                        Math.PI * 2
+                    );
+                    ctx.stroke();
+                }
             }
 
             // Draw player snake
