@@ -472,6 +472,8 @@
         let board = [];
         let currentPlayer = PLAYERS.RED;
         let gameActive = true;
+        let isAnimating = false; // Prevent rapid clicks during animation
+        let debugMode = false; // Toggle with Ctrl+D
         let scores = {
             red: 0,
             yellow: 0,
@@ -486,24 +488,68 @@
             streakPlayer: null
         };
 
+        // Debug logger
+        function debug(message, data = null) {
+            if (debugMode) {
+                const timestamp = new Date().toISOString();
+                if (data) {
+                    console.log(`[${timestamp}] 🎮 ${message}`, data);
+                } else {
+                    console.log(`[${timestamp}] 🎮 ${message}`);
+                }
+            }
+        }
+
         // Initialize game
         function initGame() {
-            // Load scores from localStorage
-            const savedScores = localStorage.getItem('fourInARowScores');
-            const savedStats = localStorage.getItem('fourInARowStats');
+            debug('Initializing game...');
 
-            if (savedScores) {
-                scores = JSON.parse(savedScores);
-                updateScoreDisplay();
-            }
+            // Load scores from localStorage with error handling
+            try {
+                const savedScores = localStorage.getItem('fourInARowScores');
+                const savedStats = localStorage.getItem('fourInARowStats');
 
-            if (savedStats) {
-                stats = JSON.parse(savedStats);
+                if (savedScores) {
+                    const parsedScores = JSON.parse(savedScores);
+                    // Validate scores object
+                    if (parsedScores && typeof parsedScores === 'object') {
+                        scores = {
+                            red: Number(parsedScores.red) || 0,
+                            yellow: Number(parsedScores.yellow) || 0,
+                            draws: Number(parsedScores.draws) || 0
+                        };
+                        debug('Loaded scores from localStorage', scores);
+                        updateScoreDisplay();
+                    }
+                }
+
+                if (savedStats) {
+                    const parsedStats = JSON.parse(savedStats);
+                    // Validate stats object
+                    if (parsedStats && typeof parsedStats === 'object') {
+                        stats = {
+                            totalGames: Number(parsedStats.totalGames) || 0,
+                            redWins: Number(parsedStats.redWins) || 0,
+                            yellowWins: Number(parsedStats.yellowWins) || 0,
+                            currentStreak: Number(parsedStats.currentStreak) || 0,
+                            longestStreak: Number(parsedStats.longestStreak) || 0,
+                            streakPlayer: parsedStats.streakPlayer || null
+                        };
+                        debug('Loaded stats from localStorage', stats);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading game data from localStorage:', error);
+                debug('Failed to load localStorage, using defaults');
+                // Reset to defaults if corrupted
+                localStorage.removeItem('fourInARowScores');
+                localStorage.removeItem('fourInARowStats');
             }
 
             createBoard();
             createColumnIndicators();
             updatePlayerIndicator();
+            debug('Game initialized successfully');
         }
 
         // Create the game board
@@ -563,10 +609,21 @@
 
         // Handle cell click
         function handleCellClick(col) {
-            if (!gameActive) return;
+            // Prevent clicks during animation or when game is inactive
+            if (!gameActive || isAnimating) {
+                debug('Click blocked - game inactive or animating');
+                return;
+            }
 
             const row = getAvailableRow(col);
-            if (row === -1) return; // Column is full
+            if (row === -1) {
+                debug(`Column ${col} is full`);
+                return; // Column is full
+            }
+
+            // Lock input during animation
+            isAnimating = true;
+            debug(`Player ${currentPlayer} placing disc at row ${row}, col ${col}`);
 
             // Update board state
             board[row][col] = currentPlayer;
@@ -583,11 +640,14 @@
             // Remove dropping class after animation completes to prevent conflict with winning-glow
             setTimeout(() => {
                 disc.classList.remove('dropping');
+                isAnimating = false; // Unlock input after animation
+                debug('Animation complete, input unlocked');
             }, 300);
 
             // Check for winner
             if (checkWinner(row, col)) {
                 gameActive = false;
+                debug(`${currentPlayer} wins!`);
                 setTimeout(() => showWinModal(currentPlayer), 300);
                 updateStats(currentPlayer);
                 return;
@@ -596,6 +656,7 @@
             // Check for draw
             if (isBoardFull()) {
                 gameActive = false;
+                debug('Game is a draw');
                 setTimeout(() => showDrawModal(), 300);
                 updateStats('draw');
                 return;
@@ -604,6 +665,7 @@
             // Switch player
             currentPlayer = currentPlayer === PLAYERS.RED ? PLAYERS.YELLOW : PLAYERS.RED;
             updatePlayerIndicator();
+            debug(`Switched to player: ${currentPlayer}`);
         }
 
         // Get available row in column
@@ -691,6 +753,13 @@
 
         // Show win modal
         function showWinModal(winner) {
+            // Validate winner parameter
+            if (winner !== PLAYERS.RED && winner !== PLAYERS.YELLOW) {
+                console.error('Invalid winner:', winner);
+                return;
+            }
+
+            debug(`Showing win modal for ${winner}`);
             scores[winner]++;
             updateScoreDisplay();
             saveScores();
@@ -705,10 +774,12 @@
             details.textContent = `${winner === PLAYERS.RED ? 'Red' : 'Yellow'} has won the game!`;
 
             modal.classList.add('active');
+            updateCellStates(); // Disable cells when game ends
         }
 
         // Show draw modal
         function showDrawModal() {
+            debug('Showing draw modal');
             scores.draws++;
             updateScoreDisplay();
             saveScores();
@@ -723,6 +794,7 @@
             details.textContent = 'The board is full with no winner!';
 
             modal.classList.add('active');
+            updateCellStates(); // Disable cells when game ends
         }
 
         // Close modal
@@ -734,16 +806,21 @@
 
         // Reset game
         function resetGame() {
+            debug('Resetting game...');
             gameActive = true;
+            isAnimating = false; // Reset animation lock
             currentPlayer = PLAYERS.RED;
             createBoard();
             updatePlayerIndicator();
+            updateCellStates(); // Update cell disabled states
 
             const modal = document.getElementById('winModal');
             modal.classList.remove('active');
 
             const circle = document.getElementById('winnerCircle');
             circle.style.display = 'block';
+            circle.className = 'winner-circle'; // Clear any previous winner class
+            debug('Game reset complete');
         }
 
         // Update score display
@@ -755,8 +832,14 @@
 
         // Save scores to localStorage
         function saveScores() {
-            localStorage.setItem('fourInARowScores', JSON.stringify(scores));
-            localStorage.setItem('fourInARowStats', JSON.stringify(stats));
+            try {
+                localStorage.setItem('fourInARowScores', JSON.stringify(scores));
+                localStorage.setItem('fourInARowStats', JSON.stringify(stats));
+                debug('Scores and stats saved to localStorage', { scores, stats });
+            } catch (error) {
+                console.error('Error saving to localStorage:', error);
+                debug('Failed to save to localStorage');
+            }
         }
 
         // Reset scores
@@ -821,18 +904,63 @@
 
         // Update statistics display
         function updateStatsDisplay() {
-            document.getElementById('totalGames').textContent = stats.totalGames;
+            // Validate stats values to prevent NaN
+            const totalGames = Number(stats.totalGames) || 0;
+            const redWins = Number(stats.redWins) || 0;
+            const yellowWins = Number(stats.yellowWins) || 0;
+            const longestStreak = Number(stats.longestStreak) || 0;
 
-            const redWinRate = stats.totalGames > 0 ? ((stats.redWins / stats.totalGames) * 100).toFixed(1) : 0;
-            const yellowWinRate = stats.totalGames > 0 ? ((stats.yellowWins / stats.totalGames) * 100).toFixed(1) : 0;
+            document.getElementById('totalGames').textContent = totalGames;
+
+            const redWinRate = totalGames > 0 ? ((redWins / totalGames) * 100).toFixed(1) : 0;
+            const yellowWinRate = totalGames > 0 ? ((yellowWins / totalGames) * 100).toFixed(1) : 0;
 
             document.getElementById('redWinRate').textContent = redWinRate + '%';
             document.getElementById('yellowWinRate').textContent = yellowWinRate + '%';
-            document.getElementById('longestStreak').textContent = stats.longestStreak;
+            document.getElementById('longestStreak').textContent = longestStreak;
+
+            debug('Stats display updated', { totalGames, redWinRate, yellowWinRate, longestStreak });
+        }
+
+        // Toggle debug mode with Ctrl+D
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                debugMode = !debugMode;
+                console.log(`🎮 Debug mode: ${debugMode ? 'ON' : 'OFF'}`);
+                if (debugMode) {
+                    console.log('Current game state:', {
+                        board,
+                        currentPlayer,
+                        gameActive,
+                        isAnimating,
+                        scores,
+                        stats
+                    });
+                }
+            }
+        });
+
+        // Disable cells when game is inactive
+        function updateCellStates() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                if (!gameActive || isAnimating) {
+                    cell.classList.add('disabled');
+                } else {
+                    cell.classList.remove('disabled');
+                }
+            });
         }
 
         // Initialize game on load
-        window.addEventListener('load', initGame);
+        window.addEventListener('load', () => {
+            initGame();
+            // Welcome message
+            console.log('%c🎮 4 in a Row - Debug Info', 'color: #667eea; font-size: 16px; font-weight: bold');
+            console.log('%cPress Ctrl+D to toggle debug mode', 'color: #888; font-size: 12px');
+            console.log('%cBug fixes applied: LocalStorage validation, race condition prevention, input locking', 'color: #4CAF50; font-size: 11px');
+        });
     </script>
 </body>
 </html>
