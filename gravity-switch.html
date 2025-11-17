@@ -247,7 +247,7 @@
         // Obstacles
         let obstacles = [];
         let obstacleTimer = 0;
-        let obstacleInterval = 120; // frames between obstacles
+        let obstacleInterval = 70; // frames between obstacles (reduced for faster gameplay)
 
         // Particles for effects
         let particles = [];
@@ -321,9 +321,9 @@
             if (obstacleTimer >= obstacleInterval) {
                 spawnObstacle();
                 obstacleTimer = 0;
-                // Gradually increase difficulty
-                if (obstacleInterval > 60) {
-                    obstacleInterval -= 0.5;
+                // Gradually increase difficulty (faster and more obstacles)
+                if (obstacleInterval > 45) {
+                    obstacleInterval -= 0.8;
                 }
             }
 
@@ -377,7 +377,7 @@
                     y: 0,
                     width: 40,
                     height: gapY,
-                    speed: 4,
+                    speed: 6,
                     color: '#ff6b6b'
                 });
 
@@ -387,7 +387,7 @@
                     y: gapY + gapSize,
                     width: 40,
                     height: canvas.height - (gapY + gapSize),
-                    speed: 4,
+                    speed: 6,
                     color: '#ff6b6b'
                 });
             } else {
@@ -399,7 +399,7 @@
                     y: isTop ? 0 : canvas.height - height,
                     width: 40,
                     height: height,
-                    speed: 4,
+                    speed: 6,
                     color: '#ffd93d'
                 });
             }
