@@ -315,32 +315,43 @@
         // Game constants
         const GRID_SIZE = 20;
         const TILE_COUNT = canvas.width / GRID_SIZE;
-        const GAME_DURATION = 60; // seconds
 
         // Game state
         let gameActive = false;
-        let timeRemaining = GAME_DURATION;
-        let playerScore = 0;
-        let aiScore = 0;
         let gameLoop = null;
-        let timerInterval = null;
+        let numPlayers = 1;
+        let numBots = 1;
+        let snakes = []; // Array of all snakes (human + AI)
 
-        // Player snake
-        let playerSnake = {
-            body: [{x: 10, y: 10}],
-            dx: 0,
-            dy: 0,
-            nextDx: 0,
-            nextDy: 0,
-            color: '#4ade80'
-        };
+        // Snake colors
+        const SNAKE_COLORS = ['#4ade80', '#ff6b6b', '#fbbf24', '#a78bfa'];
 
-        // AI snake
-        let aiSnake = {
-            body: [{x: 20, y: 20}],
-            dx: 0,
-            dy: 0,
-            color: '#ff6b6b'
+        // Control schemes for each player
+        const CONTROLS = {
+            0: { // Player 1: Arrow keys
+                up: 'ArrowUp',
+                down: 'ArrowDown',
+                left: 'ArrowLeft',
+                right: 'ArrowRight'
+            },
+            1: { // Player 2: WASD
+                up: 'w',
+                down: 's',
+                left: 'a',
+                right: 'd'
+            },
+            2: { // Player 3: IJKL
+                up: 'i',
+                down: 'k',
+                left: 'j',
+                right: 'l'
+            },
+            3: { // Player 4: Numpad 8456
+                up: '8',
+                down: '5',
+                left: '4',
+                right: '6'
+            }
         };
 
         // Apples
@@ -354,52 +365,142 @@
         };
 
         // Input handling
-        let keys = {};
         document.addEventListener('keydown', (e) => {
-            keys[e.key] = true;
+            if (!gameActive) return;
 
-            if (gameActive) {
-                if ((e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') && playerSnake.dy !== 1) {
-                    playerSnake.nextDx = 0;
-                    playerSnake.nextDy = -1;
+            const key = e.key.toLowerCase();
+
+            // Handle controls for each human player
+            for (let i = 0; i < numPlayers; i++) {
+                const snake = snakes[i];
+                if (!snake || snake.type === 'ai') continue;
+
+                const controls = CONTROLS[i];
+
+                if ((key === controls.up.toLowerCase() || e.key === controls.up) && snake.dy !== 1) {
+                    snake.nextDx = 0;
+                    snake.nextDy = -1;
                 }
-                if ((e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') && playerSnake.dy !== -1) {
-                    playerSnake.nextDx = 0;
-                    playerSnake.nextDy = 1;
+                if ((key === controls.down.toLowerCase() || e.key === controls.down) && snake.dy !== -1) {
+                    snake.nextDx = 0;
+                    snake.nextDy = 1;
                 }
-                if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') && playerSnake.dx !== 1) {
-                    playerSnake.nextDx = -1;
-                    playerSnake.nextDy = 0;
+                if ((key === controls.left.toLowerCase() || e.key === controls.left) && snake.dx !== 1) {
+                    snake.nextDx = -1;
+                    snake.nextDy = 0;
                 }
-                if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') && playerSnake.dx !== -1) {
-                    playerSnake.nextDx = 1;
-                    playerSnake.nextDy = 0;
+                if ((key === controls.right.toLowerCase() || e.key === controls.right) && snake.dx !== -1) {
+                    snake.nextDx = 1;
+                    snake.nextDy = 0;
                 }
             }
         });
 
+        // Setup screen functions
+        function updatePlayerControls() {
+            numPlayers = parseInt(document.getElementById('numPlayers').value);
+            const controlInfos = document.querySelectorAll('#controlsInfo p');
+
+            controlInfos.forEach((p, index) => {
+                if (index < numPlayers) {
+                    p.style.opacity = '1';
+                } else {
+                    p.style.opacity = '0.5';
+                }
+            });
+        }
+
+        function startGameFromSetup() {
+            numPlayers = parseInt(document.getElementById('numPlayers').value);
+            numBots = parseInt(document.getElementById('numBots').value);
+
+            const totalSnakes = numPlayers + numBots;
+            if (totalSnakes < 1 || totalSnakes > 4) {
+                alert('Total number of players and bots must be between 1 and 4!');
+                return;
+            }
+
+            // Hide setup, show game
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+
+            startGame();
+        }
+
+        function backToSetup() {
+            if (gameActive && !confirm('Are you sure you want to quit the current game?')) {
+                return;
+            }
+
+            gameActive = false;
+            if (gameLoop) clearInterval(gameLoop);
+
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('setupScreen').style.display = 'block';
+        }
+
+        function surrenderGame() {
+            if (!gameActive) return;
+
+            if (confirm('Are you sure you want to surrender? Your current scores will be recorded.')) {
+                gameActive = false;
+                if (gameLoop) clearInterval(gameLoop);
+
+                // Show scores for all players
+                let message = 'Final Scores:\n\n';
+                snakes.forEach(snake => {
+                    message += `${snake.name}: ${snake.score} points\n`;
+                });
+
+                alert(message);
+                backToSetup();
+            }
+        }
+
         function startGame() {
             gameActive = true;
-            timeRemaining = GAME_DURATION;
-            playerScore = 0;
-            aiScore = 0;
+            snakes = [];
 
-            // Reset snakes
-            playerSnake = {
-                body: [{x: 10, y: 10}],
-                dx: 1,
-                dy: 0,
-                nextDx: 1,
-                nextDy: 0,
-                color: '#4ade80'
-            };
+            // Spawn positions (corners and center regions)
+            const spawnPositions = [
+                {x: 10, y: 10},
+                {x: TILE_COUNT - 10, y: TILE_COUNT - 10},
+                {x: 10, y: TILE_COUNT - 10},
+                {x: TILE_COUNT - 10, y: 10}
+            ];
 
-            aiSnake = {
-                body: [{x: 20, y: 20}],
-                dx: -1,
-                dy: 0,
-                color: '#ff6b6b'
-            };
+            // Create human player snakes
+            for (let i = 0; i < numPlayers; i++) {
+                snakes.push({
+                    name: `Player ${i + 1}`,
+                    type: 'human',
+                    body: [{...spawnPositions[i]}],
+                    dx: 1,
+                    dy: 0,
+                    nextDx: 1,
+                    nextDy: 0,
+                    score: 0,
+                    color: SNAKE_COLORS[i],
+                    alive: true
+                });
+            }
+
+            // Create AI bot snakes
+            for (let i = 0; i < numBots; i++) {
+                const snakeIndex = numPlayers + i;
+                snakes.push({
+                    name: `Bot ${i + 1}`,
+                    type: 'ai',
+                    body: [{...spawnPositions[snakeIndex]}],
+                    dx: -1,
+                    dy: 0,
+                    nextDx: -1,
+                    nextDy: 0,
+                    score: 0,
+                    color: SNAKE_COLORS[snakeIndex],
+                    alive: true
+                });
+            }
 
             // Spawn initial apples
             apples = [];
@@ -407,36 +508,35 @@
                 spawnApple();
             }
 
-            updateDisplay();
+            updateScoreboard();
 
             // Start game loop
             if (gameLoop) clearInterval(gameLoop);
             gameLoop = setInterval(update, 100);
-
-            // Start timer
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimer, 1000);
         }
 
         function update() {
             if (!gameActive) return;
 
-            // Update player direction
-            playerSnake.dx = playerSnake.nextDx;
-            playerSnake.dy = playerSnake.nextDy;
+            // Update all snake directions and move them
+            snakes.forEach((snake, index) => {
+                if (!snake.alive) return;
 
-            // Move player snake
-            moveSnake(playerSnake);
+                // Update direction
+                snake.dx = snake.nextDx;
+                snake.dy = snake.nextDy;
 
-            // AI decision making
-            updateAI();
-            moveSnake(aiSnake);
+                // AI decision making
+                if (snake.type === 'ai') {
+                    updateAI(snake);
+                }
 
-            // Check if AI hit player's tail
-            checkAIPlayerCollision();
+                // Move snake
+                moveSnake(snake);
+            });
 
-            // Check if player hit AI's tail
-            checkPlayerAICollision();
+            // Check collisions between all snakes
+            checkAllCollisions();
 
             // Check apple collisions
             checkAppleCollisions();
@@ -461,7 +561,7 @@
             snake.body.pop();
         }
 
-        function updateAI() {
+        function updateAI(snake) {
             if (apples.length === 0) return;
 
             // Find nearest apple
@@ -469,8 +569,8 @@
             let minDist = Infinity;
 
             for (let apple of apples) {
-                const dist = Math.abs(aiSnake.body[0].x - apple.x) +
-                            Math.abs(aiSnake.body[0].y - apple.y);
+                const dist = Math.abs(snake.body[0].x - apple.x) +
+                            Math.abs(snake.body[0].y - apple.y);
                 if (dist < minDist) {
                     minDist = dist;
                     nearestApple = apple;
@@ -478,61 +578,74 @@
             }
 
             // Simple AI: move towards nearest apple
-            const dx = nearestApple.x - aiSnake.body[0].x;
-            const dy = nearestApple.y - aiSnake.body[0].y;
+            const dx = nearestApple.x - snake.body[0].x;
+            const dy = nearestApple.y - snake.body[0].y;
 
             // AI makes more mistakes now (65% optimal instead of 80%)
             if (Math.random() > 0.35) {
                 if (Math.abs(dx) > Math.abs(dy)) {
-                    if (dx > 0 && aiSnake.dx !== -1) {
-                        aiSnake.dx = 1;
-                        aiSnake.dy = 0;
-                    } else if (dx < 0 && aiSnake.dx !== 1) {
-                        aiSnake.dx = -1;
-                        aiSnake.dy = 0;
-                    } else if (dy > 0 && aiSnake.dy !== -1) {
-                        aiSnake.dx = 0;
-                        aiSnake.dy = 1;
-                    } else if (dy < 0 && aiSnake.dy !== 1) {
-                        aiSnake.dx = 0;
-                        aiSnake.dy = -1;
+                    if (dx > 0 && snake.dx !== -1) {
+                        snake.nextDx = 1;
+                        snake.nextDy = 0;
+                    } else if (dx < 0 && snake.dx !== 1) {
+                        snake.nextDx = -1;
+                        snake.nextDy = 0;
+                    } else if (dy > 0 && snake.dy !== -1) {
+                        snake.nextDx = 0;
+                        snake.nextDy = 1;
+                    } else if (dy < 0 && snake.dy !== 1) {
+                        snake.nextDx = 0;
+                        snake.nextDy = -1;
                     }
                 } else {
-                    if (dy > 0 && aiSnake.dy !== -1) {
-                        aiSnake.dx = 0;
-                        aiSnake.dy = 1;
-                    } else if (dy < 0 && aiSnake.dy !== 1) {
-                        aiSnake.dx = 0;
-                        aiSnake.dy = -1;
-                    } else if (dx > 0 && aiSnake.dx !== -1) {
-                        aiSnake.dx = 1;
-                        aiSnake.dy = 0;
-                    } else if (dx < 0 && aiSnake.dx !== 1) {
-                        aiSnake.dx = -1;
-                        aiSnake.dy = 0;
+                    if (dy > 0 && snake.dy !== -1) {
+                        snake.nextDx = 0;
+                        snake.nextDy = 1;
+                    } else if (dy < 0 && snake.dy !== 1) {
+                        snake.nextDx = 0;
+                        snake.nextDy = -1;
+                    } else if (dx > 0 && snake.dx !== -1) {
+                        snake.nextDx = 1;
+                        snake.nextDy = 0;
+                    } else if (dx < 0 && snake.dx !== 1) {
+                        snake.nextDx = -1;
+                        snake.nextDy = 0;
                     }
                 }
             }
         }
 
-        function checkAIPlayerCollision() {
-            // Check if AI snake's head collides with any segment of player's body
-            const aiHead = aiSnake.body[0];
+        function checkAllCollisions() {
+            // Check each snake against all other snakes
+            snakes.forEach((snake, index) => {
+                if (!snake.alive) return;
 
-            for (let i = 0; i < playerSnake.body.length; i++) {
-                if (aiHead.x === playerSnake.body[i].x && aiHead.y === playerSnake.body[i].y) {
-                    // AI hit player - respawn AI snake
-                    respawnAI();
-                    return;
-                }
-            }
+                const head = snake.body[0];
+
+                // Check collision with all other snakes' bodies
+                snakes.forEach((otherSnake, otherIndex) => {
+                    if (index === otherIndex || !otherSnake.alive) return;
+
+                    // Check if this snake's head hits any part of the other snake's body
+                    for (let segment of otherSnake.body) {
+                        if (head.x === segment.x && head.y === segment.y) {
+                            // Collision detected! Respawn this snake
+                            respawnSnake(snake);
+                            return;
+                        }
+                    }
+                });
+            });
         }
 
-        function respawnAI() {
+        function respawnSnake(snake) {
             // Spawn special food at death location
-            spawnSpecialFood(aiSnake.body[0].x, aiSnake.body[0].y);
+            spawnSpecialFood(snake.body[0].x, snake.body[0].y);
 
-            // Find a random position away from player
+            // Reset score to 0 (not -1 like before)
+            snake.score = 0;
+
+            // Find a safe respawn position
             let newX, newY, safe;
             let attempts = 0;
 
@@ -541,95 +654,37 @@
                 newX = Math.floor(Math.random() * TILE_COUNT);
                 newY = Math.floor(Math.random() * TILE_COUNT);
 
-                // Make sure it's not too close to player (at least 10 tiles away)
-                const dist = Math.abs(newX - playerSnake.body[0].x) + Math.abs(newY - playerSnake.body[0].y);
-                if (dist < 10) {
-                    safe = false;
-                }
+                // Make sure it's not too close to other snakes (at least 10 tiles away)
+                for (let otherSnake of snakes) {
+                    if (otherSnake === snake || !otherSnake.alive) continue;
 
-                // Make sure it doesn't spawn on player
-                for (let segment of playerSnake.body) {
-                    if (segment.x === newX && segment.y === newY) {
+                    const dist = Math.abs(newX - otherSnake.body[0].x) + Math.abs(newY - otherSnake.body[0].y);
+                    if (dist < 10) {
                         safe = false;
                         break;
                     }
+
+                    // Make sure it doesn't spawn on any other snake
+                    for (let segment of otherSnake.body) {
+                        if (segment.x === newX && segment.y === newY) {
+                            safe = false;
+                            break;
+                        }
+                    }
+                    if (!safe) break;
                 }
 
                 attempts++;
             } while (!safe && attempts < 100);
 
-            // Reset AI snake to new position
-            aiSnake.body = [{x: newX, y: newY}];
-            aiSnake.dx = Math.random() > 0.5 ? 1 : -1;
-            aiSnake.dy = 0;
+            // Reset snake to new position (back to length 1)
+            snake.body = [{x: newX, y: newY}];
+            snake.dx = Math.random() > 0.5 ? 1 : -1;
+            snake.dy = 0;
+            snake.nextDx = snake.dx;
+            snake.nextDy = snake.dy;
 
-            // Reduce AI score slightly as penalty
-            aiScore = Math.max(0, aiScore - 1);
-            updateDisplay();
-
-            // Create particle effect at respawn location
-            createRespawnParticles(newX * GRID_SIZE + GRID_SIZE / 2, newY * GRID_SIZE + GRID_SIZE / 2);
-        }
-
-        function createRespawnParticles(x, y) {
-            // Visual feedback for AI respawn (optional - can be added later)
-            // For now, just a simple console message
-            console.log('AI respawned at', x, y);
-        }
-
-        function checkPlayerAICollision() {
-            // Check if player snake's head collides with any segment of AI's body
-            const playerHead = playerSnake.body[0];
-
-            for (let i = 0; i < aiSnake.body.length; i++) {
-                if (playerHead.x === aiSnake.body[i].x && playerHead.y === aiSnake.body[i].y) {
-                    // Player hit AI - respawn player snake
-                    respawnPlayer();
-                    return;
-                }
-            }
-        }
-
-        function respawnPlayer() {
-            // Spawn special food at death location
-            spawnSpecialFood(playerSnake.body[0].x, playerSnake.body[0].y);
-
-            // Find a random position away from AI
-            let newX, newY, safe;
-            let attempts = 0;
-
-            do {
-                safe = true;
-                newX = Math.floor(Math.random() * TILE_COUNT);
-                newY = Math.floor(Math.random() * TILE_COUNT);
-
-                // Make sure it's not too close to AI (at least 10 tiles away)
-                const dist = Math.abs(newX - aiSnake.body[0].x) + Math.abs(newY - aiSnake.body[0].y);
-                if (dist < 10) {
-                    safe = false;
-                }
-
-                // Make sure it doesn't spawn on AI
-                for (let segment of aiSnake.body) {
-                    if (segment.x === newX && segment.y === newY) {
-                        safe = false;
-                        break;
-                    }
-                }
-
-                attempts++;
-            } while (!safe && attempts < 100);
-
-            // Reset player snake to new position
-            playerSnake.body = [{x: newX, y: newY}];
-            playerSnake.dx = 1;
-            playerSnake.dy = 0;
-            playerSnake.nextDx = 1;
-            playerSnake.nextDy = 0;
-
-            // Reduce player score slightly as penalty
-            playerScore = Math.max(0, playerScore - 1);
-            updateDisplay();
+            updateScoreboard();
         }
 
         function spawnSpecialFood(x, y) {
@@ -644,55 +699,34 @@
         }
 
         function checkAppleCollisions() {
-            // Check player
-            for (let i = apples.length - 1; i >= 0; i--) {
-                if (apples[i].x === playerSnake.body[0].x &&
-                    apples[i].y === playerSnake.body[0].y) {
-                    const apple = apples[i];
-                    const foodType = FOOD_TYPES[apple.type || 'normal'];
+            // Check each snake for apple collisions
+            snakes.forEach(snake => {
+                if (!snake.alive) return;
 
-                    playerScore += foodType.points;
+                for (let i = apples.length - 1; i >= 0; i--) {
+                    if (apples[i].x === snake.body[0].x &&
+                        apples[i].y === snake.body[0].y) {
+                        const apple = apples[i];
+                        const foodType = FOOD_TYPES[apple.type || 'normal'];
 
-                    // Grow snake based on food type
-                    for (let j = 0; j < foodType.growth; j++) {
-                        playerSnake.body.push({...playerSnake.body[playerSnake.body.length - 1]});
+                        snake.score += foodType.points;
+
+                        // Grow snake based on food type
+                        for (let j = 0; j < foodType.growth; j++) {
+                            snake.body.push({...snake.body[snake.body.length - 1]});
+                        }
+
+                        apples.splice(i, 1);
+
+                        // Only spawn new apple if it was a normal one
+                        if (!apple.type || apple.type === 'normal') {
+                            spawnApple();
+                        }
+
+                        updateScoreboard();
                     }
-
-                    apples.splice(i, 1);
-
-                    // Only spawn new apple if it was a normal one
-                    if (!apple.type || apple.type === 'normal') {
-                        spawnApple();
-                    }
-
-                    updateDisplay();
                 }
-            }
-
-            // Check AI
-            for (let i = apples.length - 1; i >= 0; i--) {
-                if (apples[i].x === aiSnake.body[0].x &&
-                    apples[i].y === aiSnake.body[0].y) {
-                    const apple = apples[i];
-                    const foodType = FOOD_TYPES[apple.type || 'normal'];
-
-                    aiScore += foodType.points;
-
-                    // Grow snake based on food type
-                    for (let j = 0; j < foodType.growth; j++) {
-                        aiSnake.body.push({...aiSnake.body[aiSnake.body.length - 1]});
-                    }
-
-                    apples.splice(i, 1);
-
-                    // Only spawn new apple if it was a normal one
-                    if (!apple.type || apple.type === 'normal') {
-                        spawnApple();
-                    }
-
-                    updateDisplay();
-                }
-            }
+            });
         }
 
         function spawnApple() {
@@ -708,27 +742,26 @@
 
                 valid = true;
 
-                // Check collision with player snake
-                for (let segment of playerSnake.body) {
-                    if (segment.x === apple.x && segment.y === apple.y) {
-                        valid = false;
-                        break;
-                    }
-                }
+                // Check collision with all snakes
+                for (let snake of snakes) {
+                    if (!snake.alive) continue;
 
-                // Check collision with AI snake
-                for (let segment of aiSnake.body) {
-                    if (segment.x === apple.x && segment.y === apple.y) {
-                        valid = false;
-                        break;
+                    for (let segment of snake.body) {
+                        if (segment.x === apple.x && segment.y === apple.y) {
+                            valid = false;
+                            break;
+                        }
                     }
+                    if (!valid) break;
                 }
 
                 // Check collision with other apples
-                for (let other of apples) {
-                    if (other.x === apple.x && other.y === apple.y) {
-                        valid = false;
-                        break;
+                if (valid) {
+                    for (let other of apples) {
+                        if (other.x === apple.x && other.y === apple.y) {
+                            valid = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -800,11 +833,12 @@
                 }
             }
 
-            // Draw player snake
-            drawSnake(playerSnake);
-
-            // Draw AI snake
-            drawSnake(aiSnake);
+            // Draw all snakes
+            snakes.forEach(snake => {
+                if (snake.alive) {
+                    drawSnake(snake);
+                }
+            });
         }
 
         function drawSnake(snake) {
@@ -833,106 +867,22 @@
             }
         }
 
-        function updateTimer() {
-            timeRemaining--;
-            document.getElementById('timeDisplay').textContent = timeRemaining;
+        function updateScoreboard() {
+            const scoreBoard = document.getElementById('scoreBoard');
+            scoreBoard.innerHTML = '';
 
-            if (timeRemaining <= 0) {
-                endGame();
-            }
-        }
-
-        function updateDisplay() {
-            document.getElementById('playerScore').textContent = playerScore;
-            document.getElementById('aiScore').textContent = aiScore;
-        }
-
-        function endGame() {
-            gameActive = false;
-            clearInterval(gameLoop);
-            clearInterval(timerInterval);
-
-            const modal = document.getElementById('gameOverModal');
-            const title = document.getElementById('resultTitle');
-            const message = document.getElementById('resultMessage');
-            const nameSection = document.getElementById('nameInputSection');
-
-            if (playerScore > aiScore) {
-                title.textContent = '🎉 You Win! 🎉';
-                message.textContent = `Your Score: ${playerScore} | AI Score: ${aiScore}`;
-            } else if (aiScore > playerScore) {
-                title.textContent = '🤖 AI Wins!';
-                message.textContent = `AI Score: ${aiScore} | Your Score: ${playerScore}`;
-            } else {
-                title.textContent = '🤝 It\'s a Tie!';
-                message.textContent = `Both scored ${playerScore} apples!`;
-            }
-
-            // Check if player achieved a top 10 score
-            if (playerScore > 0 && isTopScore(playerScore)) {
-                nameSection.style.display = 'block';
-                document.getElementById('playerNameInput').value = '';
-                document.getElementById('playerNameInput').focus();
-            } else {
-                nameSection.style.display = 'none';
-            }
-
-            modal.classList.add('active');
-        }
-
-        function isTopScore(score) {
-            const scores = getScores();
-            if (scores.length < 10) return true;
-            return score > scores[scores.length - 1].score;
-        }
-
-        function getScores() {
-            const data = localStorage.getItem('snakeBattleScores');
-            return data ? JSON.parse(data) : [];
-        }
-
-        function saveScore(name, score) {
-            const scores = getScores();
-            scores.push({
-                name: name,
-                score: score,
-                date: new Date().toISOString()
+            snakes.forEach(snake => {
+                const statBox = document.createElement('div');
+                statBox.className = 'stat-box';
+                statBox.innerHTML = `
+                    <div class="stat-label" style="color: ${snake.color}">${snake.name}</div>
+                    <div class="stat-value" style="color: ${snake.color}">${snake.score}</div>
+                `;
+                scoreBoard.appendChild(statBox);
             });
-
-            // Sort by score descending and keep top 100
-            scores.sort((a, b) => b.score - a.score);
-            const topScores = scores.slice(0, 100);
-
-            localStorage.setItem('snakeBattleScores', JSON.stringify(topScores));
-        }
-
-        function closeModal() {
-            const nameInput = document.getElementById('playerNameInput');
-            const nameSection = document.getElementById('nameInputSection');
-
-            // Save score if name input is visible and has a value
-            if (nameSection.style.display !== 'none' && nameInput.value.trim()) {
-                saveScore(nameInput.value.trim(), playerScore);
-            } else if (nameSection.style.display !== 'none') {
-                // If they didn't enter a name, prompt them
-                if (confirm('Save score as "Anonymous"?')) {
-                    saveScore('Anonymous', playerScore);
-                }
-            }
-
-            document.getElementById('gameOverModal').classList.remove('active');
         }
 
         function viewLeaderboard() {
-            const nameInput = document.getElementById('playerNameInput');
-            const nameSection = document.getElementById('nameInputSection');
-
-            // Save score before navigating
-            if (nameSection.style.display !== 'none') {
-                const name = nameInput.value.trim() || 'Anonymous';
-                saveScore(name, playerScore);
-            }
-
             window.location.href = 'leaderboard.html';
         }
 

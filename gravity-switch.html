@@ -261,6 +261,15 @@
         // Particles for effects
         let particles = [];
 
+        // Background animation
+        let cloudOffset = 0;
+
+        // Pre-create sky gradient for better performance
+        const groundHeight = 80;
+        const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height - groundHeight);
+        skyGradient.addColorStop(0, '#87CEEB'); // Sky blue
+        skyGradient.addColorStop(1, '#E0F6FF'); // Light blue
+
         // Input handling
         let spacePressed = false;
         document.addEventListener('keydown', (e) => {
@@ -453,22 +462,24 @@
         }
 
         function draw() {
-            const groundHeight = 80;
-
-            // Draw sky background
-            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height - groundHeight);
-            skyGradient.addColorStop(0, '#87CEEB'); // Sky blue
-            skyGradient.addColorStop(1, '#E0F6FF'); // Light blue
+            // Draw sky background (use pre-created gradient)
             ctx.fillStyle = skyGradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height - groundHeight);
 
+            // Animate clouds smoothly
+            if (gameActive) {
+                cloudOffset += 0.5; // Smooth, constant cloud movement
+                if (cloudOffset > canvas.width) cloudOffset = 0;
+            }
+
             // Draw simple clouds
             ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            const cloudOffset = (score % 200) * 2;
             for (let i = 0; i < 5; i++) {
-                const x = (i * 200 - cloudOffset) % canvas.width;
+                const x = ((i * 200) - cloudOffset) % (canvas.width + 200) - 200;
                 const y = 50 + i * 30;
-                drawCloud(x, y);
+                if (x > -100 && x < canvas.width + 100) { // Only draw visible clouds
+                    drawCloud(x, y);
+                }
             }
 
             // Draw pipes (obstacles)
