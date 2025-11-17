@@ -219,7 +219,15 @@
         <div class="modal-content">
             <h2>💥 Game Over!</h2>
             <p id="resultMessage"></p>
-            <button onclick="closeModal()">Play Again</button>
+            <div id="nameInputSection" style="margin: 20px 0; display: none;">
+                <p style="margin-bottom: 10px;">🎉 New high score! Enter your name:</p>
+                <input type="text" id="playerNameInput" maxlength="20" placeholder="Your name"
+                    style="padding: 10px; font-size: 1em; border-radius: 5px; border: none; width: 80%; margin-bottom: 15px;">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="closeModal()">Play Again</button>
+                <button onclick="viewLeaderboard()">🏆 Leaderboard</button>
+            </div>
         </div>
     </div>
 
@@ -239,8 +247,8 @@
             y: canvas.height / 2,
             size: 25,
             velocityY: 0,
-            gravity: 0.6,
-            jumpStrength: -8,
+            gravity: 0.4, // Reduced from 0.6 for slower falling
+            jumpStrength: -7, // Reduced from -8 for smoother control
             rotation: 0,
             color: '#FFD700' // Golden bird
         };
@@ -258,7 +266,9 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === ' ' && !spacePressed) {
                 spacePressed = true;
-                if (gameActive) {
+                if (!gameActive) {
+                    startGame();
+                } else {
                     flipGravity();
                 }
             }
@@ -271,7 +281,9 @@
         });
 
         canvas.addEventListener('click', () => {
-            if (gameActive) {
+            if (!gameActive) {
+                startGame();
+            } else {
                 flipGravity();
             }
         });
@@ -493,14 +505,29 @@
             ctx.fillRect(0, canvas.height - groundHeight, canvas.width, 10);
 
             // Draw score
-            ctx.fillStyle = 'white';
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 3;
-            ctx.font = 'bold 36px Arial';
-            ctx.textAlign = 'center';
-            const scoreText = Math.floor(score / 10).toString();
-            ctx.strokeText(scoreText, canvas.width / 2, 50);
-            ctx.fillText(scoreText, canvas.width / 2, 50);
+            if (gameActive) {
+                ctx.fillStyle = 'white';
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 3;
+                ctx.font = 'bold 36px Arial';
+                ctx.textAlign = 'center';
+                const scoreText = Math.floor(score / 10).toString();
+                ctx.strokeText(scoreText, canvas.width / 2, 50);
+                ctx.fillText(scoreText, canvas.width / 2, 50);
+            } else {
+                // Draw "Click to Start" message
+                ctx.fillStyle = 'white';
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 5;
+                ctx.font = 'bold 48px Arial';
+                ctx.textAlign = 'center';
+                ctx.strokeText('Click or Press SPACE', canvas.width / 2, canvas.height / 2 - 30);
+                ctx.fillText('Click or Press SPACE', canvas.width / 2, canvas.height / 2 - 30);
+
+                ctx.font = 'bold 36px Arial';
+                ctx.strokeText('to Start!', canvas.width / 2, canvas.height / 2 + 30);
+                ctx.fillText('to Start!', canvas.width / 2, canvas.height / 2 + 30);
+            }
             ctx.textAlign = 'left';
         }
 
@@ -604,6 +631,7 @@
 
             const modal = document.getElementById('gameOverModal');
             const message = document.getElementById('resultMessage');
+            const nameSection = document.getElementById('nameInputSection');
 
             if (finalScore > highScore * 0.9 && finalScore === highScore) {
                 message.textContent = `🏆 New High Score: ${finalScore}!`;
@@ -611,11 +639,74 @@
                 message.textContent = `Final Score: ${finalScore}`;
             }
 
+            // Check if player achieved a top 10 score
+            if (finalScore > 0 && isTopScore(finalScore)) {
+                nameSection.style.display = 'block';
+                document.getElementById('playerNameInput').value = '';
+                document.getElementById('playerNameInput').focus();
+            } else {
+                nameSection.style.display = 'none';
+            }
+
             modal.classList.add('active');
         }
 
+        function isTopScore(finalScore) {
+            const scores = getScores();
+            if (scores.length < 10) return true;
+            return finalScore > scores[scores.length - 1].score;
+        }
+
+        function getScores() {
+            const data = localStorage.getItem('flappyBirdScores');
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveScore(name, finalScore) {
+            const scores = getScores();
+            scores.push({
+                name: name,
+                score: finalScore,
+                date: new Date().toISOString()
+            });
+
+            // Sort by score descending and keep top 100
+            scores.sort((a, b) => b.score - a.score);
+            const topScores = scores.slice(0, 100);
+
+            localStorage.setItem('flappyBirdScores', JSON.stringify(topScores));
+        }
+
         function closeModal() {
+            const nameInput = document.getElementById('playerNameInput');
+            const nameSection = document.getElementById('nameInputSection');
+            const finalScore = Math.floor(score / 10);
+
+            // Save score if name input is visible and has a value
+            if (nameSection.style.display !== 'none' && nameInput.value.trim()) {
+                saveScore(nameInput.value.trim(), finalScore);
+            } else if (nameSection.style.display !== 'none') {
+                // If they didn't enter a name, prompt them
+                if (confirm('Save score as "Anonymous"?')) {
+                    saveScore('Anonymous', finalScore);
+                }
+            }
+
             document.getElementById('gameOverModal').classList.remove('active');
+        }
+
+        function viewLeaderboard() {
+            const nameInput = document.getElementById('playerNameInput');
+            const nameSection = document.getElementById('nameInputSection');
+            const finalScore = Math.floor(score / 10);
+
+            // Save score before navigating
+            if (nameSection.style.display !== 'none') {
+                const name = nameInput.value.trim() || 'Anonymous';
+                saveScore(name, finalScore);
+            }
+
+            window.location.href = 'leaderboard.html';
         }
 
         function goHome() {
