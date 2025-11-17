@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Chain - Word Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-box {
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .game-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            min-height: 300px;
+        }
+
+        .word-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .current-word {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffd93d;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .required-letter {
+            font-size: 1.5em;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .required-letter span {
+            color: #4ade80;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .input-area {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 15px 20px;
+            font-size: 1.5em;
+            border-radius: 10px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4ade80;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+        }
+
+        .word-history {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .word-history h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .word-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .word-item.player {
+            border-left: 4px solid #4ade80;
+        }
+
+        .word-item.cpu {
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 1.2em;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.success {
+            background: rgba(74, 222, 128, 0.3);
+            border: 2px solid #4ade80;
+        }
+
+        .message.error {
+            background: rgba(255, 107, 107, 0.3);
+            border: 2px solid #ff6b6b;
+        }
+
+        .message.info {
+            background: rgba(255, 217, 61, 0.3);
+            border: 2px solid #ffd93d;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .current-word { font-size: 2em; }
+            input[type="text"] { font-size: 1.2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🔤 Word Chain 🔗</h1>
+
+        <div class="game-info">
+            <div class="stat-box">
+                <div class="stat-label">Time</div>
+                <div class="stat-value" id="timeDisplay">60</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Your Score</div>
+                <div class="stat-value" id="playerScore">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">CPU Score</div>
+                <div class="stat-value" id="cpuScore">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Chain</div>
+                <div class="stat-value" id="chainLength">0</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="word-display">
+                <div class="current-word" id="currentWord">START</div>
+                <div class="required-letter">
+                    Next word must start with: <span id="requiredLetter">S</span>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <input
+                    type="text"
+                    id="wordInput"
+                    placeholder="Type your word here..."
+                    disabled
+                    autocomplete="off"
+                >
+            </div>
+
+            <div id="messageArea"></div>
+
+            <div class="word-history">
+                <h3>📜 Word History</h3>
+                <div id="historyList"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="startGame()">🎮 Start Game</button>
+            <button onclick="showRules()">📖 Rules</button>
+            <button onclick="goHome()">🏠 Home</button>
+        </div>
+    </div>
+
+    <div class="modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="resultTitle">Game Over!</h2>
+            <p id="resultMessage"></p>
+            <button onclick="closeModal()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Word dictionary - common English words
+        const wordDictionary = new Set([
+            "apple", "about", "above", "after", "again", "animal", "answer", "around",
+            "banana", "before", "below", "better", "between", "black", "bread", "bring",
+            "cake", "came", "carry", "change", "clean", "close", "cold", "could", "country",
+            "dance", "dark", "day", "down", "draw", "drink", "during",
+            "early", "earth", "eight", "else", "end", "even", "every", "example",
+            "face", "family", "far", "farm", "fast", "father", "find", "first", "fish", "five", "food", "four", "friend", "from", "fruit",
+            "game", "gave", "give", "glass", "gold", "good", "great", "green", "group", "grow",
+            "hand", "happy", "hard", "have", "head", "hear", "heart", "help", "here", "high", "home", "horse", "house", "how",
+            "idea", "if", "important", "in", "inside", "into", "it",
+            "jump", "just",
+            "keep", "kind", "king", "know",
+            "land", "large", "last", "late", "laugh", "learn", "leave", "left", "less", "let", "letter", "life", "light", "like", "line", "little", "live", "long", "look", "love",
+            "made", "make", "man", "many", "may", "mean", "men", "might", "mile", "mind", "miss", "money", "moon", "more", "most", "mother", "mountain", "move", "much", "music", "must",
+            "name", "near", "never", "new", "next", "night", "no", "not", "nothing", "now", "number",
+            "of", "off", "often", "old", "on", "once", "one", "only", "open", "or", "other", "our", "out", "over", "own",
+            "page", "paper", "part", "people", "picture", "place", "plant", "play", "point", "port",
+            "question", "quick", "quite",
+            "rain", "ran", "read", "red", "right", "river", "road", "rock", "room", "round", "run",
+            "said", "same", "saw", "say", "school", "sea", "second", "see", "seem", "sentence", "set", "ship", "should", "show", "side", "since", "sing", "small", "so", "some", "song", "soon", "sound", "spell", "start", "still", "stop", "story", "study", "such", "sun",
+            "take", "tell", "ten", "than", "that", "the", "their", "them", "then", "there", "these", "they", "thing", "think", "this", "those", "thought", "three", "through", "time", "to", "together", "told", "too", "took", "top", "toward", "town", "tree", "try", "turn", "two",
+            "under", "until", "up", "upon", "us", "use",
+            "very",
+            "walk", "want", "warm", "was", "watch", "water", "way", "we", "well", "went", "were", "what", "when", "where", "which", "white", "who", "why", "will", "wind", "with", "word", "work", "world", "would", "write",
+            "year", "yes", "yet", "you", "young", "your"
+        ]);
+
+        // Game state
+        let gameActive = false;
+        let timeRemaining = 60;
+        let playerScore = 0;
+        let cpuScore = 0;
+        let currentWord = "START";
+        let requiredLetter = "S";
+        let usedWords = new Set();
+        let wordHistory = [];
+        let timerInterval = null;
+        let chainLength = 0;
+
+        // Initialize
+        document.getElementById('wordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitWord();
+            }
+        });
+
+        function startGame() {
+            gameActive = true;
+            timeRemaining = 60;
+            playerScore = 0;
+            cpuScore = 0;
+            currentWord = "START";
+            requiredLetter = "T";
+            usedWords = new Set(['start']);
+            wordHistory = [{word: 'START', by: 'system'}];
+            chainLength = 1;
+
+            updateDisplay();
+            document.getElementById('wordInput').disabled = false;
+            document.getElementById('wordInput').focus();
+            document.getElementById('historyList').innerHTML = '<div class="word-item">START (System)</div>';
+            showMessage('Game started! Type a word starting with "T"', 'info');
+
+            // Start timer
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            timeRemaining--;
+            document.getElementById('timeDisplay').textContent = timeRemaining;
+
+            if (timeRemaining <= 0) {
+                endGame();
+            } else if (timeRemaining % 5 === 0 && gameActive) {
+                // CPU makes a move every 5 seconds
+                cpuMove();
+            }
+        }
+
+        function submitWord() {
+            if (!gameActive) return;
+
+            const input = document.getElementById('wordInput');
+            const word = input.value.trim().toLowerCase();
+            input.value = '';
+
+            // Validate word
+            if (!word) {
+                showMessage('Please enter a word!', 'error');
+                return;
+            }
+
+            if (!word.startsWith(requiredLetter.toLowerCase())) {
+                showMessage(`Word must start with "${requiredLetter}"!`, 'error');
+                return;
+            }
+
+            if (usedWords.has(word)) {
+                showMessage('Word already used!', 'error');
+                return;
+            }
+
+            if (!wordDictionary.has(word)) {
+                showMessage('Word not in dictionary!', 'error');
+                return;
+            }
+
+            if (word.length < 3) {
+                showMessage('Word must be at least 3 letters!', 'error');
+                return;
+            }
+
+            // Valid word!
+            usedWords.add(word);
+            wordHistory.push({word: word, by: 'player'});
+            playerScore += word.length;
+            chainLength++;
+            currentWord = word.toUpperCase();
+            requiredLetter = word[word.length - 1].toUpperCase();
+
+            updateDisplay();
+            addToHistory(word, 'player');
+            showMessage(`Great! +${word.length} points`, 'success');
+
+            // CPU responds immediately
+            setTimeout(cpuMove, 1000);
+        }
+
+        function cpuMove() {
+            if (!gameActive) return;
+
+            // Find a valid word
+            const validWords = Array.from(wordDictionary).filter(word =>
+                word.startsWith(requiredLetter.toLowerCase()) &&
+                !usedWords.has(word) &&
+                word.length >= 3
+            );
+
+            if (validWords.length === 0) {
+                showMessage('CPU cannot find a word. You win!', 'success');
+                endGame();
+                return;
+            }
+
+            // Pick a random word
+            const cpuWord = validWords[Math.floor(Math.random() * validWords.length)];
+            usedWords.add(cpuWord);
+            wordHistory.push({word: cpuWord, by: 'cpu'});
+            cpuScore += cpuWord.length;
+            chainLength++;
+            currentWord = cpuWord.toUpperCase();
+            requiredLetter = cpuWord[cpuWord.length - 1].toUpperCase();
+
+            updateDisplay();
+            addToHistory(cpuWord, 'cpu');
+            showMessage(`CPU: ${cpuWord.toUpperCase()} (+${cpuWord.length})`, 'info');
+        }
+
+        function updateDisplay() {
+            document.getElementById('currentWord').textContent = currentWord;
+            document.getElementById('requiredLetter').textContent = requiredLetter;
+            document.getElementById('playerScore').textContent = playerScore;
+            document.getElementById('cpuScore').textContent = cpuScore;
+            document.getElementById('chainLength').textContent = chainLength;
+        }
+
+        function addToHistory(word, player) {
+            const historyList = document.getElementById('historyList');
+            const item = document.createElement('div');
+            item.className = `word-item ${player}`;
+            item.innerHTML = `
+                <span>${word.toUpperCase()}</span>
+                <span>${player === 'player' ? '👤 You' : '🤖 CPU'}</span>
+            `;
+            historyList.insertBefore(item, historyList.firstChild);
+        }
+
+        function showMessage(text, type) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `<div class="message ${type}">${text}</div>`;
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 3000);
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('wordInput').disabled = true;
+
+            const modal = document.getElementById('gameOverModal');
+            const title = document.getElementById('resultTitle');
+            const message = document.getElementById('resultMessage');
+
+            if (playerScore > cpuScore) {
+                title.textContent = '🎉 You Win! 🎉';
+                message.textContent = `Your Score: ${playerScore} | CPU Score: ${cpuScore}`;
+            } else if (cpuScore > playerScore) {
+                title.textContent = '🤖 CPU Wins!';
+                message.textContent = `CPU Score: ${cpuScore} | Your Score: ${playerScore}`;
+            } else {
+                title.textContent = '🤝 It\'s a Tie!';
+                message.textContent = `Both scored ${playerScore} points!`;
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('gameOverModal').classList.remove('active');
+        }
+
+        function showRules() {
+            alert('📖 Word Chain Rules:\n\n' +
+                  '1. Type a word starting with the required letter\n' +
+                  '2. Words must be at least 3 letters long\n' +
+                  '3. No repeated words allowed\n' +
+                  '4. CPU responds every 5 seconds\n' +
+                  '5. Longer words = more points!\n' +
+                  '6. Game lasts 60 seconds\n' +
+                  '7. Highest score wins!');
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

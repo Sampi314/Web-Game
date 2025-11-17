@@ -52,6 +52,48 @@ Traditional strategy board game on a Go board!
 - Detailed statistics and win rates
 - Winning stones highlight effect
 
+### 4. 🔤 Word Chain
+Battle the CPU in a word association game!
+
+**Play:** [Word Chain](https://sampi314.github.io/Web-Game/word-chain.html)
+
+**Features:**
+- Race against CPU opponent
+- 60-second timed matches
+- Built-in word dictionary validation
+- Longer words = more points
+- Real-time word history tracking
+- Chain tracking system
+- No repeated words allowed
+
+### 5. 🐍 Snake Battle
+Classic snake with a competitive twist!
+
+**Play:** [Snake Battle](https://sampi314.github.io/Web-Game/snake-battle.html)
+
+**Features:**
+- Classic snake gameplay with a twist
+- Compete against intelligent AI snake
+- 60-second competitive matches
+- Smooth grid-based movement
+- Multiple apples on screen
+- Grow your snake as you score
+- Arrow keys or WASD controls
+
+### 6. 🌀 Gravity Switch
+One-button endless runner with gravity-flipping action!
+
+**Play:** [Gravity Switch](https://sampi314.github.io/Web-Game/gravity-switch.html)
+
+**Features:**
+- Addictive endless runner gameplay
+- One-button gravity flip mechanic
+- Procedurally generated obstacles
+- Increasing difficulty over time
+- Particle effects and smooth animations
+- High score persistence
+- Space bar or click to play
+
 ## 🚀 Quick Start
 
 1. Visit the [game hub (index.html)](https://sampi314.github.io/Web-Game/) to see all available games
@@ -93,6 +135,9 @@ Web-Game/
 ├── card-flip-game-with-leaderboard.html   # Card flip memory game
 ├── four-in-a-row.html                      # Connect Four game
 ├── gomoku.html                             # Gomoku (Five in a Row) game
+├── word-chain.html                         # Word Chain game
+├── snake-battle.html                       # Snake Battle game
+├── gravity-switch.html                     # Gravity Switch game
 └── README.md                               # This file
 ```
 
