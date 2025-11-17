@@ -468,32 +468,174 @@
     </div>
 
     <script>
-        // Word dictionary
+        // Word dictionary - Expanded with 800+ common English words
         const wordDictionary = new Set([
-            "apple", "about", "above", "after", "again", "animal", "answer", "around",
-            "banana", "before", "below", "better", "between", "black", "bread", "bring", "blue", "bird",
-            "cake", "came", "carry", "change", "clean", "close", "cold", "could", "country", "cup", "car",
-            "dance", "dark", "day", "down", "draw", "drink", "during", "door", "dog",
-            "early", "earth", "eight", "else", "end", "even", "every", "example", "eye", "ear",
-            "face", "family", "far", "farm", "fast", "father", "find", "first", "fish", "five", "food", "four", "friend", "from", "fruit", "fun",
-            "game", "gave", "give", "glass", "gold", "good", "great", "green", "group", "grow", "girl",
-            "hand", "happy", "hard", "have", "head", "hear", "heart", "help", "here", "high", "home", "horse", "house", "how", "hot",
-            "idea", "if", "important", "in", "inside", "into", "it", "ice",
-            "jump", "just", "joy",
-            "keep", "kind", "king", "know", "key",
-            "land", "large", "last", "late", "laugh", "learn", "leave", "left", "less", "let", "letter", "life", "light", "like", "line", "little", "live", "long", "look", "love", "lion",
-            "made", "make", "man", "many", "may", "mean", "men", "might", "mile", "mind", "miss", "money", "moon", "more", "most", "mother", "mountain", "move", "much", "music", "must", "mouse",
-            "name", "near", "never", "new", "next", "night", "no", "not", "nothing", "now", "number", "nose",
-            "of", "off", "often", "old", "on", "once", "one", "only", "open", "or", "other", "our", "out", "over", "own", "orange",
-            "page", "paper", "part", "people", "picture", "place", "plant", "play", "point", "port", "pig", "pen",
-            "question", "quick", "quite", "queen",
-            "rain", "ran", "read", "red", "right", "river", "road", "rock", "room", "round", "run", "rose",
-            "said", "same", "saw", "say", "school", "sea", "second", "see", "seem", "sentence", "set", "ship", "should", "show", "side", "since", "sing", "small", "so", "some", "song", "soon", "sound", "spell", "start", "still", "stop", "story", "study", "such", "sun", "star",
-            "take", "tell", "ten", "than", "that", "the", "their", "them", "then", "there", "these", "they", "thing", "think", "this", "those", "thought", "three", "through", "time", "to", "together", "told", "too", "took", "top", "toward", "town", "tree", "try", "turn", "two", "train",
-            "under", "until", "up", "upon", "us", "use",
-            "very", "valley",
-            "walk", "want", "warm", "was", "watch", "water", "way", "we", "well", "went", "were", "what", "when", "where", "which", "white", "who", "why", "will", "wind", "with", "word", "work", "world", "would", "write", "wolf",
-            "year", "yes", "yet", "you", "young", "your", "yellow"
+            // A words
+            "able", "about", "above", "accept", "across", "act", "action", "activity", "add", "afraid", "after",
+            "again", "against", "age", "ago", "agree", "air", "all", "allow", "almost", "alone", "along", "already",
+            "also", "although", "always", "among", "amount", "ancient", "and", "angry", "animal", "another", "answer",
+            "any", "anyone", "anything", "appear", "apple", "area", "arm", "army", "around", "arrive", "art", "as",
+            "ask", "at", "attack", "attention", "autumn", "average", "avoid", "away", "awful",
+
+            // B words
+            "baby", "back", "bad", "bag", "ball", "banana", "band", "bank", "base", "basic", "battle", "be", "beach",
+            "bear", "beat", "beautiful", "because", "become", "bed", "before", "begin", "behind", "believe", "bell",
+            "below", "best", "better", "between", "beyond", "big", "bird", "birth", "bit", "black", "blood", "blow",
+            "blue", "board", "boat", "body", "bone", "book", "born", "both", "bottle", "bottom", "box", "boy", "brain",
+            "branch", "brave", "bread", "break", "bridge", "bright", "bring", "brother", "brown", "build", "burn",
+            "business", "busy", "but", "buy", "by",
+
+            // C words
+            "cake", "call", "came", "camp", "can", "capital", "captain", "car", "card", "care", "careful", "carry",
+            "case", "cat", "catch", "cause", "center", "century", "certain", "chair", "chance", "change", "character",
+            "charge", "cheap", "check", "cheese", "chicken", "chief", "child", "choice", "choose", "church", "circle",
+            "city", "class", "clean", "clear", "climb", "clock", "close", "cloth", "cloud", "club", "coat", "code",
+            "coffee", "cold", "collect", "color", "come", "common", "company", "compare", "complete", "computer",
+            "condition", "connect", "consider", "contain", "continue", "control", "cook", "cool", "copy", "corner",
+            "correct", "cost", "could", "count", "country", "course", "court", "cover", "cow", "create", "cross",
+            "crowd", "cry", "cup", "current", "cut",
+
+            // D words
+            "dance", "danger", "dark", "daughter", "day", "dead", "deal", "dear", "death", "decide", "deep", "degree",
+            "depend", "describe", "desert", "design", "detail", "develop", "die", "difference", "different", "difficult",
+            "dinner", "direct", "discover", "discuss", "disease", "distance", "divide", "do", "doctor", "does", "dog",
+            "done", "door", "double", "doubt", "down", "draw", "dream", "dress", "drink", "drive", "drop", "dry",
+            "during", "dust", "duty",
+
+            // E words
+            "each", "ear", "early", "earth", "east", "easy", "eat", "edge", "effect", "effort", "egg", "eight", "either",
+            "electric", "else", "empty", "end", "enemy", "energy", "engine", "enjoy", "enough", "enter", "entire",
+            "equal", "escape", "especially", "even", "evening", "event", "ever", "every", "everyone", "everything",
+            "exact", "example", "except", "exciting", "exercise", "exist", "expect", "expensive", "experience", "explain",
+            "express", "extra", "eye",
+
+            // F words
+            "face", "fact", "fail", "fall", "false", "family", "famous", "far", "farm", "fast", "fat", "father", "fear",
+            "feed", "feel", "feet", "fell", "felt", "few", "field", "fight", "figure", "fill", "film", "final", "find",
+            "fine", "finger", "finish", "fire", "first", "fish", "fit", "five", "fix", "flat", "floor", "flow", "flower",
+            "fly", "follow", "food", "foot", "for", "force", "foreign", "forest", "forget", "form", "former", "forward",
+            "found", "four", "free", "fresh", "friend", "from", "front", "fruit", "full", "fun", "funny", "future",
+
+            // G words
+            "game", "garden", "gate", "gave", "general", "gentle", "get", "gift", "girl", "give", "glad", "glass",
+            "go", "goal", "god", "gold", "gone", "good", "got", "govern", "government", "grand", "grass", "grave",
+            "great", "green", "ground", "group", "grow", "guard", "guess", "guest", "guide", "gun",
+
+            // H words
+            "hair", "half", "hall", "hand", "handle", "hang", "happen", "happy", "hard", "hat", "hate", "have", "he",
+            "head", "health", "hear", "heard", "heart", "heat", "heavy", "held", "help", "her", "here", "hide", "high",
+            "hill", "him", "his", "history", "hit", "hold", "hole", "holiday", "home", "hope", "horse", "hospital",
+            "hot", "hotel", "hour", "house", "how", "however", "huge", "human", "hundred", "hungry", "hunt", "hurry",
+            "hurt", "husband",
+
+            // I words
+            "ice", "idea", "if", "imagine", "important", "impossible", "improve", "in", "include", "increase", "indeed",
+            "industry", "information", "inside", "instead", "interest", "into", "introduce", "invent", "iron", "island",
+            "it", "its", "itself",
+
+            // J words
+            "job", "join", "joke", "journey", "joy", "judge", "jump", "just", "justice",
+
+            // K words
+            "keep", "kept", "key", "kick", "kill", "kind", "king", "kiss", "kitchen", "knee", "knew", "knife", "knock",
+            "know", "knowledge",
+
+            // L words
+            "lack", "lady", "lake", "land", "language", "large", "last", "late", "later", "laugh", "law", "lay", "lead",
+            "leader", "leaf", "learn", "least", "leave", "led", "left", "leg", "less", "lesson", "let", "letter", "level",
+            "lie", "life", "lift", "light", "like", "likely", "limit", "line", "lion", "list", "listen", "little", "live",
+            "load", "local", "lock", "long", "look", "lose", "loss", "lost", "lot", "loud", "love", "low", "luck", "lunch",
+
+            // M words
+            "machine", "mad", "made", "magic", "mail", "main", "make", "male", "man", "manage", "many", "map", "mark",
+            "market", "marry", "master", "match", "material", "matter", "may", "maybe", "me", "meal", "mean", "measure",
+            "meat", "medicine", "meet", "member", "memory", "men", "mental", "mention", "message", "metal", "method",
+            "middle", "might", "mile", "milk", "million", "mind", "mine", "minute", "miss", "mistake", "mix", "modern",
+            "moment", "money", "month", "moon", "more", "morning", "most", "mother", "motor", "mountain", "mouse",
+            "mouth", "move", "much", "music", "must", "my", "myself",
+
+            // N words
+            "name", "narrow", "nation", "natural", "nature", "navy", "near", "nearly", "necessary", "neck", "need",
+            "neighbor", "neither", "nerve", "nest", "net", "never", "new", "news", "next", "nice", "night", "nine",
+            "no", "noble", "noise", "none", "nor", "north", "nose", "not", "note", "nothing", "notice", "now", "number",
+
+            // O words
+            "object", "ocean", "of", "off", "offer", "office", "officer", "official", "often", "oil", "old", "on",
+            "once", "one", "only", "onto", "open", "operate", "opinion", "opposite", "or", "orange", "order", "ordinary",
+            "organize", "other", "our", "out", "outside", "over", "own", "owner",
+
+            // P words
+            "page", "pain", "paint", "pair", "palace", "pale", "pan", "paper", "parent", "park", "part", "particular",
+            "partly", "party", "pass", "past", "path", "patient", "pattern", "pay", "peace", "pen", "pencil", "people",
+            "pepper", "per", "perfect", "perhaps", "period", "person", "pick", "picture", "piece", "pig", "place",
+            "plain", "plan", "plane", "plant", "plastic", "plate", "play", "pleasant", "please", "plenty", "pocket",
+            "poem", "poet", "point", "poison", "police", "poor", "popular", "population", "port", "position", "possible",
+            "post", "pot", "potato", "pound", "pour", "power", "practice", "prepare", "present", "president", "press",
+            "pretty", "prevent", "price", "print", "prison", "private", "prize", "probably", "problem", "produce",
+            "product", "program", "promise", "proper", "protect", "prove", "provide", "public", "pull", "pump",
+            "punish", "pupil", "purple", "purpose", "push", "put",
+
+            // Q words
+            "quality", "queen", "question", "quick", "quiet", "quite", "quote",
+
+            // R words
+            "race", "radio", "rail", "rain", "raise", "ran", "range", "rapid", "rate", "rather", "reach", "read",
+            "ready", "real", "realize", "reason", "receive", "recent", "recognize", "record", "red", "reduce", "refer",
+            "reflect", "refuse", "regard", "regular", "relate", "remain", "remember", "remove", "rent", "repair",
+            "repeat", "reply", "report", "represent", "request", "require", "rescue", "respect", "rest", "result",
+            "return", "reveal", "rice", "rich", "ride", "right", "ring", "rise", "risk", "river", "road", "rock",
+            "role", "roll", "roof", "room", "root", "rope", "rose", "rough", "round", "row", "royal", "rub", "rubber",
+            "rude", "rule", "ruler", "run", "rush",
+
+            // S words
+            "sad", "safe", "said", "sail", "salt", "same", "sand", "sat", "save", "saw", "say", "scale", "school",
+            "science", "sea", "search", "season", "seat", "second", "secret", "see", "seed", "seem", "seldom", "self",
+            "sell", "send", "sense", "sent", "sentence", "separate", "serious", "serve", "service", "set", "settle",
+            "seven", "several", "shadow", "shake", "shall", "shape", "share", "sharp", "she", "sheep", "sheet", "shelf",
+            "shell", "shelter", "ship", "shirt", "shock", "shoe", "shoot", "shop", "shore", "short", "should", "shoulder",
+            "shout", "show", "shut", "sick", "side", "sight", "sign", "signal", "silence", "silent", "silk", "silly",
+            "silver", "similar", "simple", "since", "sing", "single", "sink", "sister", "sit", "situation", "six",
+            "size", "skill", "skin", "skirt", "sky", "slave", "sleep", "slide", "slight", "slip", "slow", "small",
+            "smell", "smile", "smoke", "smooth", "snake", "snow", "so", "soap", "social", "society", "soft", "soil",
+            "soldier", "solid", "some", "son", "song", "soon", "sort", "soul", "sound", "soup", "south", "space",
+            "speak", "special", "speech", "speed", "spell", "spend", "spirit", "spite", "split", "spoon", "sport",
+            "spread", "spring", "square", "stage", "stamp", "stand", "star", "start", "state", "station", "stay",
+            "steady", "steal", "steam", "steel", "steep", "stem", "step", "stick", "still", "stone", "stood", "stop",
+            "store", "storm", "story", "straight", "strange", "street", "strength", "stretch", "strike", "string",
+            "strong", "structure", "struggle", "student", "study", "stupid", "subject", "substance", "succeed", "such",
+            "sudden", "suffer", "sugar", "suggest", "suit", "summer", "sun", "supply", "support", "suppose", "sure",
+            "surface", "surprise", "sweet", "swim", "sword", "system",
+
+            // T words
+            "table", "tail", "take", "talk", "tall", "taste", "tax", "tea", "teach", "team", "tear", "teeth", "telephone",
+            "tell", "temperature", "ten", "tend", "term", "terrible", "test", "than", "thank", "that", "the", "theater",
+            "their", "them", "then", "there", "therefore", "these", "they", "thick", "thin", "thing", "think", "third",
+            "this", "those", "though", "thought", "thousand", "thread", "three", "throat", "through", "throw", "thumb",
+            "thunder", "ticket", "tie", "tight", "time", "tin", "tiny", "tire", "title", "to", "today", "toe", "together",
+            "told", "tomorrow", "tongue", "tonight", "too", "took", "tool", "tooth", "top", "total", "touch", "tour",
+            "toward", "tower", "town", "toy", "track", "trade", "traffic", "train", "travel", "treasure", "treat",
+            "tree", "tribe", "trick", "trip", "trouble", "truck", "true", "trunk", "trust", "truth", "try", "tube",
+            "turn", "twelve", "twenty", "twice", "two", "type",
+
+            // U words
+            "ugly", "uncle", "under", "understand", "union", "unit", "universe", "unless", "until", "unusual", "up",
+            "upon", "upper", "upset", "upward", "urge", "us", "use", "useful", "usual",
+
+            // V words
+            "valley", "value", "variety", "various", "vegetable", "verb", "very", "victory", "view", "village", "visit",
+            "voice", "vote",
+
+            // W words
+            "wage", "wait", "wake", "walk", "wall", "want", "war", "warm", "warn", "was", "wash", "waste", "watch",
+            "water", "wave", "way", "we", "weak", "wealth", "weapon", "wear", "weather", "week", "weight", "welcome",
+            "well", "went", "were", "west", "western", "wet", "what", "wheat", "wheel", "when", "where", "whether",
+            "which", "while", "white", "who", "whole", "whom", "whose", "why", "wide", "wife", "wild", "will", "willing",
+            "win", "wind", "window", "wine", "wing", "winner", "winter", "wire", "wise", "wish", "with", "within",
+            "without", "witness", "wolf", "woman", "wonder", "wood", "wooden", "wool", "word", "wore", "work", "worker",
+            "world", "worry", "worse", "worth", "would", "wound", "wrap", "write", "wrong", "wrote",
+
+            // X, Y, Z words
+            "yard", "year", "yellow", "yes", "yesterday", "yet", "you", "young", "your", "youth", "zero", "zone", "zoo"
         ]);
 
         // Game configuration
