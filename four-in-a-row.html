@@ -147,9 +147,12 @@
             height: 100%;
             border-radius: 50%;
             position: absolute;
-            top: -500px;
+            top: 0;
             left: 0;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .disc.dropping {
             animation: drop 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
@@ -574,8 +577,13 @@
             const cell = cells[cellIndex];
 
             const disc = document.createElement('div');
-            disc.className = `disc ${currentPlayer}`;
+            disc.className = `disc ${currentPlayer} dropping`;
             cell.appendChild(disc);
+
+            // Remove dropping class after animation completes to prevent conflict with winning-glow
+            setTimeout(() => {
+                disc.classList.remove('dropping');
+            }, 500);
 
             // Check for winner
             if (checkWinner(row, col)) {
