@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Switch - Endless Runner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-box {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-top: 5px;
+            color: #4ade80;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: #1a1a2e;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        canvas {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            display: block;
+            background: linear-gradient(180deg, #0f0f1e 0%, #1a1a2e 100%);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .instructions p {
+            margin: 8px 0;
+            font-size: 1.1em;
+        }
+
+        .instructions .key-hint {
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin: 0 5px;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            canvas { width: 100%; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🌀 Gravity Switch 🔄</h1>
+
+        <div class="game-info">
+            <div class="stat-box">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="scoreDisplay">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">High Score</div>
+                <div class="stat-value" id="highScoreDisplay">0</div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+        </div>
+
+        <div class="controls">
+            <button onclick="startGame()">🎮 Start Game</button>
+            <button onclick="goHome()">🏠 Home</button>
+        </div>
+
+        <div class="instructions">
+            <p>🎯 Press <span class="key-hint">SPACE</span> or <span class="key-hint">CLICK</span> to flip gravity!</p>
+            <p>🚀 Dodge obstacles and survive as long as possible</p>
+            <p>⭐ Your score increases the longer you survive</p>
+        </div>
+    </div>
+
+    <div class="modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2>💥 Game Over!</h2>
+            <p id="resultMessage"></p>
+            <button onclick="closeModal()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game state
+        let gameActive = false;
+        let score = 0;
+        let highScore = parseInt(localStorage.getItem('gravityHighScore') || '0');
+        let gameLoop = null;
+
+        // Player
+        let player = {
+            x: 100,
+            y: canvas.height / 2,
+            size: 20,
+            velocityY: 0,
+            gravity: 0.5,
+            gravityDirection: 1, // 1 = down, -1 = up
+            color: '#4ade80'
+        };
+
+        // Obstacles
+        let obstacles = [];
+        let obstacleTimer = 0;
+        let obstacleInterval = 120; // frames between obstacles
+
+        // Particles for effects
+        let particles = [];
+
+        // Input handling
+        let spacePressed = false;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' && !spacePressed) {
+                spacePressed = true;
+                if (gameActive) {
+                    flipGravity();
+                }
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === ' ') {
+                spacePressed = false;
+            }
+        });
+
+        canvas.addEventListener('click', () => {
+            if (gameActive) {
+                flipGravity();
+            }
+        });
+
+        // Update high score display
+        document.getElementById('highScoreDisplay').textContent = highScore;
+
+        function startGame() {
+            gameActive = true;
+            score = 0;
+            obstacleTimer = 0;
+
+            // Reset player
+            player.y = canvas.height / 2;
+            player.velocityY = 0;
+            player.gravityDirection = 1;
+
+            // Clear obstacles
+            obstacles = [];
+            particles = [];
+
+            updateDisplay();
+
+            // Start game loop
+            if (gameLoop) cancelAnimationFrame(gameLoop);
+            gameLoop = requestAnimationFrame(update);
+        }
+
+        function update() {
+            if (!gameActive) return;
+
+            // Update player physics
+            player.velocityY += player.gravity * player.gravityDirection;
+            player.y += player.velocityY;
+
+            // Check boundaries
+            if (player.gravityDirection === 1 && player.y + player.size > canvas.height) {
+                player.y = canvas.height - player.size;
+                player.velocityY = 0;
+            }
+            if (player.gravityDirection === -1 && player.y < 0) {
+                player.y = 0;
+                player.velocityY = 0;
+            }
+
+            // Spawn obstacles
+            obstacleTimer++;
+            if (obstacleTimer >= obstacleInterval) {
+                spawnObstacle();
+                obstacleTimer = 0;
+                // Gradually increase difficulty
+                if (obstacleInterval > 60) {
+                    obstacleInterval -= 0.5;
+                }
+            }
+
+            // Update obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= obstacles[i].speed;
+
+                // Remove off-screen obstacles
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                    score += 10;
+                    updateDisplay();
+                }
+            }
+
+            // Check collisions
+            checkCollisions();
+
+            // Update particles
+            updateParticles();
+
+            // Increment score
+            score++;
+            if (score % 10 === 0) {
+                updateDisplay();
+            }
+
+            // Draw everything
+            draw();
+
+            gameLoop = requestAnimationFrame(update);
+        }
+
+        function flipGravity() {
+            player.gravityDirection *= -1;
+            player.velocityY = 0;
+            createParticles(player.x + player.size / 2, player.y + player.size / 2);
+        }
+
+        function spawnObstacle() {
+            const types = ['gap', 'block'];
+            const type = types[Math.floor(Math.random() * types.length)];
+
+            if (type === 'gap') {
+                const gapSize = 150;
+                const gapY = Math.random() * (canvas.height - gapSize);
+
+                // Top obstacle
+                obstacles.push({
+                    x: canvas.width,
+                    y: 0,
+                    width: 40,
+                    height: gapY,
+                    speed: 4,
+                    color: '#ff6b6b'
+                });
+
+                // Bottom obstacle
+                obstacles.push({
+                    x: canvas.width,
+                    y: gapY + gapSize,
+                    width: 40,
+                    height: canvas.height - (gapY + gapSize),
+                    speed: 4,
+                    color: '#ff6b6b'
+                });
+            } else {
+                const height = 60 + Math.random() * 100;
+                const isTop = Math.random() > 0.5;
+
+                obstacles.push({
+                    x: canvas.width,
+                    y: isTop ? 0 : canvas.height - height,
+                    width: 40,
+                    height: height,
+                    speed: 4,
+                    color: '#ffd93d'
+                });
+            }
+        }
+
+        function checkCollisions() {
+            for (let obstacle of obstacles) {
+                if (player.x < obstacle.x + obstacle.width &&
+                    player.x + player.size > obstacle.x &&
+                    player.y < obstacle.y + obstacle.height &&
+                    player.y + player.size > obstacle.y) {
+                    endGame();
+                    return;
+                }
+            }
+        }
+
+        function createParticles(x, y) {
+            for (let i = 0; i < 10; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 30,
+                    color: player.color
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].x += particles[i].vx;
+                particles[i].y += particles[i].vy;
+                particles[i].life--;
+
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            // Clear canvas with gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            if (player.gravityDirection === 1) {
+                gradient.addColorStop(0, '#0f0f1e');
+                gradient.addColorStop(1, '#1a1a2e');
+            } else {
+                gradient.addColorStop(0, '#1a1a2e');
+                gradient.addColorStop(1, '#0f0f1e');
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw gravity indicator lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < canvas.width; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+
+            // Draw center line
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw obstacles
+            for (let obstacle of obstacles) {
+                ctx.fillStyle = obstacle.color;
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+
+                // Add gradient effect
+                const grad = ctx.createLinearGradient(
+                    obstacle.x, obstacle.y,
+                    obstacle.x + obstacle.width, obstacle.y + obstacle.height
+                );
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+                grad.addColorStop(1, 'rgba(0, 0, 0, 0.2)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            }
+
+            // Draw particles
+            for (let particle of particles) {
+                ctx.fillStyle = particle.color;
+                ctx.globalAlpha = particle.life / 30;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+
+            // Draw player
+            ctx.save();
+            ctx.translate(player.x + player.size / 2, player.y + player.size / 2);
+            ctx.rotate(player.velocityY * 0.1);
+
+            // Player body
+            ctx.fillStyle = player.color;
+            ctx.fillRect(-player.size / 2, -player.size / 2, player.size, player.size);
+
+            // Player highlight
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.fillRect(-player.size / 2 + 2, -player.size / 2 + 2, player.size - 8, player.size - 8);
+
+            // Gravity arrow
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            if (player.gravityDirection === 1) {
+                ctx.moveTo(0, -5);
+                ctx.lineTo(-4, 0);
+                ctx.lineTo(4, 0);
+            } else {
+                ctx.moveTo(0, 5);
+                ctx.lineTo(-4, 0);
+                ctx.lineTo(4, 0);
+            }
+            ctx.fill();
+
+            ctx.restore();
+
+            // Draw score
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(`Score: ${Math.floor(score / 10)}`, 10, 30);
+        }
+
+        function updateDisplay() {
+            document.getElementById('scoreDisplay').textContent = Math.floor(score / 10);
+        }
+
+        function endGame() {
+            gameActive = false;
+            cancelAnimationFrame(gameLoop);
+
+            const finalScore = Math.floor(score / 10);
+
+            // Update high score
+            if (finalScore > highScore) {
+                highScore = finalScore;
+                localStorage.setItem('gravityHighScore', highScore);
+                document.getElementById('highScoreDisplay').textContent = highScore;
+            }
+
+            const modal = document.getElementById('gameOverModal');
+            const message = document.getElementById('resultMessage');
+
+            if (finalScore > highScore * 0.9 && finalScore === highScore) {
+                message.textContent = `🏆 New High Score: ${finalScore}!`;
+            } else {
+                message.textContent = `Final Score: ${finalScore}`;
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('gameOverModal').classList.remove('active');
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        // Initial draw
+        draw();
+    </script>
+</body>
+</html>

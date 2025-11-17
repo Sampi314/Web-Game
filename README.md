@@ -4,7 +4,9 @@ A collection of fun, free browser games built with vanilla HTML, CSS, and JavaSc
 
 ## 🌐 Play Now
 
-**🏠 Main Hub:** [https://sampi314.github.io/Web-Game/](https://sampi314.github.io/Web-Game/)
+**🏠 Main Hub (index.html):** [https://sampi314.github.io/Web-Game/](https://sampi314.github.io/Web-Game/)
+
+Visit the landing page to browse all games in one place!
 
 ## 🎯 Available Games
 
@@ -36,10 +38,66 @@ Classic Connect Four game with smooth animations!
 - Statistics panel with win rates
 - Winning piece glow effects
 
+### 3. ⚫⚪ Gomoku (Five in a Row)
+Traditional strategy board game on a Go board!
+
+**Play:** [Gomoku](https://sampi314.github.io/Web-Game/gomoku.html)
+
+**Features:**
+- Traditional Gomoku/Five in a Row gameplay
+- Two board sizes: 15x15 (standard) and 19x19 (Go board)
+- Beautiful stone placement animations
+- Undo move functionality
+- Score tracking with persistent storage
+- Detailed statistics and win rates
+- Winning stones highlight effect
+
+### 4. 🔤 Word Chain
+Battle the CPU in a word association game!
+
+**Play:** [Word Chain](https://sampi314.github.io/Web-Game/word-chain.html)
+
+**Features:**
+- Race against CPU opponent
+- 60-second timed matches
+- Built-in word dictionary validation
+- Longer words = more points
+- Real-time word history tracking
+- Chain tracking system
+- No repeated words allowed
+
+### 5. 🐍 Snake Battle
+Classic snake with a competitive twist!
+
+**Play:** [Snake Battle](https://sampi314.github.io/Web-Game/snake-battle.html)
+
+**Features:**
+- Classic snake gameplay with a twist
+- Compete against intelligent AI snake
+- 60-second competitive matches
+- Smooth grid-based movement
+- Multiple apples on screen
+- Grow your snake as you score
+- Arrow keys or WASD controls
+
+### 6. 🌀 Gravity Switch
+One-button endless runner with gravity-flipping action!
+
+**Play:** [Gravity Switch](https://sampi314.github.io/Web-Game/gravity-switch.html)
+
+**Features:**
+- Addictive endless runner gameplay
+- One-button gravity flip mechanic
+- Procedurally generated obstacles
+- Increasing difficulty over time
+- Particle effects and smooth animations
+- High score persistence
+- Space bar or click to play
+
 ## 🚀 Quick Start
 
-1. Visit the [game hub](https://sampi314.github.io/Web-Game/) or click any game link above
-2. Start playing instantly - no setup required!
+1. Visit the [game hub (index.html)](https://sampi314.github.io/Web-Game/) to see all available games
+2. Click on any game card to start playing instantly - no setup required!
 3. All progress and scores are saved locally in your browser
 
 ## 💻 Tech Stack
@@ -76,6 +134,10 @@ Web-Game/
 ├── index.html                              # Landing page/game hub
 ├── card-flip-game-with-leaderboard.html   # Card flip memory game
 ├── four-in-a-row.html                      # Connect Four game
+├── gomoku.html                             # Gomoku (Five in a Row) game
+├── word-chain.html                         # Word Chain game
+├── snake-battle.html                       # Snake Battle game
+├── gravity-switch.html                     # Gravity Switch game
 └── README.md                               # This file
 ```
 
@@ -97,6 +159,6 @@ Built with ❤️ using vanilla web technologies - no frameworks, no build proce
 
 ---
 
-**Visit the game hub:** [https://sampi314.github.io/Web-Game/](https://sampi314.github.io/Web-Game/)
+**🎮 Start Playing:** Visit the [game hub (index.html)](https://sampi314.github.io/Web-Game/) to access all games!
 
 Enjoy playing! 🎉

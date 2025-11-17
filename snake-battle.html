@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Battle - Race the AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-box {
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .player-score {
+            color: #4ade80;
+        }
+
+        .ai-score {
+            color: #ff6b6b;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: #1a1a2e;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        canvas {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            display: block;
+            background: #0f0f1e;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.95em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            canvas { width: 100%; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🐍 Snake Battle ⚔️</h1>
+
+        <div class="game-info">
+            <div class="stat-box">
+                <div class="stat-label">⏰ Time</div>
+                <div class="stat-value" id="timeDisplay">60</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">🟢 Your Score</div>
+                <div class="stat-value player-score" id="playerScore">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">🔴 AI Score</div>
+                <div class="stat-value ai-score" id="aiScore">0</div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="600" height="600"></canvas>
+        </div>
+
+        <div class="controls">
+            <button onclick="startGame()">🎮 Start Game</button>
+            <button onclick="goHome()">🏠 Home</button>
+        </div>
+
+        <div class="instructions">
+            <p>🎯 Use Arrow Keys or WASD to move your green snake</p>
+            <p>🍎 Eat apples to grow and score points</p>
+            <p>⚔️ Race against the red AI snake for 60 seconds!</p>
+        </div>
+    </div>
+
+    <div class="modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="resultTitle">Game Over!</h2>
+            <p id="resultMessage"></p>
+            <button onclick="closeModal()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game constants
+        const GRID_SIZE = 20;
+        const TILE_COUNT = canvas.width / GRID_SIZE;
+        const GAME_DURATION = 60; // seconds
+
+        // Game state
+        let gameActive = false;
+        let timeRemaining = GAME_DURATION;
+        let playerScore = 0;
+        let aiScore = 0;
+        let gameLoop = null;
+        let timerInterval = null;
+
+        // Player snake
+        let playerSnake = {
+            body: [{x: 10, y: 10}],
+            dx: 0,
+            dy: 0,
+            nextDx: 0,
+            nextDy: 0,
+            color: '#4ade80'
+        };
+
+        // AI snake
+        let aiSnake = {
+            body: [{x: 20, y: 20}],
+            dx: 0,
+            dy: 0,
+            color: '#ff6b6b'
+        };
+
+        // Apples
+        let apples = [];
+
+        // Input handling
+        let keys = {};
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+
+            if (gameActive) {
+                if ((e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') && playerSnake.dy !== 1) {
+                    playerSnake.nextDx = 0;
+                    playerSnake.nextDy = -1;
+                }
+                if ((e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') && playerSnake.dy !== -1) {
+                    playerSnake.nextDx = 0;
+                    playerSnake.nextDy = 1;
+                }
+                if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') && playerSnake.dx !== 1) {
+                    playerSnake.nextDx = -1;
+                    playerSnake.nextDy = 0;
+                }
+                if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') && playerSnake.dx !== -1) {
+                    playerSnake.nextDx = 1;
+                    playerSnake.nextDy = 0;
+                }
+            }
+        });
+
+        function startGame() {
+            gameActive = true;
+            timeRemaining = GAME_DURATION;
+            playerScore = 0;
+            aiScore = 0;
+
+            // Reset snakes
+            playerSnake = {
+                body: [{x: 10, y: 10}],
+                dx: 1,
+                dy: 0,
+                nextDx: 1,
+                nextDy: 0,
+                color: '#4ade80'
+            };
+
+            aiSnake = {
+                body: [{x: 20, y: 20}],
+                dx: -1,
+                dy: 0,
+                color: '#ff6b6b'
+            };
+
+            // Spawn initial apples
+            apples = [];
+            for (let i = 0; i < 5; i++) {
+                spawnApple();
+            }
+
+            updateDisplay();
+
+            // Start game loop
+            if (gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(update, 100);
+
+            // Start timer
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function update() {
+            if (!gameActive) return;
+
+            // Update player direction
+            playerSnake.dx = playerSnake.nextDx;
+            playerSnake.dy = playerSnake.nextDy;
+
+            // Move player snake
+            moveSnake(playerSnake);
+
+            // AI decision making
+            updateAI();
+            moveSnake(aiSnake);
+
+            // Check apple collisions
+            checkAppleCollisions();
+
+            // Draw everything
+            draw();
+        }
+
+        function moveSnake(snake) {
+            const head = {
+                x: snake.body[0].x + snake.dx,
+                y: snake.body[0].y + snake.dy
+            };
+
+            // Wrap around walls
+            if (head.x < 0) head.x = TILE_COUNT - 1;
+            if (head.x >= TILE_COUNT) head.x = 0;
+            if (head.y < 0) head.y = TILE_COUNT - 1;
+            if (head.y >= TILE_COUNT) head.y = 0;
+
+            snake.body.unshift(head);
+            snake.body.pop();
+        }
+
+        function updateAI() {
+            if (apples.length === 0) return;
+
+            // Find nearest apple
+            let nearestApple = apples[0];
+            let minDist = Infinity;
+
+            for (let apple of apples) {
+                const dist = Math.abs(aiSnake.body[0].x - apple.x) +
+                            Math.abs(aiSnake.body[0].y - apple.y);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestApple = apple;
+                }
+            }
+
+            // Simple AI: move towards nearest apple
+            const dx = nearestApple.x - aiSnake.body[0].x;
+            const dy = nearestApple.y - aiSnake.body[0].y;
+
+            // Randomly sometimes make suboptimal moves (80% optimal)
+            if (Math.random() > 0.2) {
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    if (dx > 0 && aiSnake.dx !== -1) {
+                        aiSnake.dx = 1;
+                        aiSnake.dy = 0;
+                    } else if (dx < 0 && aiSnake.dx !== 1) {
+                        aiSnake.dx = -1;
+                        aiSnake.dy = 0;
+                    } else if (dy > 0 && aiSnake.dy !== -1) {
+                        aiSnake.dx = 0;
+                        aiSnake.dy = 1;
+                    } else if (dy < 0 && aiSnake.dy !== 1) {
+                        aiSnake.dx = 0;
+                        aiSnake.dy = -1;
+                    }
+                } else {
+                    if (dy > 0 && aiSnake.dy !== -1) {
+                        aiSnake.dx = 0;
+                        aiSnake.dy = 1;
+                    } else if (dy < 0 && aiSnake.dy !== 1) {
+                        aiSnake.dx = 0;
+                        aiSnake.dy = -1;
+                    } else if (dx > 0 && aiSnake.dx !== -1) {
+                        aiSnake.dx = 1;
+                        aiSnake.dy = 0;
+                    } else if (dx < 0 && aiSnake.dx !== 1) {
+                        aiSnake.dx = -1;
+                        aiSnake.dy = 0;
+                    }
+                }
+            }
+        }
+
+        function checkAppleCollisions() {
+            // Check player
+            for (let i = apples.length - 1; i >= 0; i--) {
+                if (apples[i].x === playerSnake.body[0].x &&
+                    apples[i].y === playerSnake.body[0].y) {
+                    playerScore++;
+                    playerSnake.body.push({...playerSnake.body[playerSnake.body.length - 1]});
+                    apples.splice(i, 1);
+                    spawnApple();
+                    updateDisplay();
+                }
+            }
+
+            // Check AI
+            for (let i = apples.length - 1; i >= 0; i--) {
+                if (apples[i].x === aiSnake.body[0].x &&
+                    apples[i].y === aiSnake.body[0].y) {
+                    aiScore++;
+                    aiSnake.body.push({...aiSnake.body[aiSnake.body.length - 1]});
+                    apples.splice(i, 1);
+                    spawnApple();
+                    updateDisplay();
+                }
+            }
+        }
+
+        function spawnApple() {
+            let apple;
+            let valid = false;
+
+            while (!valid) {
+                apple = {
+                    x: Math.floor(Math.random() * TILE_COUNT),
+                    y: Math.floor(Math.random() * TILE_COUNT)
+                };
+
+                valid = true;
+
+                // Check collision with player snake
+                for (let segment of playerSnake.body) {
+                    if (segment.x === apple.x && segment.y === apple.y) {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                // Check collision with AI snake
+                for (let segment of aiSnake.body) {
+                    if (segment.x === apple.x && segment.y === apple.y) {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                // Check collision with other apples
+                for (let other of apples) {
+                    if (other.x === apple.x && other.y === apple.y) {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+
+            apples.push(apple);
+        }
+
+        function draw() {
+            // Clear canvas
+            ctx.fillStyle = '#0f0f1e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= TILE_COUNT; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * GRID_SIZE, 0);
+                ctx.lineTo(i * GRID_SIZE, canvas.height);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, i * GRID_SIZE);
+                ctx.lineTo(canvas.width, i * GRID_SIZE);
+                ctx.stroke();
+            }
+
+            // Draw apples
+            ctx.fillStyle = '#ffd93d';
+            for (let apple of apples) {
+                ctx.beginPath();
+                ctx.arc(
+                    apple.x * GRID_SIZE + GRID_SIZE / 2,
+                    apple.y * GRID_SIZE + GRID_SIZE / 2,
+                    GRID_SIZE / 2 - 2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+
+                // Apple shine
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.beginPath();
+                ctx.arc(
+                    apple.x * GRID_SIZE + GRID_SIZE / 3,
+                    apple.y * GRID_SIZE + GRID_SIZE / 3,
+                    GRID_SIZE / 6,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                ctx.fillStyle = '#ffd93d';
+            }
+
+            // Draw player snake
+            drawSnake(playerSnake);
+
+            // Draw AI snake
+            drawSnake(aiSnake);
+        }
+
+        function drawSnake(snake) {
+            for (let i = 0; i < snake.body.length; i++) {
+                const segment = snake.body[i];
+
+                // Body
+                ctx.fillStyle = snake.color;
+                ctx.fillRect(
+                    segment.x * GRID_SIZE + 1,
+                    segment.y * GRID_SIZE + 1,
+                    GRID_SIZE - 2,
+                    GRID_SIZE - 2
+                );
+
+                // Head highlight
+                if (i === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.fillRect(
+                        segment.x * GRID_SIZE + 3,
+                        segment.y * GRID_SIZE + 3,
+                        GRID_SIZE - 6,
+                        GRID_SIZE - 6
+                    );
+                }
+            }
+        }
+
+        function updateTimer() {
+            timeRemaining--;
+            document.getElementById('timeDisplay').textContent = timeRemaining;
+
+            if (timeRemaining <= 0) {
+                endGame();
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('playerScore').textContent = playerScore;
+            document.getElementById('aiScore').textContent = aiScore;
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(gameLoop);
+            clearInterval(timerInterval);
+
+            const modal = document.getElementById('gameOverModal');
+            const title = document.getElementById('resultTitle');
+            const message = document.getElementById('resultMessage');
+
+            if (playerScore > aiScore) {
+                title.textContent = '🎉 You Win! 🎉';
+                message.textContent = `Your Score: ${playerScore} | AI Score: ${aiScore}`;
+            } else if (aiScore > playerScore) {
+                title.textContent = '🤖 AI Wins!';
+                message.textContent = `AI Score: ${aiScore} | Your Score: ${playerScore}`;
+            } else {
+                title.textContent = '🤝 It\'s a Tie!';
+                message.textContent = `Both scored ${playerScore} apples!`;
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('gameOverModal').classList.remove('active');
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        // Initial draw
+        draw();
+    </script>
+</body>
+</html>

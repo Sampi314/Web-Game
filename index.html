@@ -3,6 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Play free browser games! Card Flip Memory, Connect Four, and Gomoku. No downloads required, 100% free, works on all devices.">
+    <meta name="keywords" content="browser games, free games, card flip, connect four, gomoku, memory game, strategy games">
+    <meta name="author" content="Web Games Collection">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Web Games Collection - Free Browser Games">
+    <meta property="og:description" content="Play 3 fun browser games for free! Card Flip Memory, 4 in a Row, and Gomoku. No downloads needed!">
+    <meta property="og:url" content="https://sampi314.github.io/Web-Game/">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Web Games Collection - Free Browser Games">
+    <meta name="twitter:description" content="Play 3 fun browser games for free! Card Flip Memory, 4 in a Row, and Gomoku.">
+
     <title>Web Games Collection - Fun Browser Games</title>
     <style>
         * {
@@ -284,6 +299,22 @@
             border-color: rgba(255, 255, 255, 0.5);
             transform: scale(1.05);
         }
+
+        .quick-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .quick-link:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -291,13 +322,17 @@
         <header>
             <h1>🎮 Web Games Collection 🎮</h1>
             <p class="subtitle">Fun, free browser games - No downloads required!</p>
+            <p style="margin-top: 15px; font-size: 1.1em; opacity: 0.85;">
+                Welcome to your one-stop destination for classic games reimagined for the web.
+                Play instantly in your browser with no installations, no accounts, and no ads!
+            </p>
         </header>
 
         <div class="stats-banner">
             <h2>🏆 Game Collection</h2>
             <div class="stats-grid">
                 <div class="stat-item">
-                    <span class="stat-number">2</span>
+                    <span class="stat-number">6</span>
                     <span class="stat-label">Games Available</span>
                 </div>
                 <div class="stat-item">
@@ -369,9 +404,134 @@
                     🎮 Play Now
                 </a>
             </div>
+
+            <!-- Gomoku Game -->
+            <div class="game-card">
+                <div class="game-icon">⚫⚪</div>
+                <h2 class="game-title">Gomoku</h2>
+                <p class="game-description">
+                    Classic Five in a Row strategy game! Place your stones strategically to get 5 in a row before your opponent.
+                </p>
+
+                <div>
+                    <span class="badge">🧠 Strategy</span>
+                    <span class="badge">👥 Two Player</span>
+                    <span class="badge">📏 Multiple Boards</span>
+                </div>
+
+                <ul class="game-features">
+                    <li>Traditional Gomoku/Five in a Row gameplay</li>
+                    <li>Two board sizes: 15x15 (standard) and 19x19 (Go board)</li>
+                    <li>Beautiful stone placement animations</li>
+                    <li>Undo move functionality</li>
+                    <li>Score tracking with persistent storage</li>
+                    <li>Detailed statistics and win rates</li>
+                    <li>Winning stones highlight effect</li>
+                </ul>
+
+                <a href="gomoku.html" class="play-button">
+                    🎮 Play Now
+                </a>
+            </div>
+
+            <!-- Word Chain Game -->
+            <div class="game-card">
+                <div class="game-icon">🔤</div>
+                <h2 class="game-title">Word Chain</h2>
+                <p class="game-description">
+                    Battle the CPU in a word game! Type words starting with the last letter of the previous word before time runs out.
+                </p>
+
+                <div>
+                    <span class="badge">📝 Word Game</span>
+                    <span class="badge">🤖 CPU Opponent</span>
+                    <span class="badge">⏰ Timed</span>
+                </div>
+
+                <ul class="game-features">
+                    <li>Race against CPU opponent</li>
+                    <li>60-second timed matches</li>
+                    <li>Built-in word dictionary validation</li>
+                    <li>Longer words = more points</li>
+                    <li>Real-time word history tracking</li>
+                    <li>Chain tracking system</li>
+                    <li>No repeated words allowed</li>
+                </ul>
+
+                <a href="word-chain.html" class="play-button">
+                    🎮 Play Now
+                </a>
+            </div>
+
+            <!-- Snake Battle Game -->
+            <div class="game-card">
+                <div class="game-icon">🐍</div>
+                <h2 class="game-title">Snake Battle</h2>
+                <p class="game-description">
+                    Classic snake reimagined! Race against an AI snake to eat the most apples in 60 seconds. Fast-paced arcade action!
+                </p>
+
+                <div>
+                    <span class="badge">🎮 Arcade</span>
+                    <span class="badge">🤖 AI Opponent</span>
+                    <span class="badge">⚡ Fast-Paced</span>
+                </div>
+
+                <ul class="game-features">
+                    <li>Classic snake gameplay with a twist</li>
+                    <li>Compete against intelligent AI snake</li>
+                    <li>60-second competitive matches</li>
+                    <li>Smooth grid-based movement</li>
+                    <li>Multiple apples on screen</li>
+                    <li>Grow your snake as you score</li>
+                    <li>Arrow keys or WASD controls</li>
+                </ul>
+
+                <a href="snake-battle.html" class="play-button">
+                    🎮 Play Now
+                </a>
+            </div>
+
+            <!-- Gravity Switch Game -->
+            <div class="game-card">
+                <div class="game-icon">🌀</div>
+                <h2 class="game-title">Gravity Switch</h2>
+                <p class="game-description">
+                    One-button endless runner! Flip gravity to dodge obstacles. Simple controls, challenging gameplay!
+                </p>
+
+                <div>
+                    <span class="badge">🚀 Endless Runner</span>
+                    <span class="badge">🎯 One Button</span>
+                    <span class="badge">⭐ High Score</span>
+                </div>
+
+                <ul class="game-features">
+                    <li>Addictive endless runner gameplay</li>
+                    <li>One-button gravity flip mechanic</li>
+                    <li>Procedurally generated obstacles</li>
+                    <li>Increasing difficulty over time</li>
+                    <li>Particle effects and smooth animations</li>
+                    <li>High score persistence</li>
+                    <li>Space bar or click to play</li>
+                </ul>
+
+                <a href="gravity-switch.html" class="play-button">
+                    🎮 Play Now
+                </a>
+            </div>
         </div>
 
         <footer>
+            <h3 style="margin-bottom: 15px; font-size: 1.5em;">Quick Links</h3>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                <a href="card-flip-game-with-leaderboard.html" class="quick-link">🎴 Card Flip</a>
+                <a href="four-in-a-row.html" class="quick-link">🔴 4 in a Row</a>
+                <a href="gomoku.html" class="quick-link">⚫ Gomoku</a>
+                <a href="word-chain.html" class="quick-link">🔤 Word Chain</a>
+                <a href="snake-battle.html" class="quick-link">🐍 Snake Battle</a>
+                <a href="gravity-switch.html" class="quick-link">🌀 Gravity Switch</a>
+            </div>
             <p>All games are built with vanilla HTML, CSS, and JavaScript</p>
             <p>Play directly in your browser - no installation needed!</p>
             <a href="https://github.com/Sampi314/Web-Game" class="github-link" target="_blank">
