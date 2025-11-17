@@ -247,8 +247,8 @@
             y: canvas.height / 2,
             size: 25,
             velocityY: 0,
-            gravity: 0.6,
-            jumpStrength: -8,
+            gravity: 0.4, // Reduced from 0.6 for slower falling
+            jumpStrength: -7, // Reduced from -8 for smoother control
             rotation: 0,
             color: '#FFD700' // Golden bird
         };
@@ -266,7 +266,9 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === ' ' && !spacePressed) {
                 spacePressed = true;
-                if (gameActive) {
+                if (!gameActive) {
+                    startGame();
+                } else {
                     flipGravity();
                 }
             }
@@ -279,7 +281,9 @@
         });
 
         canvas.addEventListener('click', () => {
-            if (gameActive) {
+            if (!gameActive) {
+                startGame();
+            } else {
                 flipGravity();
             }
         });
@@ -501,14 +505,29 @@
             ctx.fillRect(0, canvas.height - groundHeight, canvas.width, 10);
 
             // Draw score
-            ctx.fillStyle = 'white';
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 3;
-            ctx.font = 'bold 36px Arial';
-            ctx.textAlign = 'center';
-            const scoreText = Math.floor(score / 10).toString();
-            ctx.strokeText(scoreText, canvas.width / 2, 50);
-            ctx.fillText(scoreText, canvas.width / 2, 50);
+            if (gameActive) {
+                ctx.fillStyle = 'white';
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 3;
+                ctx.font = 'bold 36px Arial';
+                ctx.textAlign = 'center';
+                const scoreText = Math.floor(score / 10).toString();
+                ctx.strokeText(scoreText, canvas.width / 2, 50);
+                ctx.fillText(scoreText, canvas.width / 2, 50);
+            } else {
+                // Draw "Click to Start" message
+                ctx.fillStyle = 'white';
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 5;
+                ctx.font = 'bold 48px Arial';
+                ctx.textAlign = 'center';
+                ctx.strokeText('Click or Press SPACE', canvas.width / 2, canvas.height / 2 - 30);
+                ctx.fillText('Click or Press SPACE', canvas.width / 2, canvas.height / 2 - 30);
+
+                ctx.font = 'bold 36px Arial';
+                ctx.strokeText('to Start!', canvas.width / 2, canvas.height / 2 + 30);
+                ctx.fillText('to Start!', canvas.width / 2, canvas.height / 2 + 30);
+            }
             ctx.textAlign = 'left';
         }
 
