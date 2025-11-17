@@ -36,6 +36,20 @@ Classic Connect Four game with smooth animations!
 - Statistics panel with win rates
 - Winning piece glow effects
 
+### 3. ⚫⚪ Gomoku (Five in a Row)
+Traditional strategy board game on a Go board!
+
+**Play:** [Gomoku](https://sampi314.github.io/Web-Game/gomoku.html)
+
+**Features:**
+- Traditional Gomoku/Five in a Row gameplay
+- Two board sizes: 15x15 (standard) and 19x19 (Go board)
+- Beautiful stone placement animations
+- Undo move functionality
+- Score tracking with persistent storage
+- Detailed statistics and win rates
+- Winning stones highlight effect
+
 ## 🚀 Quick Start
 
 1. Visit the [game hub](https://sampi314.github.io/Web-Game/) or click any game link above
@@ -76,6 +90,7 @@ Web-Game/
 ├── index.html                              # Landing page/game hub
 ├── card-flip-game-with-leaderboard.html   # Card flip memory game
 ├── four-in-a-row.html                      # Connect Four game
+├── gomoku.html                             # Gomoku (Five in a Row) game
 └── README.md                               # This file
 ```
 
