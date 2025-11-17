@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Chain - Word Game</title>
+    <title>Word Chain - Turn-Based Word Game</title>
     <style>
         * {
             margin: 0;
@@ -29,7 +29,7 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 700px;
+            max-width: 800px;
             width: 100%;
         }
 
@@ -40,9 +40,65 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .game-info {
+        .setup-screen, .game-screen {
+            display: none;
+        }
+
+        .setup-screen.active, .game-screen.active {
+            display: block;
+        }
+
+        .setup-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .setup-group {
+            margin-bottom: 25px;
+        }
+
+        .setup-group label {
+            display: block;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .player-selector {
             display: flex;
-            justify-content: space-between;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .selector-btn {
+            padding: 15px 25px;
+            font-size: 1.2em;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 70px;
+        }
+
+        .selector-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .selector-btn.active {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            border-color: #4ade80;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+        }
+
+        .players-display {
+            display: flex;
+            justify-content: space-around;
             margin-bottom: 20px;
             padding: 20px;
             background: rgba(255, 255, 255, 0.1);
@@ -51,21 +107,37 @@
             gap: 15px;
         }
 
-        .stat-box {
+        .player-box {
             text-align: center;
-            flex: 1;
-            min-width: 100px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            min-width: 120px;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
         }
 
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.8;
+        .player-box.active {
+            background: rgba(74, 222, 128, 0.2);
+            border-color: #4ade80;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
         }
 
-        .stat-value {
-            font-size: 2em;
+        .player-box.eliminated {
+            opacity: 0.4;
+            background: rgba(255, 107, 107, 0.2);
+        }
+
+        .player-name {
+            font-size: 1.1em;
             font-weight: bold;
-            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .player-score {
+            font-size: 1.5em;
+            color: #ffd93d;
         }
 
         .game-area {
@@ -73,7 +145,16 @@
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 20px;
-            min-height: 300px;
+        }
+
+        .turn-indicator {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(74, 222, 128, 0.2);
+            border-radius: 10px;
+            border: 2px solid #4ade80;
         }
 
         .word-display {
@@ -124,12 +205,17 @@
             box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
         }
 
+        input[type="text"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .word-history {
             margin-top: 20px;
             padding: 15px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
         }
 
@@ -139,7 +225,7 @@
         }
 
         .word-item {
-            padding: 8px;
+            padding: 10px;
             margin: 5px 0;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
@@ -148,13 +234,11 @@
             align-items: center;
         }
 
-        .word-item.player {
-            border-left: 4px solid #4ade80;
-        }
-
-        .word-item.cpu {
-            border-left: 4px solid #ff6b6b;
-        }
+        .word-item.player1 { border-left: 4px solid #4ade80; }
+        .word-item.player2 { border-left: 4px solid #60a5fa; }
+        .word-item.player3 { border-left: 4px solid #fbbf24; }
+        .word-item.player4 { border-left: 4px solid #f472b6; }
+        .word-item.bot { border-left: 4px solid #ff6b6b; }
 
         .controls {
             display: flex;
@@ -176,7 +260,7 @@
             color: white;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
@@ -188,6 +272,14 @@
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #ff6b6b, #c92a2a);
+        }
+
+        button.success {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
         }
 
         .message {
@@ -241,7 +333,7 @@
             padding: 40px;
             border-radius: 20px;
             text-align: center;
-            max-width: 400px;
+            max-width: 500px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             animation: modalSlideIn 0.3s ease;
         }
@@ -261,10 +353,26 @@
             margin-bottom: 30px;
         }
 
+        .winner-podium {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .winner-item {
+            padding: 10px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            font-size: 1.2em;
+        }
+
         @media (max-width: 768px) {
             h1 { font-size: 2em; }
             .current-word { font-size: 2em; }
             input[type="text"] { font-size: 1.2em; }
+            .player-box { min-width: 100px; }
         }
     </style>
 </head>
@@ -272,200 +380,353 @@
     <div class="game-container">
         <h1>🔤 Word Chain 🔗</h1>
 
-        <div class="game-info">
-            <div class="stat-box">
-                <div class="stat-label">Time</div>
-                <div class="stat-value" id="timeDisplay">60</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Your Score</div>
-                <div class="stat-value" id="playerScore">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">CPU Score</div>
-                <div class="stat-value" id="cpuScore">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Chain</div>
-                <div class="stat-value" id="chainLength">0</div>
-            </div>
-        </div>
+        <!-- Setup Screen -->
+        <div class="setup-screen active" id="setupScreen">
+            <div class="setup-panel">
+                <div class="setup-group">
+                    <label>👥 Number of Human Players:</label>
+                    <div class="player-selector" id="humanSelector">
+                        <button class="selector-btn active" onclick="selectHumans(1)">1</button>
+                        <button class="selector-btn" onclick="selectHumans(2)">2</button>
+                        <button class="selector-btn" onclick="selectHumans(3)">3</button>
+                        <button class="selector-btn" onclick="selectHumans(4)">4</button>
+                    </div>
+                </div>
 
-        <div class="game-area">
-            <div class="word-display">
-                <div class="current-word" id="currentWord">START</div>
-                <div class="required-letter">
-                    Next word must start with: <span id="requiredLetter">S</span>
+                <div class="setup-group">
+                    <label>🤖 Number of Bots:</label>
+                    <div class="player-selector" id="botSelector">
+                        <button class="selector-btn active" onclick="selectBots(0)">0</button>
+                        <button class="selector-btn" onclick="selectBots(1)">1</button>
+                        <button class="selector-btn" onclick="selectBots(2)">2</button>
+                        <button class="selector-btn" onclick="selectBots(3)">3</button>
+                    </div>
+                </div>
+
+                <div class="setup-group">
+                    <p style="text-align: center; font-size: 1.1em; opacity: 0.8;">
+                        Total Players: <span id="totalPlayers" style="font-weight: bold; color: #4ade80;">1</span>
+                    </p>
                 </div>
             </div>
 
-            <div class="input-area">
-                <input
-                    type="text"
-                    id="wordInput"
-                    placeholder="Type your word here..."
-                    disabled
-                    autocomplete="off"
-                >
-            </div>
-
-            <div id="messageArea"></div>
-
-            <div class="word-history">
-                <h3>📜 Word History</h3>
-                <div id="historyList"></div>
+            <div class="controls">
+                <button class="success" onclick="startGame()">🎮 Start Game</button>
+                <button onclick="showRules()">📖 Rules</button>
+                <button onclick="goHome()">🏠 Home</button>
             </div>
         </div>
 
-        <div class="controls">
-            <button onclick="startGame()">🎮 Start Game</button>
-            <button onclick="showRules()">📖 Rules</button>
-            <button onclick="goHome()">🏠 Home</button>
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <div class="players-display" id="playersDisplay"></div>
+
+            <div class="game-area">
+                <div class="turn-indicator" id="turnIndicator">
+                    Player 1's Turn
+                </div>
+
+                <div class="word-display">
+                    <div class="current-word" id="currentWord">START</div>
+                    <div class="required-letter">
+                        Next word must start with: <span id="requiredLetter">T</span>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <input
+                        type="text"
+                        id="wordInput"
+                        placeholder="Type your word here..."
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div id="messageArea"></div>
+
+                <div class="word-history">
+                    <h3>📜 Word History (Chain: <span id="chainLength">1</span>)</h3>
+                    <div id="historyList"></div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="success" onclick="submitWord()">✓ Submit Word</button>
+                <button class="danger" onclick="giveUp()">🏳️ Give Up</button>
+                <button onclick="newGame()">🔄 New Game</button>
+                <button onclick="backToSetup()">⚙️ Settings</button>
+            </div>
         </div>
     </div>
 
     <div class="modal" id="gameOverModal">
         <div class="modal-content">
             <h2 id="resultTitle">Game Over!</h2>
-            <p id="resultMessage"></p>
+            <div class="winner-podium" id="winnerPodium"></div>
             <button onclick="closeModal()">Play Again</button>
         </div>
     </div>
 
     <script>
-        // Word dictionary - common English words
+        // Word dictionary
         const wordDictionary = new Set([
             "apple", "about", "above", "after", "again", "animal", "answer", "around",
-            "banana", "before", "below", "better", "between", "black", "bread", "bring",
-            "cake", "came", "carry", "change", "clean", "close", "cold", "could", "country",
-            "dance", "dark", "day", "down", "draw", "drink", "during",
-            "early", "earth", "eight", "else", "end", "even", "every", "example",
-            "face", "family", "far", "farm", "fast", "father", "find", "first", "fish", "five", "food", "four", "friend", "from", "fruit",
-            "game", "gave", "give", "glass", "gold", "good", "great", "green", "group", "grow",
-            "hand", "happy", "hard", "have", "head", "hear", "heart", "help", "here", "high", "home", "horse", "house", "how",
-            "idea", "if", "important", "in", "inside", "into", "it",
-            "jump", "just",
-            "keep", "kind", "king", "know",
-            "land", "large", "last", "late", "laugh", "learn", "leave", "left", "less", "let", "letter", "life", "light", "like", "line", "little", "live", "long", "look", "love",
-            "made", "make", "man", "many", "may", "mean", "men", "might", "mile", "mind", "miss", "money", "moon", "more", "most", "mother", "mountain", "move", "much", "music", "must",
-            "name", "near", "never", "new", "next", "night", "no", "not", "nothing", "now", "number",
-            "of", "off", "often", "old", "on", "once", "one", "only", "open", "or", "other", "our", "out", "over", "own",
-            "page", "paper", "part", "people", "picture", "place", "plant", "play", "point", "port",
-            "question", "quick", "quite",
-            "rain", "ran", "read", "red", "right", "river", "road", "rock", "room", "round", "run",
-            "said", "same", "saw", "say", "school", "sea", "second", "see", "seem", "sentence", "set", "ship", "should", "show", "side", "since", "sing", "small", "so", "some", "song", "soon", "sound", "spell", "start", "still", "stop", "story", "study", "such", "sun",
-            "take", "tell", "ten", "than", "that", "the", "their", "them", "then", "there", "these", "they", "thing", "think", "this", "those", "thought", "three", "through", "time", "to", "together", "told", "too", "took", "top", "toward", "town", "tree", "try", "turn", "two",
+            "banana", "before", "below", "better", "between", "black", "bread", "bring", "blue", "bird",
+            "cake", "came", "carry", "change", "clean", "close", "cold", "could", "country", "cup", "car",
+            "dance", "dark", "day", "down", "draw", "drink", "during", "door", "dog",
+            "early", "earth", "eight", "else", "end", "even", "every", "example", "eye", "ear",
+            "face", "family", "far", "farm", "fast", "father", "find", "first", "fish", "five", "food", "four", "friend", "from", "fruit", "fun",
+            "game", "gave", "give", "glass", "gold", "good", "great", "green", "group", "grow", "girl",
+            "hand", "happy", "hard", "have", "head", "hear", "heart", "help", "here", "high", "home", "horse", "house", "how", "hot",
+            "idea", "if", "important", "in", "inside", "into", "it", "ice",
+            "jump", "just", "joy",
+            "keep", "kind", "king", "know", "key",
+            "land", "large", "last", "late", "laugh", "learn", "leave", "left", "less", "let", "letter", "life", "light", "like", "line", "little", "live", "long", "look", "love", "lion",
+            "made", "make", "man", "many", "may", "mean", "men", "might", "mile", "mind", "miss", "money", "moon", "more", "most", "mother", "mountain", "move", "much", "music", "must", "mouse",
+            "name", "near", "never", "new", "next", "night", "no", "not", "nothing", "now", "number", "nose",
+            "of", "off", "often", "old", "on", "once", "one", "only", "open", "or", "other", "our", "out", "over", "own", "orange",
+            "page", "paper", "part", "people", "picture", "place", "plant", "play", "point", "port", "pig", "pen",
+            "question", "quick", "quite", "queen",
+            "rain", "ran", "read", "red", "right", "river", "road", "rock", "room", "round", "run", "rose",
+            "said", "same", "saw", "say", "school", "sea", "second", "see", "seem", "sentence", "set", "ship", "should", "show", "side", "since", "sing", "small", "so", "some", "song", "soon", "sound", "spell", "start", "still", "stop", "story", "study", "such", "sun", "star",
+            "take", "tell", "ten", "than", "that", "the", "their", "them", "then", "there", "these", "they", "thing", "think", "this", "those", "thought", "three", "through", "time", "to", "together", "told", "too", "took", "top", "toward", "town", "tree", "try", "turn", "two", "train",
             "under", "until", "up", "upon", "us", "use",
-            "very",
-            "walk", "want", "warm", "was", "watch", "water", "way", "we", "well", "went", "were", "what", "when", "where", "which", "white", "who", "why", "will", "wind", "with", "word", "work", "world", "would", "write",
-            "year", "yes", "yet", "you", "young", "your"
+            "very", "valley",
+            "walk", "want", "warm", "was", "watch", "water", "way", "we", "well", "went", "were", "what", "when", "where", "which", "white", "who", "why", "will", "wind", "with", "word", "work", "world", "would", "write", "wolf",
+            "year", "yes", "yet", "you", "young", "your", "yellow"
         ]);
 
-        // Game state
-        let gameActive = false;
-        let timeRemaining = 60;
-        let playerScore = 0;
-        let cpuScore = 0;
+        // Game configuration
+        let numHumans = 1;
+        let numBots = 0;
+        let players = [];
+        let currentPlayerIndex = 0;
         let currentWord = "START";
-        let requiredLetter = "S";
-        let usedWords = new Set();
-        let wordHistory = [];
-        let timerInterval = null;
-        let chainLength = 0;
+        let requiredLetter = "T";
+        let usedWords = new Set(['start']);
+        let wordHistory = [{word: 'START', player: 'System', index: -1}];
+        let gameActive = false;
+        let chainLength = 1;
+
+        // Player colors
+        const playerColors = ['#4ade80', '#60a5fa', '#fbbf24', '#f472b6'];
 
         // Initialize
         document.getElementById('wordInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && gameActive) {
                 submitWord();
             }
         });
 
+        function selectHumans(num) {
+            numHumans = num;
+            updateSelectors('humanSelector', num);
+            updateTotalPlayers();
+        }
+
+        function selectBots(num) {
+            numBots = num;
+            updateSelectors('botSelector', num);
+            updateTotalPlayers();
+        }
+
+        function updateSelectors(id, selected) {
+            const buttons = document.getElementById(id).querySelectorAll('.selector-btn');
+            buttons.forEach((btn, index) => {
+                if (parseInt(btn.textContent) === selected) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function updateTotalPlayers() {
+            const total = numHumans + numBots;
+            document.getElementById('totalPlayers').textContent = total;
+
+            if (total < 2) {
+                document.getElementById('totalPlayers').style.color = '#ff6b6b';
+            } else {
+                document.getElementById('totalPlayers').style.color = '#4ade80';
+            }
+        }
+
         function startGame() {
-            gameActive = true;
-            timeRemaining = 60;
-            playerScore = 0;
-            cpuScore = 0;
+            const total = numHumans + numBots;
+            if (total < 2) {
+                alert('You need at least 2 total players (humans + bots) to play!');
+                return;
+            }
+
+            // Initialize players
+            players = [];
+            for (let i = 0; i < numHumans; i++) {
+                players.push({
+                    name: `Player ${i + 1}`,
+                    type: 'human',
+                    score: 0,
+                    eliminated: false,
+                    color: playerColors[i % playerColors.length]
+                });
+            }
+            for (let i = 0; i < numBots; i++) {
+                players.push({
+                    name: `Bot ${i + 1}`,
+                    type: 'bot',
+                    score: 0,
+                    eliminated: false,
+                    color: '#ff6b6b'
+                });
+            }
+
+            // Reset game state
+            currentPlayerIndex = 0;
             currentWord = "START";
             requiredLetter = "T";
             usedWords = new Set(['start']);
-            wordHistory = [{word: 'START', by: 'system'}];
+            wordHistory = [{word: 'START', player: 'System', index: -1}];
+            gameActive = true;
             chainLength = 1;
 
-            updateDisplay();
-            document.getElementById('wordInput').disabled = false;
-            document.getElementById('wordInput').focus();
-            document.getElementById('historyList').innerHTML = '<div class="word-item">START (System)</div>';
-            showMessage('Game started! Type a word starting with "T"', 'info');
+            // Switch screens
+            document.getElementById('setupScreen').classList.remove('active');
+            document.getElementById('gameScreen').classList.add('active');
 
-            // Start timer
-            timerInterval = setInterval(updateTimer, 1000);
+            // Setup display
+            updatePlayersDisplay();
+            updateDisplay();
+            document.getElementById('historyList').innerHTML = '<div class="word-item">START (System)</div>';
+
+            // Start first turn
+            nextTurn();
         }
 
-        function updateTimer() {
-            timeRemaining--;
-            document.getElementById('timeDisplay').textContent = timeRemaining;
+        function updatePlayersDisplay() {
+            const display = document.getElementById('playersDisplay');
+            display.innerHTML = '';
 
-            if (timeRemaining <= 0) {
+            players.forEach((player, index) => {
+                const box = document.createElement('div');
+                box.className = 'player-box';
+                box.id = `player-box-${index}`;
+                if (player.eliminated) box.classList.add('eliminated');
+                if (index === currentPlayerIndex && !player.eliminated) box.classList.add('active');
+
+                const icon = player.type === 'human' ? '👤' : '🤖';
+                box.innerHTML = `
+                    <div class="player-name">${icon} ${player.name}</div>
+                    <div class="player-score">${player.score} pts</div>
+                    ${player.eliminated ? '<div style="font-size: 0.9em; color: #ff6b6b;">Eliminated</div>' : ''}
+                `;
+                display.appendChild(box);
+            });
+        }
+
+        function nextTurn() {
+            if (!gameActive) return;
+
+            // Find next non-eliminated player
+            let attempts = 0;
+            while (players[currentPlayerIndex].eliminated && attempts < players.length) {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                attempts++;
+            }
+
+            // Check if only one player left
+            const activePlayers = players.filter(p => !p.eliminated);
+            if (activePlayers.length <= 1) {
                 endGame();
-            } else if (timeRemaining % 5 === 0 && gameActive) {
-                // CPU makes a move every 5 seconds
-                cpuMove();
+                return;
+            }
+
+            const currentPlayer = players[currentPlayerIndex];
+            updatePlayersDisplay();
+
+            const turnIndicator = document.getElementById('turnIndicator');
+            const icon = currentPlayer.type === 'human' ? '👤' : '🤖';
+            turnIndicator.textContent = `${icon} ${currentPlayer.name}'s Turn`;
+
+            if (currentPlayer.type === 'bot') {
+                document.getElementById('wordInput').disabled = true;
+                showMessage(`${currentPlayer.name} is thinking...`, 'info');
+                setTimeout(() => botMove(), 1500);
+            } else {
+                document.getElementById('wordInput').disabled = false;
+                document.getElementById('wordInput').focus();
+                document.getElementById('wordInput').value = '';
             }
         }
 
         function submitWord() {
             if (!gameActive) return;
 
+            const currentPlayer = players[currentPlayerIndex];
+            if (currentPlayer.type !== 'human') return;
+
             const input = document.getElementById('wordInput');
             const word = input.value.trim().toLowerCase();
             input.value = '';
 
-            // Validate word
+            if (!validateWord(word, currentPlayer)) {
+                return;
+            }
+
+            processWord(word, currentPlayer, currentPlayerIndex);
+        }
+
+        function validateWord(word, player) {
             if (!word) {
                 showMessage('Please enter a word!', 'error');
-                return;
+                return false;
             }
 
             if (!word.startsWith(requiredLetter.toLowerCase())) {
                 showMessage(`Word must start with "${requiredLetter}"!`, 'error');
-                return;
+                return false;
             }
 
             if (usedWords.has(word)) {
                 showMessage('Word already used!', 'error');
-                return;
+                return false;
             }
 
             if (!wordDictionary.has(word)) {
                 showMessage('Word not in dictionary!', 'error');
-                return;
+                return false;
             }
 
             if (word.length < 3) {
                 showMessage('Word must be at least 3 letters!', 'error');
-                return;
+                return false;
             }
 
-            // Valid word!
+            return true;
+        }
+
+        function processWord(word, player, playerIndex) {
             usedWords.add(word);
-            wordHistory.push({word: word, by: 'player'});
-            playerScore += word.length;
+            wordHistory.push({word: word, player: player.name, index: playerIndex});
+            player.score += word.length;
             chainLength++;
             currentWord = word.toUpperCase();
             requiredLetter = word[word.length - 1].toUpperCase();
 
             updateDisplay();
-            addToHistory(word, 'player');
-            showMessage(`Great! +${word.length} points`, 'success');
+            addToHistory(word, player.name, playerIndex);
+            showMessage(`${player.name}: ${word.toUpperCase()} (+${word.length} points)`, 'success');
 
-            // CPU responds immediately
-            setTimeout(cpuMove, 1000);
+            // Move to next player
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            setTimeout(nextTurn, 1000);
         }
 
-        function cpuMove() {
+        function botMove() {
             if (!gameActive) return;
 
-            // Find a valid word
+            const currentPlayer = players[currentPlayerIndex];
+
+            // Find valid words
             const validWords = Array.from(wordDictionary).filter(word =>
                 word.startsWith(requiredLetter.toLowerCase()) &&
                 !usedWords.has(word) &&
@@ -473,40 +734,56 @@
             );
 
             if (validWords.length === 0) {
-                showMessage('CPU cannot find a word. You win!', 'success');
-                endGame();
+                eliminatePlayer(currentPlayerIndex);
                 return;
             }
 
-            // Pick a random word
-            const cpuWord = validWords[Math.floor(Math.random() * validWords.length)];
-            usedWords.add(cpuWord);
-            wordHistory.push({word: cpuWord, by: 'cpu'});
-            cpuScore += cpuWord.length;
-            chainLength++;
-            currentWord = cpuWord.toUpperCase();
-            requiredLetter = cpuWord[cpuWord.length - 1].toUpperCase();
+            // Bot strategy: prefer longer words (70% of time)
+            let botWord;
+            if (Math.random() > 0.3) {
+                validWords.sort((a, b) => b.length - a.length);
+                botWord = validWords[Math.floor(Math.random() * Math.min(5, validWords.length))];
+            } else {
+                botWord = validWords[Math.floor(Math.random() * validWords.length)];
+            }
 
-            updateDisplay();
-            addToHistory(cpuWord, 'cpu');
-            showMessage(`CPU: ${cpuWord.toUpperCase()} (+${cpuWord.length})`, 'info');
+            processWord(botWord, currentPlayer, currentPlayerIndex);
+        }
+
+        function giveUp() {
+            if (!gameActive) return;
+            const currentPlayer = players[currentPlayerIndex];
+            if (currentPlayer.type !== 'human') return;
+
+            if (confirm(`${currentPlayer.name}, are you sure you want to give up?`)) {
+                eliminatePlayer(currentPlayerIndex);
+            }
+        }
+
+        function eliminatePlayer(playerIndex) {
+            const player = players[playerIndex];
+            player.eliminated = true;
+            showMessage(`${player.name} has been eliminated!`, 'error');
+
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            setTimeout(nextTurn, 1500);
         }
 
         function updateDisplay() {
             document.getElementById('currentWord').textContent = currentWord;
             document.getElementById('requiredLetter').textContent = requiredLetter;
-            document.getElementById('playerScore').textContent = playerScore;
-            document.getElementById('cpuScore').textContent = cpuScore;
             document.getElementById('chainLength').textContent = chainLength;
+            updatePlayersDisplay();
         }
 
-        function addToHistory(word, player) {
+        function addToHistory(word, playerName, playerIndex) {
             const historyList = document.getElementById('historyList');
             const item = document.createElement('div');
-            item.className = `word-item ${player}`;
+            const playerClass = players[playerIndex].type === 'bot' ? 'bot' : `player${(playerIndex % 4) + 1}`;
+            item.className = `word-item ${playerClass}`;
             item.innerHTML = `
                 <span>${word.toUpperCase()}</span>
-                <span>${player === 'player' ? '👤 You' : '🤖 CPU'}</span>
+                <span>${playerName} (+${word.length})</span>
             `;
             historyList.insertBefore(item, historyList.firstChild);
         }
@@ -521,23 +798,26 @@
 
         function endGame() {
             gameActive = false;
-            clearInterval(timerInterval);
             document.getElementById('wordInput').disabled = true;
+
+            // Sort players by score
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
             const modal = document.getElementById('gameOverModal');
             const title = document.getElementById('resultTitle');
-            const message = document.getElementById('resultMessage');
+            const podium = document.getElementById('winnerPodium');
 
-            if (playerScore > cpuScore) {
-                title.textContent = '🎉 You Win! 🎉';
-                message.textContent = `Your Score: ${playerScore} | CPU Score: ${cpuScore}`;
-            } else if (cpuScore > playerScore) {
-                title.textContent = '🤖 CPU Wins!';
-                message.textContent = `CPU Score: ${cpuScore} | Your Score: ${playerScore}`;
-            } else {
-                title.textContent = '🤝 It\'s a Tie!';
-                message.textContent = `Both scored ${playerScore} points!`;
-            }
+            title.textContent = '🎉 Game Over! 🎉';
+            podium.innerHTML = '<h3>Final Standings:</h3>';
+
+            sortedPlayers.forEach((player, index) => {
+                const item = document.createElement('div');
+                item.className = 'winner-item';
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+                const icon = player.type === 'human' ? '👤' : '🤖';
+                item.textContent = `${medal} ${icon} ${player.name}: ${player.score} points`;
+                podium.appendChild(item);
+            });
 
             modal.classList.add('active');
         }
@@ -546,20 +826,37 @@
             document.getElementById('gameOverModal').classList.remove('active');
         }
 
+        function newGame() {
+            startGame();
+        }
+
+        function backToSetup() {
+            if (gameActive) {
+                if (!confirm('Leave current game and return to setup?')) return;
+            }
+            gameActive = false;
+            document.getElementById('gameScreen').classList.remove('active');
+            document.getElementById('setupScreen').classList.add('active');
+        }
+
         function showRules() {
             alert('📖 Word Chain Rules:\n\n' +
-                  '1. Type a word starting with the required letter\n' +
-                  '2. Words must be at least 3 letters long\n' +
-                  '3. No repeated words allowed\n' +
-                  '4. CPU responds every 5 seconds\n' +
+                  '1. Players take turns typing words\n' +
+                  '2. Each word must start with the last letter of the previous word\n' +
+                  '3. Words must be at least 3 letters long\n' +
+                  '4. No repeated words allowed\n' +
                   '5. Longer words = more points!\n' +
-                  '6. Game lasts 60 seconds\n' +
-                  '7. Highest score wins!');
+                  '6. If you can\'t make a word, you\'re eliminated\n' +
+                  '7. Last player standing wins!\n' +
+                  '8. Bots make moves automatically');
         }
 
         function goHome() {
             window.location.href = 'index.html';
         }
+
+        // Initialize
+        updateTotalPlayers();
     </script>
 </body>
 </html>

@@ -53,18 +53,19 @@ Traditional strategy board game on a Go board!
 - Winning stones highlight effect
 
 ### 4. 🔤 Word Chain
-Battle the CPU in a word association game!
+Turn-based word association game with multiplayer support!
 
 **Play:** [Word Chain](https://sampi314.github.io/Web-Game/word-chain.html)
 
 **Features:**
-- Race against CPU opponent
-- 60-second timed matches
+- Turn-based gameplay (1-4 human players)
+- Configurable bot opponents (0-3 bots)
+- Players take turns in sequence
 - Built-in word dictionary validation
 - Longer words = more points
 - Real-time word history tracking
-- Chain tracking system
-- No repeated words allowed
+- Player elimination system
+- Last player standing wins
 
 ### 5. 🐍 Snake Battle
 Classic snake with a competitive twist!
