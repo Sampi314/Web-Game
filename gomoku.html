@@ -3237,13 +3237,6 @@
                 if (icon) icon.textContent = soundEnabled ? '🔊' : '🔇';
                 if (text) text.textContent = soundEnabled ? 'ON' : 'OFF';
             }
-
-            // Update top controls button
-            const topBtn = document.getElementById('topSoundToggle');
-            if (topBtn) {
-                topBtn.textContent = soundEnabled ? '🔊' : '🔇';
-                topBtn.title = soundEnabled ? 'Sound: ON' : 'Sound: OFF';
-            }
         }
 
         function updateVolume(value) {
@@ -3272,13 +3265,6 @@
                         const text = btn.querySelector('.rule-text strong');
                         if (icon) icon.textContent = soundEnabled ? '🔊' : '🔇';
                         if (text) text.textContent = soundEnabled ? 'ON' : 'OFF';
-                    }
-
-                    // Update top controls button
-                    const topBtn = document.getElementById('topSoundToggle');
-                    if (topBtn) {
-                        topBtn.textContent = soundEnabled ? '🔊' : '🔇';
-                        topBtn.title = soundEnabled ? 'Sound: ON' : 'Sound: OFF';
                     }
                 }
 
