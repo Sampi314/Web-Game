@@ -209,6 +209,73 @@
             font-size: 1em;
         }
 
+        .player-customization {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .player-card h4 {
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            color: #4ade80;
+        }
+
+        .player-card label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .player-card select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1em;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .color-btn:hover:not(.disabled) {
+            transform: scale(1.1);
+        }
+
+        .color-btn.selected {
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+        }
+
+        .color-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -325,12 +392,8 @@
                     </select>
                 </div>
             </div>
-            <div id="controlsInfo" class="controls-info">
-                <h3>Controls:</h3>
-                <p>Player 1: Arrow Keys (↑ ↓ ← →)</p>
-                <p style="opacity: 0.5;">Player 2: WASD</p>
-                <p style="opacity: 0.5;">Player 3: IJKL</p>
-                <p style="opacity: 0.5;">Player 4: Numpad 8456</p>
+            <div id="playerCustomization" class="player-customization">
+                <!-- Player cards will be dynamically generated here -->
             </div>
             <button onclick="startGameFromSetup()" style="margin-top: 20px; padding: 15px 40px; font-size: 1.2em;">🚀 Start Battle!</button>
         </div>
@@ -512,35 +575,26 @@
         let timerInterval = null;
 
         // Snake colors
-        const SNAKE_COLORS = ['#4ade80', '#ff6b6b', '#fbbf24', '#a78bfa'];
+        const SNAKE_COLORS = ['#4ade80', '#ff6b6b', '#fbbf24', '#a78bfa', '#60a5fa', '#f472b6', '#fb923c', '#34d399'];
 
-        // Control schemes for each player
-        const CONTROLS = {
-            0: { // Player 1: Arrow keys
-                up: 'ArrowUp',
-                down: 'ArrowDown',
-                left: 'ArrowLeft',
-                right: 'ArrowRight'
-            },
-            1: { // Player 2: WASD
-                up: 'w',
-                down: 's',
-                left: 'a',
-                right: 'd'
-            },
-            2: { // Player 3: IJKL
-                up: 'i',
-                down: 'k',
-                left: 'j',
-                right: 'l'
-            },
-            3: { // Player 4: Numpad 8456
-                up: '8',
-                down: '5',
-                left: '4',
-                right: '6'
-            }
+        // Control scheme presets
+        const CONTROL_PRESETS = {
+            arrows: { name: '↑↓←→ Arrow Keys', up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' },
+            wasd: { name: 'WASD', up: 'w', down: 's', left: 'a', right: 'd' },
+            ijkl: { name: 'IJKL', up: 'i', down: 'k', left: 'j', right: 'l' },
+            numpad: { name: 'Numpad 8456', up: '8', down: '5', left: '4', right: '6' }
         };
+
+        // Player customizations
+        let playerSettings = [
+            { controlScheme: 'arrows', color: SNAKE_COLORS[0] },
+            { controlScheme: 'wasd', color: SNAKE_COLORS[1] },
+            { controlScheme: 'ijkl', color: SNAKE_COLORS[2] },
+            { controlScheme: 'numpad', color: SNAKE_COLORS[3] }
+        ];
+
+        // Control schemes for each player (will be set from playerSettings)
+        const CONTROLS = {};
 
         // Apples
         let apples = [];
@@ -627,15 +681,88 @@
         // Setup screen functions
         function updatePlayerControls() {
             numPlayers = parseInt(document.getElementById('numPlayers').value);
-            const controlInfos = document.querySelectorAll('#controlsInfo p');
+            const container = document.getElementById('playerCustomization');
+            container.innerHTML = '';
 
-            controlInfos.forEach((p, index) => {
-                if (index < numPlayers) {
-                    p.style.opacity = '1';
-                } else {
-                    p.style.opacity = '0.5';
-                }
-            });
+            for (let i = 0; i < numPlayers; i++) {
+                const card = document.createElement('div');
+                card.className = 'player-card';
+                card.innerHTML = `
+                    <h4>🎮 Player ${i + 1}</h4>
+                    <label>Controls:</label>
+                    <select onchange="setPlayerControl(${i}, this.value)">
+                        <option value="arrows" ${playerSettings[i].controlScheme === 'arrows' ? 'selected' : ''}>↑↓←→ Arrow Keys</option>
+                        <option value="wasd" ${playerSettings[i].controlScheme === 'wasd' ? 'selected' : ''}>WASD</option>
+                        <option value="ijkl" ${playerSettings[i].controlScheme === 'ijkl' ? 'selected' : ''}>IJKL</option>
+                        <option value="numpad" ${playerSettings[i].controlScheme === 'numpad' ? 'selected' : ''}>Numpad 8456</option>
+                    </select>
+                    <label>Snake Color:</label>
+                    <div class="color-options" id="colorOptions${i}"></div>
+                `;
+                container.appendChild(card);
+
+                // Add color buttons
+                const colorOptions = document.getElementById(`colorOptions${i}`);
+                SNAKE_COLORS.forEach((color, colorIndex) => {
+                    const btn = document.createElement('div');
+                    btn.className = 'color-btn';
+                    btn.style.backgroundColor = color;
+                    btn.onclick = () => setPlayerColor(i, color);
+                    if (playerSettings[i].color === color) {
+                        btn.classList.add('selected');
+                    }
+                    colorOptions.appendChild(btn);
+                });
+            }
+
+            updateColorAvailability();
+        }
+
+        function setPlayerControl(playerIndex, scheme) {
+            playerSettings[playerIndex].controlScheme = scheme;
+        }
+
+        function setPlayerColor(playerIndex, color) {
+            // Check if color is already used by another player
+            const usedByOther = playerSettings.some((setting, idx) =>
+                idx !== playerIndex && setting.color === color && idx < numPlayers
+            );
+
+            if (usedByOther) {
+                alert('This color is already in use by another player!');
+                return;
+            }
+
+            playerSettings[playerIndex].color = color;
+            updatePlayerControls();
+        }
+
+        function updateColorAvailability() {
+            const usedColors = playerSettings.slice(0, numPlayers).map(s => s.color);
+
+            for (let i = 0; i < numPlayers; i++) {
+                const colorOptions = document.getElementById(`colorOptions${i}`);
+                if (!colorOptions) continue;
+
+                const buttons = colorOptions.querySelectorAll('.color-btn');
+                buttons.forEach((btn) => {
+                    const color = btn.style.backgroundColor;
+                    const hexColor = rgbToHex(color);
+                    const isUsed = usedColors.includes(hexColor) && hexColor !== playerSettings[i].color;
+
+                    btn.classList.toggle('disabled', isUsed);
+                    btn.classList.toggle('selected', hexColor === playerSettings[i].color);
+                });
+            }
+        }
+
+        function rgbToHex(rgb) {
+            const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            if (!match) return rgb;
+            return '#' + [match[1], match[2], match[3]].map(x => {
+                const hex = parseInt(x).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
         }
 
         function startGameFromSetup() {
@@ -706,6 +833,17 @@
             snakes = [];
             gameTimer = 60; // Reset timer to 60 seconds
 
+            // Set up controls from player settings
+            for (let i = 0; i < numPlayers; i++) {
+                const preset = CONTROL_PRESETS[playerSettings[i].controlScheme];
+                CONTROLS[i] = {
+                    up: preset.up,
+                    down: preset.down,
+                    left: preset.left,
+                    right: preset.right
+                };
+            }
+
             // Spawn positions (corners and center regions)
             const spawnPositions = [
                 {x: 10, y: 10},
@@ -713,6 +851,10 @@
                 {x: 10, y: TILE_COUNT - 10},
                 {x: TILE_COUNT - 10, y: 10}
             ];
+
+            // Get available colors for bots (colors not used by players)
+            const usedColors = playerSettings.slice(0, numPlayers).map(s => s.color);
+            const availableColors = SNAKE_COLORS.filter(c => !usedColors.includes(c));
 
             // Create human player snakes
             for (let i = 0; i < numPlayers; i++) {
@@ -725,7 +867,7 @@
                     nextDx: 1,
                     nextDy: 0,
                     score: 0,
-                    color: SNAKE_COLORS[i],
+                    color: playerSettings[i].color,
                     alive: true
                 });
             }
@@ -742,7 +884,7 @@
                     nextDx: -1,
                     nextDy: 0,
                     score: 0,
-                    color: SNAKE_COLORS[snakeIndex],
+                    color: availableColors[i] || SNAKE_COLORS[snakeIndex],
                     alive: true
                 });
             }
@@ -1295,9 +1437,10 @@
             window.location.href = 'index.html';
         }
 
-        // Initialize sound button on page load
+        // Initialize sound button and player customization on page load
         window.addEventListener('DOMContentLoaded', () => {
             updateSoundButton();
+            updatePlayerControls();
         });
 
         // Initial draw
