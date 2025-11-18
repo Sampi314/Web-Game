@@ -32,7 +32,9 @@
 
 ## 🎯 About
 
-A curated collection of **6 engaging browser games** built with pure vanilla HTML, CSS, and JavaScript. No frameworks, no build process, no installations - just instant gaming fun that works on any modern browser!
+A curated collection of **7 engaging browser games** built with pure vanilla HTML, CSS, and JavaScript. No frameworks, no build process, no installations - just instant gaming fun that works on any modern browser!
+
+**🏠 [Play Now on the Home Page](https://sampi314.github.io/Web-Game/)** - Browse all games with beautiful cards, descriptions, and instant access!
 
 All games feature:
 - 💾 **Auto-save progress** using LocalStorage
@@ -50,12 +52,13 @@ All games feature:
 
 | Game | Genre | Players | Difficulty | Highlights |
 |------|-------|---------|------------|------------|
-| [🎴 Card Flip](#1--card-flip-memory-game) | Memory/Puzzle | 1 | ⭐⭐ | 8 modes, achievements, themes |
+| [🎴 Card Flip](#1--card-flip-memory-game) | Memory/Puzzle | 1 | ⭐⭐ | 8 modes, themes, global leaderboard |
 | [🔴🟡 4 in a Row](#2--4-in-a-row) | Strategy | 2 | ⭐⭐ | Classic Connect Four |
 | [⚫⚪ Gomoku](#3--gomoku) | Strategy | 2 | ⭐⭐⭐ | Traditional Go board |
 | [🔤 Word Chain](#4--word-chain) | Word/Party | 1-4 | ⭐⭐ | Multiplayer + AI bots |
-| [🐍 Snake Battle](#5--snake-battle) | Arcade/Action | 1 vs AI | ⭐⭐ | Competitive twist |
+| [🐍 Snake Battle](#5--snake-battle) | Arcade/Action | 1 vs AI | ⭐⭐ | Competitive 60s matches |
 | [🌀 Gravity Switch](#6--gravity-switch) | Endless Runner | 1 | ⭐⭐⭐ | One-button challenge |
+| [💣 Minesweeper](#7--minesweeper) | Logic/Puzzle | 1 | ⭐⭐⭐ | Classic mine detection |
 
 ---
 
@@ -69,9 +72,8 @@ All games feature:
 - **8 Game Modes:** Normal, Peek, Fade, Fortune, Chaos, Swap, Rotate, Color
 - **Multiple Difficulties:** 4x4, 6x6, 8x8, or custom grid sizes
 - **6 Visual Themes:** Choose your favorite aesthetic
-- **15 Achievements:** Unlock rewards as you play
+- **Global Leaderboard:** Compete with all players across time periods
 - **Combo System:** Chain matches for bonus points
-- **Leaderboard:** Track your best scores
 - **Audio:** Sound effects and background music
 - **Statistics:** Detailed gameplay analytics
 
@@ -191,6 +193,30 @@ All games feature:
 2. Avoid obstacles by switching between top and bottom
 3. Survive as long as possible
 4. Beat your high score!
+
+---
+
+### 7. 💣 Minesweeper
+
+> **Classic logic puzzle with modern features!**
+
+**[▶ Play Now](https://sampi314.github.io/Web-Game/minesweeper.html)**
+
+#### Features
+- **Three Difficulty Levels:** Easy, Medium, and Hard
+- **Timer System:** Track your completion time
+- **Heart System:** Multiple lives on easier difficulties
+- **Power-Ups:** Reveal cells with special abilities
+- **Coin Rewards:** Earn coins based on difficulty
+- **Score System:** Time-based scoring for leaderboard
+- **Classic Controls:** Left click to reveal, right click to flag
+
+#### How to Play
+1. Left-click to reveal a cell
+2. Right-click to flag suspected mines
+3. Numbers show how many mines are adjacent
+4. Use logic to deduce mine locations
+5. Clear all non-mine cells to win!
 
 ---
 
@@ -335,7 +361,9 @@ Web-Game/
 │   ├── gomoku.html                            # Gomoku/Five-in-a-Row
 │   ├── word-chain.html                        # Word association game
 │   ├── snake-battle.html                      # Snake vs AI
-│   └── gravity-switch.html                    # Endless runner
+│   ├── gravity-switch.html                    # Endless runner
+│   ├── minesweeper.html                       # Classic Minesweeper
+│   └── leaderboard.html                       # Global leaderboard
 │
 └── 📖 README.md                               # This file
 
@@ -493,11 +521,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
 ## 🎯 Roadmap
 
+### Completed Features
+- [x] Global leaderboards with Daily/Weekly/Monthly/All Time rankings
+- [x] Minesweeper game
+
 ### Planned Features
-- [ ] More games (Tetris, Minesweeper, Tower Defense)
+- [ ] More games (Tetris, Tower Defense, Mahjong)
 - [ ] Online multiplayer support
-- [ ] Global leaderboards
-- [ ] Achievement badges and unlockables
 - [ ] Dark/Light theme toggle
 - [ ] Customizable controls
 - [ ] Game tutorials and guides
