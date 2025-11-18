@@ -729,45 +729,32 @@
             }
         }
 
-        // Play cell unlock sound (satisfying reveal)
+        // Play cell unlock sound (modern subtle click like Minesweeper 2020)
         function playClickSound() {
             if (!soundEnabled || !audioContext) return;
 
             const now = audioContext.currentTime;
 
-            // Two-part sound: unlock click + reveal chime
-            const click = audioContext.createOscillator();
-            const chime = audioContext.createOscillator();
-            const clickGain = audioContext.createGain();
-            const chimeGain = audioContext.createGain();
+            // Clean, subtle click sound
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
 
-            click.connect(clickGain);
-            chime.connect(chimeGain);
-            clickGain.connect(audioContext.destination);
-            chimeGain.connect(audioContext.destination);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
 
-            // Click part - crisp unlock sound
-            click.frequency.setValueAtTime(1000, now);
-            click.frequency.exponentialRampToValueAtTime(600, now + 0.04);
-            click.type = 'square';
+            // Soft click with gentle tone
+            oscillator.frequency.setValueAtTime(800, now);
+            oscillator.frequency.exponentialRampToValueAtTime(400, now + 0.03);
+            oscillator.type = 'sine';
 
-            clickGain.gain.setValueAtTime(0.15, now);
-            clickGain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+            gainNode.gain.setValueAtTime(0.12, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
 
-            // Chime part - pleasant reveal tone
-            chime.frequency.setValueAtTime(800, now + 0.02);
-            chime.type = 'sine';
-
-            chimeGain.gain.setValueAtTime(0.08, now + 0.02);
-            chimeGain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
-
-            click.start(now);
-            click.stop(now + 0.04);
-            chime.start(now + 0.02);
-            chime.stop(now + 0.12);
+            oscillator.start(now);
+            oscillator.stop(now + 0.03);
         }
 
-        // Play flag sound (soft pop)
+        // Play flag sound (modern subtle pop like Minesweeper 2020)
         function playFlagSound() {
             if (!soundEnabled || !audioContext) return;
 
@@ -778,79 +765,49 @@
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
 
-            oscillator.frequency.setValueAtTime(600, now);
-            oscillator.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+            // Gentle pop sound
+            oscillator.frequency.setValueAtTime(900, now);
+            oscillator.frequency.exponentialRampToValueAtTime(450, now + 0.05);
+            oscillator.type = 'sine';
 
-            gainNode.gain.setValueAtTime(0.15, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
 
             oscillator.start(now);
-            oscillator.stop(now + 0.08);
+            oscillator.stop(now + 0.05);
         }
 
-        // Play mine explosion sound (dramatic boom!)
+        // Play mine explosion sound (modern failure sound like Minesweeper 2020)
         function playExplosionSound() {
             if (!soundEnabled || !audioContext) return;
 
             const now = audioContext.currentTime;
 
-            // Create noise buffer for explosion effect
-            const bufferSize = audioContext.sampleRate * 0.6;
-            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-            const data = buffer.getChannelData(0);
+            // Create a short, descending "wrong" sound
+            const oscillator1 = audioContext.createOscillator();
+            const oscillator2 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
 
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
+            oscillator1.connect(gainNode);
+            oscillator2.connect(gainNode);
+            gainNode.connect(audioContext.destination);
 
-            const noise = audioContext.createBufferSource();
-            noise.buffer = buffer;
+            // Two-tone descending sound
+            oscillator1.frequency.setValueAtTime(400, now);
+            oscillator1.frequency.exponentialRampToValueAtTime(200, now + 0.15);
+            oscillator1.type = 'sine';
 
-            const noiseFilter = audioContext.createBiquadFilter();
-            noiseFilter.type = 'lowpass';
-            noiseFilter.frequency.setValueAtTime(3000, now);
-            noiseFilter.frequency.exponentialRampToValueAtTime(100, now + 0.6);
+            oscillator2.frequency.setValueAtTime(300, now);
+            oscillator2.frequency.exponentialRampToValueAtTime(150, now + 0.15);
+            oscillator2.type = 'sine';
 
-            const noiseGain = audioContext.createGain();
-            noiseGain.gain.setValueAtTime(0.4, now);
-            noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
 
-            // Add a powerful low frequency rumble
-            const rumble = audioContext.createOscillator();
-            rumble.frequency.setValueAtTime(100, now);
-            rumble.frequency.exponentialRampToValueAtTime(30, now + 0.5);
-            rumble.type = 'sawtooth';
-
-            const rumbleGain = audioContext.createGain();
-            rumbleGain.gain.setValueAtTime(0.35, now);
-            rumbleGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-
-            // Add a sharp initial crack
-            const crack = audioContext.createOscillator();
-            crack.frequency.setValueAtTime(200, now);
-            crack.frequency.exponentialRampToValueAtTime(50, now + 0.08);
-            crack.type = 'square';
-
-            const crackGain = audioContext.createGain();
-            crackGain.gain.setValueAtTime(0.3, now);
-            crackGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-
-            noise.connect(noiseFilter);
-            noiseFilter.connect(noiseGain);
-            noiseGain.connect(audioContext.destination);
-
-            rumble.connect(rumbleGain);
-            rumbleGain.connect(audioContext.destination);
-
-            crack.connect(crackGain);
-            crackGain.connect(audioContext.destination);
-
-            noise.start(now);
-            noise.stop(now + 0.6);
-            rumble.start(now);
-            rumble.stop(now + 0.5);
-            crack.start(now);
-            crack.stop(now + 0.08);
+            oscillator1.start(now);
+            oscillator1.stop(now + 0.15);
+            oscillator2.start(now);
+            oscillator2.stop(now + 0.15);
         }
 
         // Play win sound (victory fanfare)
@@ -910,12 +867,12 @@
             oscillator2.stop(now + 0.2);
         }
 
-        // Play number reveal sound (variations based on number)
+        // Play number reveal sound (subtle variations based on number)
         function playNumberSound(number) {
             if (!soundEnabled || !audioContext || number === 0) return;
 
             const now = audioContext.currentTime;
-            const baseFreq = 400 + (number * 100); // Higher pitch for higher numbers
+            const baseFreq = 600 + (number * 80); // Slightly higher pitch for higher numbers
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
 
@@ -923,13 +880,14 @@
             gainNode.connect(audioContext.destination);
 
             oscillator.frequency.setValueAtTime(baseFreq, now);
+            oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.8, now + 0.04);
             oscillator.type = 'sine';
 
-            gainNode.gain.setValueAtTime(0.08, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            gainNode.gain.setValueAtTime(0.06, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
 
             oscillator.start(now);
-            oscillator.stop(now + 0.1);
+            oscillator.stop(now + 0.04);
         }
 
         // ===== GAME VARIABLES =====
