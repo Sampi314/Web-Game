@@ -93,14 +93,23 @@ function cleanupPlayer(playerId) {
                 playerName: player.playerName
             });
 
-            // Could implement game pause or end logic here
-            // For now, just remove the game if host leaves
-            if (game.host === playerId) {
-                activeGames.delete(player.currentGame);
+            // Notify other players before deleting game
+            broadcastToGame(player.currentGame, {
+                type: 'player_disconnected',
+                playerId: playerId,
+                playerName: player.playerName
+            }, playerId);
+
+            // Remove player from game
+            game.players = game.players.filter(p => p.id !== playerId);
+
+            // If host leaves or no players left, end game
+            if (game.host === playerId || game.players.length === 0) {
                 broadcastToGame(player.currentGame, {
                     type: 'game_ended',
-                    reason: 'host_disconnected'
+                    reason: game.host === playerId ? 'host_disconnected' : 'no_players'
                 });
+                activeGames.delete(player.currentGame);
             }
         }
     }
@@ -110,8 +119,14 @@ function cleanupPlayer(playerId) {
 
 wss.on('connection', (ws) => {
     let playerId = null;
+    ws.isAlive = true;
 
     console.log('📱 New connection');
+
+    // Heartbeat - respond to ping
+    ws.on('pong', () => {
+        ws.isAlive = true;
+    });
 
     ws.on('message', (data) => {
         try {

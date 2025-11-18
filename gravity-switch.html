@@ -998,12 +998,10 @@
 
         function restartGame() {
             gameActive = false;
-            gameStarted = false;
             score = 0;
-            bird.y = canvas.height / 2;
-            bird.velocity = 0;
-            pipes = [];
-            pipesPassed.clear();
+            player.y = canvas.height / 2;
+            player.velocityY = 0;
+            obstacles = [];
             updateScore();
             draw();
         }

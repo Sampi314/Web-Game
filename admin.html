@@ -653,17 +653,21 @@
                 try {
                     const backup = JSON.parse(e.target.result);
 
-                    if (backup.data) {
+                    if (backup.game && backup.data) {
+                        // Single game backup - check this first
+                        if (!GAMES[backup.game]) {
+                            showGlobalMessage('❌ Error: Unknown game type in backup', 'info');
+                            return;
+                        }
+                        const storageKey = GAMES[backup.game].storageKey;
+                        localStorage.setItem(storageKey, JSON.stringify(backup.data));
+                        showGlobalMessage(`✅ ${GAMES[backup.game].name} backup restored!`, 'success');
+                    } else if (backup.data) {
                         // Full backup
                         Object.keys(backup.data).forEach(storageKey => {
                             localStorage.setItem(storageKey, JSON.stringify(backup.data[storageKey]));
                         });
                         showGlobalMessage('✅ Full backup restored successfully!', 'success');
-                    } else if (backup.game && backup.data) {
-                        // Single game backup
-                        const storageKey = GAMES[backup.game].storageKey;
-                        localStorage.setItem(storageKey, JSON.stringify(backup.data));
-                        showGlobalMessage(`✅ ${GAMES[backup.game].name} backup restored!`, 'success');
                     }
 
                     loadAdminPanel();
