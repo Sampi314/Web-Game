@@ -1,165 +1,540 @@
+<div align="center">
+
 # 🎮 Web Games Collection
 
-A collection of fun, free browser games built with vanilla HTML, CSS, and JavaScript. No downloads or installations required - just open and play!
+### *Fun, Free Browser Games - No Downloads Required!*
 
-## 🌐 Play Now
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://sampi314.github.io/Web-Game/)
+[![Made with](https://img.shields.io/badge/made%20with-vanilla%20JS-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-**🏠 Main Hub (index.html):** [https://sampi314.github.io/Web-Game/](https://sampi314.github.io/Web-Game/)
+[🎯 Play Now](https://sampi314.github.io/Web-Game/) • [🎮 Games](#-games-library) • [🚀 Features](#-key-features) • [💻 Development](#-local-development)
 
-Visit the landing page to browse all games in one place!
+</div>
 
-## 🎯 Available Games
+---
+
+## 📋 Table of Contents
+
+- [About](#-about)
+- [Games Library](#-games-library)
+- [Key Features](#-key-features)
+- [Quick Start](#-quick-start)
+- [Local Development](#-local-development)
+- [Tech Stack](#-tech-stack)
+- [Browser Support](#-browser-support)
+- [Repository Structure](#-repository-structure)
+- [Contributing](#-contributing)
+- [FAQ](#-frequently-asked-questions)
+
+---
+
+## 🎯 About
+
+A curated collection of **7 engaging browser games** built with pure vanilla HTML, CSS, and JavaScript. No frameworks, no build process, no installations - just instant gaming fun that works on any modern browser!
+
+**🏠 [Play Now on the Home Page](https://sampi314.github.io/Web-Game/)** - Browse all games with beautiful cards, descriptions, and instant access!
+
+All games feature:
+- 💾 **Auto-save progress** using LocalStorage
+- 📱 **Fully responsive** design for mobile and desktop
+- 🎨 **Beautiful animations** and smooth gameplay
+- 🏆 **Achievement systems** and persistent leaderboards
+- 🎵 **Optional sound effects** (where applicable)
+- 🚀 **Zero dependencies** - pure web technologies
+
+---
+
+## 🎮 Games Library
+
+### Quick Comparison
+
+| Game | Genre | Players | Difficulty | Highlights |
+|------|-------|---------|------------|------------|
+| [🎴 Card Flip](#1--card-flip-memory-game) | Memory/Puzzle | 1 | ⭐⭐ | 8 modes, themes, global leaderboard |
+| [🔴🟡 4 in a Row](#2--4-in-a-row) | Strategy | 2 | ⭐⭐ | Classic Connect Four |
+| [⚫⚪ Gomoku](#3--gomoku) | Strategy | 2 | ⭐⭐⭐ | Traditional Go board |
+| [🔤 Word Chain](#4--word-chain) | Word/Party | 1-4 | ⭐⭐ | Multiplayer + AI bots |
+| [🐍 Snake Battle](#5--snake-battle) | Arcade/Action | 1 vs AI | ⭐⭐ | Competitive 60s matches |
+| [🌀 Gravity Switch](#6--gravity-switch) | Endless Runner | 1 | ⭐⭐⭐ | One-button challenge |
+| [💣 Minesweeper](#7--minesweeper) | Logic/Puzzle | 1 | ⭐⭐⭐ | Classic mine detection |
+
+---
 
 ### 1. 🎴 Card Flip Memory Game
-Test your memory with this feature-rich card matching game!
 
-**Play:** [Card Flip Game](https://sampi314.github.io/Web-Game/card-flip-game-with-leaderboard.html)
+> **Test your memory with this feature-rich card matching game!**
 
-**Features:**
-- Multiple difficulty levels (4x4, 6x6, 8x8, custom)
-- 8 unique game modes (Normal, Peek, Fade, Fortune, Chaos, Swap, Rotate, Color)
-- 6 visual themes and multiple icon sets
-- Achievement system with 15 unlockables
-- Persistent leaderboard and statistics
-- Sound effects and background music
-- Combo system for extra points
+**[▶ Play Now](https://sampi314.github.io/Web-Game/card-flip.html)**
 
-### 2. 🔴🟡 4 in a Row (Connect Four)
-Classic Connect Four game with smooth animations!
+#### Features
+- **8 Game Modes:** Normal, Peek, Fade, Fortune, Chaos, Swap, Rotate, Color
+- **Multiple Difficulties:** 4x4, 6x6, 8x8, or custom grid sizes
+- **6 Visual Themes:** Choose your favorite aesthetic
+- **Global Leaderboard:** Compete with all players across time periods
+- **Combo System:** Chain matches for bonus points
+- **Audio:** Sound effects and background music
+- **Statistics:** Detailed gameplay analytics
 
-**Play:** [4 in a Row](https://sampi314.github.io/Web-Game/four-in-a-row.html)
+#### How to Play
+1. Click cards to flip and reveal icons
+2. Match pairs to clear them from the board
+3. Clear all pairs with minimum moves for high scores
+4. Try different game modes for unique challenges
 
-**Features:**
-- Classic 6x7 Connect Four gameplay
-- Two-player local multiplayer
-- Smooth piece drop animations
-- Win detection in all directions
-- Score tracking with persistent storage
-- Statistics panel with win rates
-- Winning piece glow effects
+---
 
-### 3. ⚫⚪ Gomoku (Five in a Row)
-Traditional strategy board game on a Go board!
+### 2. 🔴🟡 4 in a Row
 
-**Play:** [Gomoku](https://sampi314.github.io/Web-Game/gomoku.html)
+> **Classic Connect Four with smooth animations!**
 
-**Features:**
-- Traditional Gomoku/Five in a Row gameplay
-- Two board sizes: 15x15 (standard) and 19x19 (Go board)
-- Beautiful stone placement animations
-- Undo move functionality
-- Score tracking with persistent storage
-- Detailed statistics and win rates
-- Winning stones highlight effect
+**[▶ Play Now](https://sampi314.github.io/Web-Game/four-in-a-row.html)**
+
+#### Features
+- **Classic Gameplay:** Traditional 6x7 Connect Four grid
+- **Two-Player Local:** Play with friends on same device
+- **Smooth Animations:** Beautiful piece drop effects
+- **Win Detection:** All directions (horizontal, vertical, diagonal)
+- **Score Tracking:** Persistent statistics and win rates
+- **Visual Effects:** Winning pieces glow on victory
+
+#### How to Play
+1. Players alternate dropping colored discs into columns
+2. First to get 4 in a row (any direction) wins
+3. Plan ahead to block your opponent's moves
+4. Track your wins in the statistics panel
+
+---
+
+### 3. ⚫⚪ Gomoku
+
+> **Traditional Five-in-a-Row strategy game on a Go board!**
+
+**[▶ Play Now](https://sampi314.github.io/Web-Game/gomoku.html)**
+
+#### Features
+- **Two Board Sizes:** 15x15 (standard) or 19x19 (Go board)
+- **Beautiful Animations:** Smooth stone placement effects
+- **Undo Function:** Take back moves
+- **Score Tracking:** Persistent stats and win rates
+- **Winning Highlight:** Winning stones light up
+- **Two-Player:** Local multiplayer
+
+#### How to Play
+1. Players alternate placing black and white stones
+2. First to get 5 in a row (any direction) wins
+3. Strategic placement is key to victory
+4. Use undo to analyze different strategies
+
+---
 
 ### 4. 🔤 Word Chain
-Turn-based word association game with multiplayer support!
 
-**Play:** [Word Chain](https://sampi314.github.io/Web-Game/word-chain.html)
+> **Turn-based word association with multiplayer support!**
 
-**Features:**
-- Turn-based gameplay (1-4 human players)
-- Configurable bot opponents (0-3 bots)
-- Players take turns in sequence
-- Built-in word dictionary validation
-- Longer words = more points
-- Real-time word history tracking
-- Player elimination system
-- Last player standing wins
+**[▶ Play Now](https://sampi314.github.io/Web-Game/word-chain.html)**
+
+#### Features
+- **1-4 Players:** Mix human and AI players
+- **AI Opponents:** Configurable bot difficulty (0-3 bots)
+- **Comprehensive Dictionary:** 370,000+ English words from Oxford-quality sources
+- **Dictionary Validation:** Built-in word checking with extensive vocabulary
+- **Point System:** Longer words = more points
+- **Elimination:** Last player standing wins
+- **Word History:** Track all submitted words
+
+#### How to Play
+1. Each word must start with the last letter of previous word
+2. Words must be valid and not previously used
+3. Players eliminated if they can't submit valid word
+4. Longer words score more points
+
+---
 
 ### 5. 🐍 Snake Battle
-Classic snake with a competitive twist!
 
-**Play:** [Snake Battle](https://sampi314.github.io/Web-Game/snake-battle.html)
+> **Classic Snake with a competitive AI twist!**
 
-**Features:**
-- Classic snake gameplay with a twist
-- Compete against intelligent AI snake
-- 60-second competitive matches
-- Smooth grid-based movement
-- Multiple apples on screen
-- Grow your snake as you score
-- Arrow keys or WASD controls
+**[▶ Play Now](https://sampi314.github.io/Web-Game/snake-battle.html)**
+
+#### Features
+- **AI Competition:** Battle against intelligent snake AI
+- **60-Second Matches:** Fast-paced competitive rounds
+- **Multiple Apples:** More scoring opportunities
+- **Smooth Movement:** Grid-based with fluid animations
+- **Dual Controls:** Arrow keys or WASD
+- **Growth System:** Snake grows with each apple
+
+#### How to Play
+1. Control your snake with arrow keys or WASD
+2. Collect apples to grow and score points
+3. Avoid walls and your own tail
+4. Outscore the AI within 60 seconds to win
+
+---
 
 ### 6. 🌀 Gravity Switch
-One-button endless runner with gravity-flipping action!
 
-**Play:** [Gravity Switch](https://sampi314.github.io/Web-Game/gravity-switch.html)
+> **One-button endless runner with gravity-flipping action!**
 
-**Features:**
-- Addictive endless runner gameplay
-- One-button gravity flip mechanic
-- Procedurally generated obstacles
-- Increasing difficulty over time
-- Particle effects and smooth animations
-- High score persistence
-- Space bar or click to play
+**[▶ Play Now](https://sampi314.github.io/Web-Game/gravity-switch.html)**
+
+#### Features
+- **One-Button Control:** Simple but challenging
+- **Gravity Flip Mechanic:** Switch between floor and ceiling
+- **Procedural Generation:** Unique obstacle patterns
+- **Progressive Difficulty:** Gets harder over time
+- **Particle Effects:** Eye-catching visual feedback
+- **High Score:** Persistent best score tracking
+
+#### How to Play
+1. Press SPACE or click to flip gravity
+2. Avoid obstacles by switching between top and bottom
+3. Survive as long as possible
+4. Beat your high score!
+
+---
+
+### 7. 💣 Minesweeper
+
+> **Classic logic puzzle with modern features!**
+
+**[▶ Play Now](https://sampi314.github.io/Web-Game/minesweeper.html)**
+
+#### Features
+- **Three Difficulty Levels:** Easy, Medium, and Hard
+- **Timer System:** Track your completion time
+- **Heart System:** Multiple lives on easier difficulties
+- **Power-Ups:** Reveal cells with special abilities
+- **Coin Rewards:** Earn coins based on difficulty
+- **Score System:** Time-based scoring for leaderboard
+- **Classic Controls:** Left click to reveal, right click to flag
+
+#### How to Play
+1. Left-click to reveal a cell
+2. Right-click to flag suspected mines
+3. Numbers show how many mines are adjacent
+4. Use logic to deduce mine locations
+5. Clear all non-mine cells to win!
+
+---
+
+## 🌟 Key Features
+
+### For Players
+- 🎮 **100% Free** - No ads, no paywalls, no catch
+- 📱 **Cross-Platform** - Works on desktop, tablet, and mobile
+- 💾 **Auto-Save** - Never lose your progress
+- 🏆 **Achievements** - Unlock rewards and track milestones
+- 📊 **Statistics** - Detailed gameplay analytics
+- 🎨 **Polished UI** - Beautiful design and smooth animations
+
+### For Developers
+- 📦 **Zero Dependencies** - Pure vanilla JavaScript
+- 🚀 **No Build Process** - Open HTML and play
+- 💻 **Clean Code** - Well-structured and readable
+- 🎓 **Educational** - Great for learning web development
+- 🔧 **Easy to Modify** - Simple architecture
+- 📱 **Responsive** - Mobile-first design patterns
+
+---
 
 ## 🚀 Quick Start
 
-1. Visit the [game hub (index.html)](https://sampi314.github.io/Web-Game/) to see all available games
-2. Click on any game card to start playing instantly - no setup required!
-3. All progress and scores are saved locally in your browser
+### Play Online (Recommended)
 
-## 💻 Tech Stack
+1. Visit the **[Game Hub](https://sampi314.github.io/Web-Game/)**
+2. Click on any game card
+3. Start playing instantly - no setup needed!
 
-- **HTML5** - Structure and content
-- **CSS3** - Styling, animations, and responsive design
-- **Vanilla JavaScript** - Game logic and interactivity
-- **LocalStorage API** - Score and statistics persistence
-- **Web Audio API** - Sound effects (Card Flip Game)
+### Play Offline
+
+1. Download or clone this repository
+2. Open any `.html` file in your browser
+3. Enjoy gaming without internet!
+
+---
+
+## 💻 Local Development
+
+### Prerequisites
+
+- Any modern web browser (Chrome, Firefox, Safari, Edge)
+- A text editor (VS Code, Sublime, Atom, etc.)
+- Optional: Local web server for best experience
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/Sampi314/Web-Game.git
+
+# Navigate to the directory
+cd Web-Game
+
+# Option 1: Open directly in browser
+# Double-click any .html file
+
+# Option 2: Use a local server (recommended)
+# Python 3
+python -m http.server 8000
+
+# Python 2
+python -m SimpleHTTPServer 8000
+
+# Node.js (with http-server installed)
+npx http-server
+
+# VS Code Live Server extension
+# Right-click index.html → "Open with Live Server"
+```
+
+Then visit `http://localhost:8000` in your browser.
+
+### File Organization
+
+Each game is completely self-contained in a single HTML file:
+- All CSS is in `<style>` tags
+- All JavaScript is in `<script>` tags
+- No external dependencies or imports
+- Easy to understand and modify
+
+### Making Changes
+
+1. Open the game's `.html` file in your text editor
+2. Modify the HTML, CSS, or JavaScript as needed
+3. Save and refresh your browser to see changes
+4. Test on different screen sizes and browsers
+
+---
+
+## 🛠 Tech Stack
+
+| Technology | Purpose | Usage |
+|------------|---------|-------|
+| **HTML5** | Structure | Semantic markup, canvas elements |
+| **CSS3** | Styling | Flexbox, Grid, animations, responsive design |
+| **JavaScript (ES6+)** | Logic | Game mechanics, event handling, state management |
+| **LocalStorage API** | Persistence | Save scores, settings, achievements |
+| **Web Audio API** | Sound | Music and sound effects (Card Flip Game) |
+| **Canvas API** | Graphics | Game rendering (where applicable) |
+
+### Why Vanilla JavaScript?
+
+- ✅ **No build complexity** - Open and run immediately
+- ✅ **Better performance** - No framework overhead
+- ✅ **Educational value** - Learn core web APIs
+- ✅ **Universal compatibility** - Works everywhere
+- ✅ **Small file sizes** - Fast loading times
+- ✅ **Easy debugging** - No abstraction layers
+
+---
 
 ## 📱 Browser Support
 
-All games work on:
-- ✅ Chrome/Edge 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Mobile browsers (iOS 14+, Android 10+)
+All games are tested and working on:
 
-## 🎨 Features
+| Browser | Minimum Version | Status |
+|---------|----------------|---------|
+| Chrome | 90+ | ✅ Fully Supported |
+| Firefox | 88+ | ✅ Fully Supported |
+| Safari | 14+ | ✅ Fully Supported |
+| Edge | 90+ | ✅ Fully Supported |
+| iOS Safari | 14+ | ✅ Mobile Optimized |
+| Chrome Android | 90+ | ✅ Mobile Optimized |
 
-- 🎮 100% free to play
-- 📱 Fully responsive design
-- 💾 Auto-save progress
-- 🎵 Optional sound effects
-- 🏆 Achievement systems
-- 📊 Detailed statistics
-- 🎨 Beautiful animations
-- 🚀 No installation needed
+**Note:** Some features may degrade gracefully on older browsers while maintaining core functionality.
+
+---
 
 ## 📂 Repository Structure
 
 ```
 Web-Game/
-├── index.html                              # Landing page/game hub
-├── card-flip-game-with-leaderboard.html   # Card flip memory game
-├── four-in-a-row.html                      # Connect Four game
-├── gomoku.html                             # Gomoku (Five in a Row) game
-├── word-chain.html                         # Word Chain game
-├── snake-battle.html                       # Snake Battle game
-├── gravity-switch.html                     # Gravity Switch game
-└── README.md                               # This file
+│
+├── 📄 index.html                              # Main landing page/game hub
+│
+├── 🎮 Game Files (Self-contained)
+│   ├── card-flip.html  # Memory card game
+│   ├── four-in-a-row.html                     # Connect Four game
+│   ├── gomoku.html                            # Gomoku/Five-in-a-Row
+│   ├── word-chain.html                        # Word association game
+│   ├── snake-battle.html                      # Snake vs AI
+│   ├── gravity-switch.html                    # Endless runner
+│   ├── minesweeper.html                       # Classic Minesweeper
+│   └── leaderboard.html                       # Global leaderboard
+│
+└── 📖 README.md                               # This file
+
+Each .html file contains:
+├── HTML structure
+├── <style> tags with all CSS
+├── <script> tags with all JavaScript
+└── Complete game logic and assets
 ```
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest new features
-- Submit pull requests
-- Add new games
-
-## 📄 License
-
-This project is open source and available for personal and educational use.
-
-## 🌟 Acknowledgments
-
-Built with ❤️ using vanilla web technologies - no frameworks, no build process, just pure HTML, CSS, and JavaScript!
 
 ---
 
-**🎮 Start Playing:** Visit the [game hub (index.html)](https://sampi314.github.io/Web-Game/) to access all games!
+## 🤝 Contributing
 
-Enjoy playing! 🎉
+We welcome contributions from the community! Here's how you can help:
+
+### Ways to Contribute
+
+1. **🐛 Report Bugs**
+   - Use GitHub Issues
+   - Include browser version and steps to reproduce
+   - Screenshots/recordings are helpful
+
+2. **💡 Suggest Features**
+   - Open a GitHub Issue with [FEATURE] tag
+   - Describe the feature and its benefits
+   - Explain use cases
+
+3. **🔧 Submit Code**
+   - Fork the repository
+   - Create a feature branch (`git checkout -b feature/AmazingFeature`)
+   - Make your changes
+   - Test thoroughly on multiple browsers
+   - Commit with clear messages
+   - Push to your branch
+   - Open a Pull Request
+
+4. **🎮 Add New Games**
+   - Follow the single-file structure
+   - Include comprehensive features
+   - Add responsive design
+   - Update README with game details
+   - Ensure LocalStorage for persistence
+
+### Development Guidelines
+
+- ✅ Use vanilla JavaScript only (no frameworks)
+- ✅ Keep games in single HTML files
+- ✅ Follow existing code style and patterns
+- ✅ Add comments for complex logic
+- ✅ Test on mobile and desktop
+- ✅ Ensure accessibility (keyboard navigation, ARIA labels)
+- ✅ Optimize performance (smooth 60fps)
+
+### Code Style
+
+```javascript
+// Use clear, descriptive variable names
+const playerScore = 0;
+const gameBoard = [];
+
+// Comment complex logic
+// Check for winning condition in all directions
+function checkWin(board, player) {
+    // Implementation...
+}
+
+// Use modern ES6+ features
+const squares = [...document.querySelectorAll('.square')];
+squares.forEach(square => square.addEventListener('click', handleClick));
+```
+
+---
+
+## ❓ Frequently Asked Questions
+
+### General
+
+**Q: Do I need to create an account?**
+A: No! All games work instantly without any registration.
+
+**Q: Are my scores saved?**
+A: Yes, scores and progress are saved locally using browser LocalStorage.
+
+**Q: Can I play offline?**
+A: Yes! Download the repository and open any HTML file in your browser.
+
+**Q: Do these games work on mobile?**
+A: Absolutely! All games are fully responsive and mobile-optimized.
+
+**Q: Is there a cost?**
+A: No, everything is 100% free and open source.
+
+### Technical
+
+**Q: Why are all games in single HTML files?**
+A: This makes them easy to share, modify, and run without any setup or build process.
+
+**Q: Can I embed these games on my website?**
+A: Yes! Use an iframe or download and host the HTML files yourself.
+
+**Q: How do I clear my saved data?**
+A: Use your browser's developer tools to clear LocalStorage, or look for reset buttons in the games.
+
+**Q: Can I modify the games?**
+A: Yes! All code is open source. Feel free to fork and customize.
+
+### Development
+
+**Q: Can I use these as learning resources?**
+A: Absolutely! The code is designed to be readable and educational.
+
+**Q: How do I contribute a new game?**
+A: Fork the repo, create your game in a single HTML file, and submit a pull request.
+
+**Q: What if I find a bug?**
+A: Please report it on our [GitHub Issues](https://github.com/Sampi314/Web-Game/issues) page.
+
+---
+
+## 🌟 Acknowledgments
+
+- Built with ❤️ using pure vanilla web technologies
+- No frameworks, no dependencies, just clean code
+- Inspired by classic games and modern web capabilities
+- Thanks to all contributors and players!
+
+---
+
+## 🎯 Roadmap
+
+### Completed Features
+- [x] Global leaderboards with Daily/Weekly/Monthly/All Time rankings
+- [x] Minesweeper game
+
+### Planned Features
+- [ ] More games (Tetris, Tower Defense, Mahjong)
+- [ ] Online multiplayer support
+- [ ] Dark/Light theme toggle
+- [ ] Customizable controls
+- [ ] Game tutorials and guides
+- [ ] PWA support for offline play
+
+### Under Consideration
+- Social sharing features
+- Tournament mode
+- Custom game creator
+- Mobile app versions
+- Localization/translations
+
+---
+
+<div align="center">
+
+## 🎮 Ready to Play?
+
+### **[🚀 Visit the Game Hub Now!](https://sampi314.github.io/Web-Game/)**
+
+---
+
+### Show Your Support
+
+If you enjoy these games:
+- ⭐ Star this repository
+- 🐛 Report bugs to help improve
+- 💡 Suggest new features
+- 🔄 Share with friends
+- 🤝 Contribute code
+
+---
+
+**Made with 💜 and vanilla JavaScript**
+
+*No frameworks were harmed in the making of these games*
+
+</div>

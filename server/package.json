@@ -1,0 +1,20 @@
+{
+  "name": "web-game-matchmaking-server",
+  "version": "1.0.0",
+  "description": "WebSocket matchmaking server for Web Games Collection",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["websocket", "matchmaking", "multiplayer", "games"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.14.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
