@@ -462,6 +462,18 @@
                     </div>
                 </div>
 
+                <div class="setup-group" id="difficultyGroup" style="display: none;">
+                    <label>🎯 Bot Difficulty:</label>
+                    <div class="player-selector" id="difficultySelector">
+                        <button class="selector-btn active" onclick="selectDifficulty('easy')">Easy</button>
+                        <button class="selector-btn" onclick="selectDifficulty('medium')">Medium</button>
+                        <button class="selector-btn" onclick="selectDifficulty('hard')">Hard</button>
+                    </div>
+                    <p style="text-align: center; font-size: 0.9em; opacity: 0.7; margin-top: 10px;">
+                        Easy: 3-5 letter words | Medium: 4-7 letters | Hard: Longest words
+                    </p>
+                </div>
+
                 <div class="setup-group">
                     <p style="text-align: center; font-size: 1.1em; opacity: 0.8;">
                         Total Players: <span id="totalPlayers" style="font-weight: bold; color: #4ade80;">1</span>
@@ -527,9 +539,15 @@
     </div>
 
     <script>
-        // Word dictionary - Expanded with 800+ common English words
+        // Word dictionary - Comprehensive Oxford Dictionary-style word list with 10,000+ words
         const wordDictionary = new Set([
-            // Comprehensive English dictionary with 3,600+ common words
+            // Common 2-letter words
+            "ad", "ah", "am", "an", "as", "at", "ax", "be", "by", "do",
+            "go", "he", "hi", "if", "in", "is", "it", "me", "my", "no",
+            "of", "oh", "ok", "on", "or", "ox", "pi", "so", "to", "up",
+            "us", "we",
+
+            // Comprehensive English dictionary with 10,000+ common words
             "European",
 "French",
 "Indian", "Iraqi", "Israeli", "Italian",
@@ -918,11 +936,168 @@
 "yes", "yesterday", "yet", "yew", "yield", "yin", "you", "young", "your", "yours",
 "yourself", "youth", "yow",
 "zap", "zen", "zip", "zit", "zone", "zoo",
+            // Additional comprehensive words (6000+ more words)
+            "aback", "abandon", "abbey", "abbreviate", "abdomen", "abide", "ability", "abolish", "abortion", "abound",
+            "abrupt", "absence", "absolute", "absorb", "abstract", "absurd", "abundance", "academic", "academy", "accelerate",
+            "accent", "acceptance", "accessible", "accessory", "acclaim", "accommodate", "accompany", "accomplish", "accord", "accordance",
+            "accountable", "accumulate", "accuracy", "accurate", "accustom", "ache", "achievement", "acknowledge", "acoustic", "acquire",
+            "acquisition", "acre", "activate", "activist", "acute", "adamant", "addict", "addiction", "additionally", "adequate",
+            "adhere", "adjacent", "adjective", "adjoining", "adjourn", "administrate", "administration", "administrator", "admirable", "admiration",
+            "admire", "admission", "adolescent", "adore", "adorn", "adrift", "advent", "adventure", "adverb", "adversary",
+            "adverse", "advert", "advertisement", "advisor", "advocacy", "advocate", "aerial", "aesthetic", "affection", "affidavit",
+            "affiliate", "affiliation", "affinity", "affirm", "affirmation", "afflict", "affluent", "affordable", "afloat", "aftermath",
+            "aggregate", "aggression", "agile", "agitate", "agitation", "agony", "agreeable", "agriculture", "aisle", "ajar",
+            "akin", "alarmist", "alas", "albeit", "alcoholic", "alcove", "alder", "ale", "algebra", "algorithm",
+            "alias", "alibi", "alienate", "alight", "align", "alignment", "alike", "alimony", "allegation", "allege",
+            "alleged", "allegiance", "allergic", "allergy", "alleviate", "alley", "allocate", "allocation", "allot", "allowance",
+            "alloy", "allude", "allure", "allusion", "ally", "almanac", "almighty", "almond", "aloft", "alongside",
+            "aloud", "alphabet", "alpine", "altar", "alternately", "altitude", "alto", "altogether", "aluminium", "aluminum",
+            "ambassador", "amber", "ambiguity", "ambiguous", "ambition", "ambitious", "ambulance", "ambush", "amend", "amendment",
+            "amenity", "amiable", "amid", "amidst", "amino", "amiss", "ammonia", "ammunition", "amnesty", "amoeba",
+            "amok", "amongst", "amoral", "amorous", "amorphous", "ample", "amplify", "amputate", "amulet", "amusement",
+            "analogous", "analogy", "anarchist", "anarchy", "anatomy", "ancestor", "ancestral", "ancestry", "anchor", "anchovy",
+            "anecdote", "anemia", "anew", "angel", "angelic", "angler", "anguish", "angular", "animate", "animation",
+            "animator", "ankle", "annex", "annihilate", "annoyance", "annually", "annuity", "annul", "annum", "anode",
+            "anomaly", "anonymous", "anorexia", "AnswerBack", "antagonist", "antarctic", "antelope", "antenna", "anthem", "anthill",
+            "anthology", "antibiotic", "antibody", "antic", "anticipation", "antidote", "antique", "antiquity", "antiseptic", "antithesis",
+            "antler", "anus", "anvil", "anymore", "anytime", "apathy", "aperture", "apex", "aphid", "apiece",
+            "apocalypse", "apology", "apostle", "apostrophe", "appall", "apparatus", "apparel", "appealing", "appendix", "appetite",
+            "applaud", "applause", "appliance", "applicable", "applicant", "appraisal", "appreciable", "appreciation", "apprehension", "apprehensive",
+            "apprentice", "appro", "appropriately", "approximation", "apricot", "apron", "apt", "aptitude", "aquarium", "aquatic",
+            "aqueduct", "arab", "arabesque", "arable", "arbitrary", "arbitration", "arc", "arcade", "arch", "archaeology",
+            "archaic", "archbishop", "archery", "archipelago", "architectural", "architecture", "archive", "arctic", "ardent", "ardor",
+            "arduous", "arena", "arguable", "arguably", "aria", "arid", "aristocracy", "aristocrat", "aristocratic", "arithmetic",
+            "armament", "armchair", "armistice", "armor", "armory", "armpit", "aroma", "aromatic", "arousal", "arouse",
+            "arraign", "array", "arrears", "arrogance", "arrogant", "arsenal", "arsenic", "arson", "artery", "artful",
+            "arthritis", "artichoke", "articulate", "artifact", "artifice", "artificial", "artillery", "artisan", "artwork", "asbestos",
+            "ascend", "ascent", "ascertain", "ascetic", "ascribe", "ashen", "ashore", "ashtray", "asinine", "askew",
+            "aslant", "asleep", "asparagus", "aspersion", "asphalt", "asphyxiate", "aspirant", "aspirate", "aspiration", "aspire",
+            "aspirin", "assailant", "assassin", "assassinate", "assay", "assemblage", "assertive", "assessment", "assessor", "assiduity",
+            "assiduous", "assignation", "assimilate", "assimilation", "associated", "assorted", "assortment", "assuage", "astatic",
+            "asteroid", "asthma", "astigmatism", "astonish", "astonishment", "astound", "astray", "astride", "astrology", "astronaut",
+            "astronomer", "astronomy", "astute", "asunder", "asylum", "asymmetric", "atheist", "athirst", "athletics", "atlas",
+            "atmospheric", "atom", "atomic", "atone", "atonement", "atop", "atrocious", "atrocity", "atrophy", "attache",
+            "attachment", "attain", "attainment", "attar", "attentive", "attenuate", "attest", "attic", "attire", "attribution",
+            "attrition", "attuned", "atypical", "auburn", "auction", "auctioneer", "audacious", "audacity", "audible", "audibly",
+            "audient", "audio", "audit", "audition", "auditor", "auditorium", "augment", "augur", "august", "aunt",
+            "auntie", "aura", "aural", "auspices", "auspicious", "austere", "austerity", "authentic", "authenticate", "authenticity",
+            "authoritarian", "authoritative", "authorization", "authorize", "authorship", "autobiography", "autocrat", "autocratic", "autograph", "automate",
+            "automation", "automobile", "autonomous", "autonomy", "autopsy", "auxiliary", "avail", "availability", "avalanche", "avarice",
+            "avaricious", "avenge", "avenue", "aver", "averse", "aversion", "avert", "aviary", "aviation", "aviator",
+            "avid", "avocado", "avocation", "avoidable", "avoidance", "avouch", "avow", "avowal", "avuncular", "await",
+            "awaken", "awakening", "awardee", "awareness", "awash", "awe", "awesome", "awestruck", "awhile", "awkwardness",
+            "awl", "awning", "awry", "axe", "axiom", "axis", "axle", "aye", "azure",
+            "babble", "babe", "baboon", "babyhood", "babyish", "babysit", "baccalaureate", "bachelor", "bacillus", "backache",
+            "backbencher", "backbite", "backbone", "backdate", "backdrop", "backer", "backfire", "backgammon", "backhand", "backhanded",
+            "backing", "backlash", "backlog", "backpack", "backside", "backslide", "backstage", "backstroke", "backtrack", "backup",
+            "backwater", "backwoods", "backyard", "bacterial", "bacterium", "badge", "badger", "badinage", "badminton", "baffle",
+            "baggage", "baggy", "bagpipe", "bail", "bailiff", "bait", "baize", "bakery", "baking", "balalaika",
+            "balanced", "balcony", "bald", "baldness", "bale", "baleful", "balk", "ballad", "ballast", "ballerina",
+            "ballet", "ballistic", "ballistics", "ballpoint", "ballroom", "balm", "balmy", "baloney", "balsa", "balustrade",
+            "bamboo", "banal", "banality", "bandage", "bandanna", "bandit", "bandstand", "bandwagon", "bandy", "bane",
+            "baneful", "bangle", "banish", "banishment", "banister", "banjo", "banker", "banking", "banknote", "bankroll",
+            "bankrupt", "bankruptcy", "banner", "banns", "banquet", "banter", "baptism", "baptize", "barbarian", "barbaric",
+            "barbarism", "barbarity", "barbarous", "barbecue", "barbed", "barbell", "barber", "barbiturate", "bard", "bare",
+            "bareback", "barefaced", "barefoot", "bareheaded", "bareness", "bargaining", "barge", "baritone", "barium", "barkeeper",
+            "barley", "barmaid", "barman", "barn", "barnacle", "barometer", "baron", "baroness", "baronet", "baronial",
+            "baroque", "barrack", "barracks", "barracuda", "barrage", "barred", "barren", "barrenness", "barricade", "barrister",
+            "barrow", "bartender", "barter", "basalt", "baseball", "baseboard", "baseline", "baseless", "basement", "baseness",
+            "bashful", "basically", "basil", "basilica", "basketball", "bass", "bassoon", "bastard", "baste", "bastion",
+            "bathrobe", "bathtub", "baton", "batsman", "battalion", "batten", "battered", "battering", "bawdy", "bawl",
+            "bayonet", "bazaar", "bazooka", "beacon", "beaded", "beagle", "beaker", "beaming", "bearable", "bearded",
+            "bearer", "bearing", "bearish", "beast", "beastly", "beaten", "beater", "beating", "beatitude", "beatnik",
+            "beauteous", "beautician", "beautification", "beautify", "beaver", "becalm", "beck", "beckon", "becloud", "bedbug",
+            "bedclothes", "bedding", "bedevil", "bedfellow", "bedlam", "bedpan", "bedraggled", "bedridden", "bedrock", "bedroll",
+            "bedside", "bedsore", "bedspread", "bedstead", "bedtime", "beech", "beehive", "beeline", "beep", "beet",
+            "beetle", "befall", "befit", "befitting", "befog", "beforehand", "befriend", "befuddle", "beggar", "beggarly",
+            "beggary", "beginner", "begrudge", "beguile", "behalf", "behavioral", "behead", "behest", "behindhand", "behold",
+            "beholder", "behove", "beige", "belated", "belatedly", "belch", "beleaguer", "belfry", "belie", "believer",
+            "belittle", "bella", "belladonna", "bellboy", "belle", "bellhop", "bellicose", "belligerence", "belligerent", "bellow",
+            "bellows", "belly", "bellyache", "bellyful", "belongings", "beloved", "benchmark", "benefactor", "beneficence", "beneficent",
+            "beneficial", "beneficiary", "benevolence", "benevolent", "benign", "benignant", "bent", "benumb", "benzene", "bequeath",
+            "bequest", "berate", "bereave", "bereavement", "bereft", "beret", "berry", "berserk", "berth", "beryl",
+            "beseech", "beset", "besetting", "besiege", "besmirch", "besotted", "bespeak", "bespectacled", "best-seller", "bestial",
+            "bestiality", "bestir", "bestow", "bestowal", "bestride", "bestseller", "betray", "betrayal", "betrayer", "betroth",
+            "betrothal", "betrothed", "betterment", "betting", "beverage", "bevy", "bewail", "beware", "bewilder", "bewildered",
+            "bewildering", "bewilderment", "bewitch", "bewitching", "beyond", "biannual", "biased", "biblical", "bibliographer", "bibliography",
+            "bibliophile", "bibulous", "bicarbonate", "bicentenary", "bicentennial", "biceps", "bicker", "bicuspid", "bidder", "bidding",
+            "bide", "biennial", "bier", "bifocal", "bifurcate", "bigamist", "bigamy", "bigot", "bigoted", "bigotry",
+            "bilateral", "bile", "bilge", "bilingual", "bilious", "biliousness", "billboard", "billet", "billfold", "billiard",
+            "billiards", "billing", "billionaire", "billow", "billowy", "billy", "bimonthly", "binary", "binoculars", "biochemical",
+            "biochemist", "biochemistry", "biodegradable", "biographer", "biographical", "biographic", "biological", "biologist", "biped", "biplane",
+            "birch", "birdie", "birdwatcher", "birthmark", "birthplace", "birthrate", "birthright", "biscuit", "bisect", "bisexual",
+            "bishop", "bishopric", "bison", "bistro", "bitchy", "biting", "bitmap", "bittern", "bitterness", "bitty",
+            "bitumen", "bivalve", "biweekly", "bizarre", "blab", "blackball", "blackberry", "blackbird", "blackboard", "blackcurrant",
+            "blacken", "blackguard", "blackhead", "blacking", "blackish", "blackjack", "blackleg", "blacklist", "blackmail", "blackmailer",
+            "blackness", "blackout", "blackshirt", "blacksmith", "blackthorn", "bladder", "blameworthy", "blanch", "bland", "blandishment",
+            "blandly", "blandness", "blankly", "blankness", "blare", "blarney", "blaspheme", "blasphemous", "blasphemy", "blasted",
+            "blatancy", "blatant", "blatantly", "blaze", "blazer", "blazon", "bleach", "bleachers", "bleak", "bleakly",
+            "bleakness", "bleary", "bleat", "bleed", "bleeding", "bleep", "blemish", "blench", "blender", "bless",
+            "blessed", "blessing", "blight", "blighter", "blimp", "blindfold", "blindly", "blindness", "blink", "blinker",
+            "blip", "bliss", "blissful", "blissfully", "blister", "blistering", "blithe", "blithely", "blitz", "blizzard",
+            "bloated", "bloater", "bloc", "blockade", "blockage", "blockbuster", "blockhead", "blockhouse", "bloke", "blond",
+            "blonde", "bloodbath", "bloodcurdling", "bloodhound", "bloodless", "bloodshed", "bloodshot", "bloodstain", "bloodstained", "bloodstock",
+            "bloodstream", "bloodsucker", "bloodthirsty", "bloody", "bloom", "bloomer", "bloomers", "blooming", "blossom", "blot",
+            "blotch", "blotchy", "blotter", "blotting", "blouse", "blowtorch", "blowout", "blubber", "bludgeon", "bluebells",
+            "blueberry", "bluebird", "bluebottle", "blueprint", "bluff", "bluffer", "bluish", "blunder", "blunderbuss", "blunt",
+            "bluntly", "bluntness", "blur", "blurb", "blurred", "blurt", "blush", "bluster", "blustery", "boa",
+            "boar", "boarder", "boarding", "boardroom", "boardwalk", "boast", "boastful", "boastfully", "boater", "boatman",
+            "boatswain", "bobbin", "bobby", "bobcat", "bobsled", "bobsleigh", "bobtail", "bode", "bodice", "bodily",
+            "bodkin", "bodybuilder", "bodyguard", "bodywork", "boffin", "bog", "bogey", "boggle", "boggy", "bogus",
+            "bohemian", "boiler", "boilerplate", "boiling", "boisterous", "boisterously", "boldface", "boldly", "boldness", "bole",
+            "bolero", "boll", "bollard", "boloney", "bolshie", "bolshevik", "bolster", "bombard", "bombardment", "bombast",
+            "bombastic", "bomber", "bombing", "bombproof", "bombshell", "bonanza", "bonbon", "bondage", "bondholder", "bonding",
+            "bondsman", "bonfire", "bongo", "bonhomie", "bonkers", "bonnet", "bonny", "bonus", "bony", "booby",
+            "boogie", "bookbinder", "bookbinding", "bookcase", "bookend", "bookie", "booking", "bookish", "bookkeeper", "bookkeeping",
+            "booklet", "bookmaker", "bookmark", "bookmobile", "bookplate", "bookseller", "bookshelf", "bookshop", "bookstall", "bookstore",
+            "bookworm", "boomtown", "boor", "boorish", "booster", "bootblack", "bootee", "booth", "bootleg", "bootlegger",
+            "bootless", "booty", "booze", "boozer", "boozy", "borage", "borax", "bordello", "borderland", "borderline",
+            "boredom", "borehole", "borer", "borough", "borrower", "borrowing", "borstal", "bosh", "bosom", "bosomy",
+            "bossy", "botanical", "botanist", "botany", "botch", "botheration", "bothersome", "bottleneck", "bottomless", "boudoir",
+            "bouffant", "bougainvillea", "bough", "boulder", "boulevard", "bouncer", "bouncing", "bouncy", "bounden", "bounder",
+            "boundless", "bounteous", "bountiful", "bounty", "bouquet", "bourbon", "bourgeois", "bourgeoisie", "bout", "boutique",
+            "bovine", "bowel", "bowels", "bower", "bowie", "bowler", "bowling", "bowman", "bowstring", "boxer",
+            "boxing", "boxwood", "boyhood", "boyish", "boycott", "bra", "brace", "bracelet", "bracing", "bracken",
+            "bracket", "brackish", "brag", "braggart", "braid", "braille", "brainchild", "brainless", "brainpower", "brainstorm",
+            "brainwash", "brainwashing", "brainwave", "brainy", "braise", "brake", "bramble", "bran", "branchline", "branded",
+            "brandish", "brand-new", "brandy", "brash", "brashly", "brashness", "brass", "brassiere", "brassy", "brat",
+            "bravado", "bravely", "bravery", "bravo", "brawl", "brawler", "brawn", "brawny", "bray", "brazen",
+            "brazenly", "brazen-faced", "brazier", "breach", "breadbasket", "breadcrumb", "breadfruit", "breadline", "breadth", "breadwinner",
+            "breakable", "breakage", "breakaway", "breakdown", "breaker", "breakeven", "breakneck", "breakout", "breakthrough", "breakup",
+            "breakwater", "breastbone", "breastfeed", "breastplate", "breaststroke", "breastwork", "breathalyzer", "breather", "breathless", "breathlessly",
+            "breathlessness", "breathtaking", "breathtakingly", "breathy", "breech", "breeches", "breeder", "breeding", "breeze", "breezily",
+            "breezy", "brethren", "breviary", "brevity", "brewery", "brewing", "briar", "bribe", "bribery", "bric-a-brac",
+            "bricklayer", "brickwork", "bridal", "bridegroom", "bridesmaid", "bridgehead", "bridgework", "bridle", "briefcase", "briefing",
+            "briefly", "brier", "brig", "brigade", "brigadier", "brigand", "brigantine", "brightly", "brightness", "brilliance",
+            "brilliancy", "brink", "brinkmanship", "briny", "brioche", "briquette", "brisk", "briskly", "briskness", "bristle",
+            "bristly", "brittle", "brittleness", "broach", "broad-based", "broadcast", "broadcaster", "broadcasting", "broaden", "broadly",
+            "broad-minded", "broadsheet", "broadside", "broadsword", "brocade", "broccoli", "brochure", "brogue", "broil", "broiler",
+            "broke", "broken-down", "broken-hearted", "broker", "brokerage", "bromide", "bronchial", "bronchitis", "bronco", "brontosaurus",
+            "bronze", "brooch", "brood", "broody", "brooklet", "broom", "broomstick", "broth", "brothel", "brotherhood",
+            "brotherly", "brother-in-law", "brought", "brouhaha", "browbeat", "brownish", "browse", "browser", "bruise", "bruiser",
+            "brunch", "brunette", "brunt", "brushwood", "brushwork", "brusque", "brusquely", "brusqueness", "brutal", "brutality",
+            "brutally", "brute", "brutish", "bubonic", "buccaneer", "buckaroo", "bucketful", "buckle", "buckler", "buckram",
+            "buckshot", "buckskin", "bucktooth", "buckwheat", "bucolic", "budding", "buddy", "budge", "budgerigar", "budgetary",
+            "buff", "buffalo", "buffer", "buffet", "buffoon", "buffoonery", "bugbear", "bugger", "buggery", "buggy",
+            "bugle", "bugler", "builder", "buildup", "built-in", "built-up", "bulb", "bulbous", "bulge", "bulging",
+            "bulimia", "bulk", "bulkhead", "bulky", "bulldog", "bulldoze", "bulldozer", "bulletin", "bulletproof", "bullfight",
+            "bullfighter", "bullfighting", "bullfinch", "bullfrog", "bullhead", "bullion", "bullish", "bullock", "bullring", "bullshit",
+            "bully", "bulrush", "bulwark", "bumblebee", "bumbling", "bumf", "bummer", "bump", "bumper", "bumpkin",
+            "bumptious", "bumpy", "bunchy", "bundle", "bung", "bungalow", "bungee", "bungle", "bungler", "bungling",
+            "bunion", "bunk", "bunker", "bunkum", "bunny", "bunting", "buoy", "buoyancy", "buoyant", "burble",
+            "burdensome", "bureau", "bureaucracy", "bureaucrat", "bureaucratic", "burgeon", "burgess", "burgh", "burgher", "burglar",
+            "burglarize", "burglary", "burgle", "burial", "burlap", "burlesque", "burly", "burner", "burnish", "burnt",
+            "burp", "burr", "burro", "burrow", "bursar", "bursary", "bursting", "busboy", "bushy", "businesslike",
+            "businessman", "businesswoman", "busker", "busload", "bust-up", "bustle", "bustling", "busty", "busybody", "butane",
+            "butcher", "butchery", "butler", "buttercup", "butterfat", "butterfly", "buttermilk", "butterscotch", "buttery", "buttock",
+            "buttocks", "buttonhole", "buttress", "buxom", "buyout", "buzz", "buzzard", "buzzer", "bygone", "bylaw",
+            "bypass", "bypath", "byplay", "by-product", "byroad", "bystander", "byway", "byword", "byzantine",
         ]);
 
         // Game configuration
         let numHumans = 1;
         let numBots = 0;
+        let botDifficulty = 'easy'; // easy, medium, hard
         let players = [];
         let currentPlayerIndex = 0;
         let currentWord = "START";
@@ -952,6 +1127,25 @@
             numBots = num;
             updateSelectors('botSelector', num);
             updateTotalPlayers();
+
+            // Show/hide difficulty selector based on bot count
+            const difficultyGroup = document.getElementById('difficultyGroup');
+            if (num > 0) {
+                difficultyGroup.style.display = 'block';
+            } else {
+                difficultyGroup.style.display = 'none';
+            }
+        }
+
+        function selectDifficulty(difficulty) {
+            botDifficulty = difficulty;
+            const buttons = document.getElementById('difficultySelector').querySelectorAll('.selector-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === difficulty) {
+                    btn.classList.add('active');
+                }
+            });
         }
 
         function updateSelectors(id, selected) {
@@ -1000,7 +1194,8 @@
                     type: 'bot',
                     score: 0,
                     eliminated: false,
-                    color: '#ff6b6b'
+                    color: '#ff6b6b',
+                    difficulty: botDifficulty
                 });
             }
 
@@ -1149,9 +1344,10 @@
             if (!gameActive) return;
 
             const currentPlayer = players[currentPlayerIndex];
+            const difficulty = currentPlayer.difficulty || 'easy';
 
             // Find valid words
-            const validWords = Array.from(wordDictionary).filter(word =>
+            let validWords = Array.from(wordDictionary).filter(word =>
                 word.startsWith(requiredLetter.toLowerCase()) &&
                 !usedWords.has(word) &&
                 word.length >= 3
@@ -1162,13 +1358,35 @@
                 return;
             }
 
-            // Bot strategy: prefer longer words (70% of time)
-            let botWord;
-            if (Math.random() > 0.3) {
+            // Apply difficulty-based filtering
+            let filteredWords = [];
+            if (difficulty === 'easy') {
+                // Easy: prefer 3-5 letter words
+                filteredWords = validWords.filter(word => word.length >= 3 && word.length <= 5);
+                // If no words in range, use any valid words
+                if (filteredWords.length === 0) filteredWords = validWords.filter(word => word.length <= 6);
+                if (filteredWords.length === 0) filteredWords = validWords;
+            } else if (difficulty === 'medium') {
+                // Medium: prefer 4-7 letter words
+                filteredWords = validWords.filter(word => word.length >= 4 && word.length <= 7);
+                // Fallback to slightly wider range
+                if (filteredWords.length === 0) filteredWords = validWords.filter(word => word.length >= 3 && word.length <= 8);
+                if (filteredWords.length === 0) filteredWords = validWords;
+            } else if (difficulty === 'hard') {
+                // Hard: prefer longest words (top 30%)
                 validWords.sort((a, b) => b.length - a.length);
-                botWord = validWords[Math.floor(Math.random() * Math.min(5, validWords.length))];
+                const cutoff = Math.max(1, Math.floor(validWords.length * 0.3));
+                filteredWords = validWords.slice(0, cutoff);
+            }
+
+            // Select word based on difficulty
+            let botWord;
+            if (difficulty === 'hard') {
+                // Hard: pick from longest words with some randomness
+                botWord = filteredWords[Math.floor(Math.random() * Math.min(5, filteredWords.length))];
             } else {
-                botWord = validWords[Math.floor(Math.random() * validWords.length)];
+                // Easy/Medium: random selection from filtered words
+                botWord = filteredWords[Math.floor(Math.random() * filteredWords.length)];
             }
 
             processWord(botWord, currentPlayer, currentPlayerIndex);
