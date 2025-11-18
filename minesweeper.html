@@ -92,6 +92,26 @@
             gap: 10px;
             justify-content: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .settings-toggle {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .settings-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
 
         .btn {
@@ -544,7 +564,18 @@
 <body>
     <div class="container">
         <h1>💣 Minesweeper</h1>
-        
+
+        <div class="controls">
+            <button class="settings-toggle" onclick="window.location.href='leaderboard.html'">🏆 Leaderboard</button>
+        </div>
+
+        <div class="controls" style="margin-top: 0; margin-bottom: 20px;">
+            <button class="btn btn-new-game" onclick="newGame()">New Game</button>
+            <button class="btn btn-shop" onclick="openShop()">Shop 🛒</button>
+            <button class="btn btn-difficulty" onclick="changeDifficulty()">Change Difficulty</button>
+            <button class="btn btn-sound" id="soundToggle" onclick="toggleSound()">🔊 Sound On</button>
+        </div>
+
         <div class="game-info">
             <div class="hearts" id="hearts"></div>
             <div class="coins" id="coins">🪙 0</div>
@@ -575,14 +606,6 @@
         <div style="text-align: center; margin-bottom: 15px; color: #555; font-size: 14px;">
             💡 Desktop: Click both buttons on a number to reveal surrounding cells<br>
             📱 Mobile: Long press to flag, tap numbers to reveal surrounding cells
-        </div>
-
-        <div class="controls">
-            <button class="btn btn-new-game" onclick="newGame()">New Game</button>
-            <button class="btn btn-shop" onclick="openShop()">Shop 🛒</button>
-            <button class="btn btn-difficulty" onclick="changeDifficulty()">Change Difficulty</button>
-            <button class="btn btn-sound" id="soundToggle" onclick="toggleSound()">🔊 Sound On</button>
-            <button class="btn btn-leaderboard" onclick="window.location.href='leaderboard.html'">🏆 View Leaderboard</button>
         </div>
 
         <div class="board-container">
