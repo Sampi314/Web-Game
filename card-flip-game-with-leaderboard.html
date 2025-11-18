@@ -528,139 +528,6 @@
             }
         }
 
-        /* Leaderboard Styles */
-        .leaderboard-toggle {
-            background: rgba(255, 255, 255, 0.3);
-            color: white;
-            border: 2px solid white;
-            padding: 12px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-        }
-
-        .leaderboard-toggle:hover {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        .leaderboard-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            margin: 20px auto;
-            max-width: 600px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: none;
-        }
-
-        .leaderboard-container.show {
-            display: block;
-        }
-
-        .leaderboard-container h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .leaderboard-tabs {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .leaderboard-tab {
-            background: rgba(102, 126, 234, 0.2);
-            color: #667eea;
-            border: 2px solid #667eea;
-            padding: 8px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .leaderboard-tab:hover {
-            background: rgba(102, 126, 234, 0.3);
-        }
-
-        .leaderboard-tab.active {
-            background: #667eea;
-            color: white;
-        }
-
-        .leaderboard-list {
-            list-style: none;
-        }
-
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-
-        .leaderboard-item:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateX(5px);
-        }
-
-        .leaderboard-item.new-record {
-            background: rgba(255, 215, 0, 0.3);
-            border: 2px solid #ffd700;
-        }
-
-        .leaderboard-rank {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #667eea;
-            min-width: 40px;
-        }
-
-        .leaderboard-rank.gold { color: #ffd700; }
-        .leaderboard-rank.silver { color: #c0c0c0; }
-        .leaderboard-rank.bronze { color: #cd7f32; }
-
-        .leaderboard-info {
-            flex-grow: 1;
-            padding: 0 15px;
-        }
-
-        .leaderboard-name {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 3px;
-        }
-
-        .leaderboard-score {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .leaderboard-details {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .no-scores {
-            text-align: center;
-            color: #666;
-            padding: 40px;
-            font-style: italic;
-        }
 
         /* Name input modal */
         .name-input-modal {
@@ -986,9 +853,6 @@
         }
 
         /* Theme-specific accent colors */
-        body.theme-ocean .leaderboard-rank,
-        body.theme-ocean .leaderboard-score,
-        body.theme-ocean .leaderboard-tab.active,
         body.theme-ocean .stats-value {
             background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
             -webkit-background-clip: text;
@@ -996,9 +860,6 @@
             background-clip: text;
         }
 
-        body.theme-sunset .leaderboard-rank,
-        body.theme-sunset .leaderboard-score,
-        body.theme-sunset .leaderboard-tab.active,
         body.theme-sunset .stats-value {
             background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
             -webkit-background-clip: text;
@@ -1006,9 +867,6 @@
             background-clip: text;
         }
 
-        body.theme-forest .leaderboard-rank,
-        body.theme-forest .leaderboard-score,
-        body.theme-forest .leaderboard-tab.active,
         body.theme-forest .stats-value {
             background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);
             -webkit-background-clip: text;
@@ -1016,9 +874,6 @@
             background-clip: text;
         }
 
-        body.theme-midnight .leaderboard-rank,
-        body.theme-midnight .leaderboard-score,
-        body.theme-midnight .leaderboard-tab.active,
         body.theme-midnight .stats-value {
             background: linear-gradient(135deg, #000428 0%, #004e92 100%);
             -webkit-background-clip: text;
@@ -1026,28 +881,11 @@
             background-clip: text;
         }
 
-        body.theme-candy .leaderboard-rank,
-        body.theme-candy .leaderboard-score,
-        body.theme-candy .leaderboard-tab.active,
         body.theme-candy .stats-value {
             background: linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-
-        /* Keep medal colors for ranks regardless of theme */
-        .leaderboard-rank.gold { 
-            color: #ffd700 !important;
-            -webkit-text-fill-color: #ffd700 !important;
-        }
-        .leaderboard-rank.silver { 
-            color: #c0c0c0 !important;
-            -webkit-text-fill-color: #c0c0c0 !important;
-        }
-        .leaderboard-rank.bronze { 
-            color: #cd7f32 !important;
-            -webkit-text-fill-color: #cd7f32 !important;
         }
 
         /* Theme-specific card backs */
@@ -1108,207 +946,6 @@
             border: 3px solid #FC466B;
         }
 
-        /* Achievements System Styles */
-        .achievements-toggle {
-            background: rgba(255, 255, 255, 0.3);
-            color: white;
-            border: 2px solid white;
-            padding: 12px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-        }
-
-        .achievements-toggle:hover {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        .achievements-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            margin: 20px auto;
-            max-width: 800px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: none;
-        }
-
-        .achievements-container.show {
-            display: block;
-        }
-
-        .achievements-container h2 {
-            color: #667eea;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .achievements-progress {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            color: white;
-        }
-
-        .achievements-progress h3 {
-            font-size: 2em;
-            margin-bottom: 5px;
-        }
-
-        .achievements-progress p {
-            opacity: 0.9;
-        }
-
-        .achievements-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .achievement-card {
-            background: white;
-            border: 3px solid #e0e0e0;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .achievement-card.unlocked {
-            border-color: #ffd700;
-            background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
-
-        .achievement-card.unlocked::before {
-            content: '✓';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 30px;
-            height: 30px;
-            background: #4caf50;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .achievement-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        .achievement-icon {
-            font-size: 3em;
-            margin-bottom: 10px;
-            filter: grayscale(100%);
-            opacity: 0.5;
-        }
-
-        .achievement-card.unlocked .achievement-icon {
-            filter: grayscale(0%);
-            opacity: 1;
-            animation: unlockBounce 0.6s ease;
-        }
-
-        @keyframes unlockBounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        .achievement-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 1em;
-        }
-
-        .achievement-card.unlocked .achievement-name {
-            color: #667eea;
-        }
-
-        .achievement-description {
-            font-size: 0.85em;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .achievement-progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .achievement-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.5s ease;
-        }
-
-        .achievement-progress-text {
-            font-size: 0.75em;
-            color: #999;
-            margin-top: 5px;
-        }
-
-        /* Achievement notification popup */
-        .achievement-notification {
-            position: fixed;
-            top: -200px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 2000;
-            transition: top 0.5s ease;
-            text-align: center;
-            min-width: 300px;
-        }
-
-        .achievement-notification.show {
-            top: 20px;
-        }
-
-        .achievement-notification-icon {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-
-        .achievement-notification-title {
-            font-size: 0.9em;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        .achievement-notification-name {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .achievement-notification-desc {
-            font-size: 0.85em;
-            opacity: 0.8;
-        }
 
         /* Peek Mode Styles */
         .peek-overlay {
@@ -1416,9 +1053,10 @@
         <h1>🎴 Just a Card Flip Game</h1>
         
         <button class="settings-toggle" onclick="toggleSettings()">⚙️ Settings</button>
-        <button class="leaderboard-toggle" onclick="toggleLeaderboard()">🏆 Leaderboard</button>
         <button class="stats-toggle" onclick="toggleStats()">📊 Statistics</button>
-        <button class="achievements-toggle" onclick="toggleAchievements()">🏅 Achievements</button>
+        <a href="leaderboard.html" style="display: inline-block; margin-bottom: 15px;">
+            <button class="settings-toggle" style="margin-bottom: 0;">🏆 Global Leaderboard</button>
+        </a>
         
         <div class="settings-panel" id="settingsPanel">
             <div class="dimension-selector">
@@ -1521,18 +1159,6 @@
             <button onclick="submitScore()">Submit Score</button>
         </div>
 
-        <!-- Leaderboard Panel -->
-        <div id="leaderboardPanel" class="leaderboard-container">
-            <h2>🏆 High Scores</h2>
-            <div class="leaderboard-tabs">
-                <button class="leaderboard-tab active" onclick="showLeaderboardTab('4x4')">4x4</button>
-                <button class="leaderboard-tab" onclick="showLeaderboardTab('6x6')">6x6</button>
-                <button class="leaderboard-tab" onclick="showLeaderboardTab('8x8')">8x8</button>
-                <button class="leaderboard-tab" onclick="showLeaderboardTab('all')">All Sizes</button>
-            </div>
-            <ul id="leaderboardList" class="leaderboard-list"></ul>
-        </div>
-
         <!-- Statistics Panel -->
         <div id="statsPanel" class="stats-container">
             <h2>📊 Game Statistics</h2>
@@ -1615,28 +1241,6 @@
             <button class="reset-stats-btn" onclick="resetStatistics()">Reset All Statistics</button>
         </div>
 
-        <!-- Achievements Panel -->
-        <div id="achievementsPanel" class="achievements-container">
-            <h2>🏅 Achievements</h2>
-            
-            <div class="achievements-progress">
-                <h3><span id="achievementsUnlocked">0</span> / <span id="achievementsTotal">0</span></h3>
-                <p>Achievements Unlocked</p>
-            </div>
-
-            <div class="achievements-grid" id="achievementsGrid">
-                <!-- Achievements will be dynamically generated here -->
-            </div>
-        </div>
-
-        <!-- Achievement Notification -->
-        <div id="achievementNotification" class="achievement-notification">
-            <div class="achievement-notification-icon" id="notifIcon">🏆</div>
-            <div class="achievement-notification-title">Achievement Unlocked!</div>
-            <div class="achievement-notification-name" id="notifName"></div>
-            <div class="achievement-notification-desc" id="notifDesc"></div>
-        </div>
-
         <!-- Peek Mode Overlay -->
         <div id="peekOverlay" class="peek-overlay">
             <div class="peek-message">👁️ Memorize the cards!</div>
@@ -1683,9 +1287,6 @@
         let cardRevealTimes = new Map(); // Track when cards were revealed for fade mode
         let colorShiftInterval = null; // Track color shift for Color Chaos mode
         
-        // Leaderboard
-        let leaderboard = [];
-        let currentLeaderboardTab = '4x4';
         let lastGameResult = null;
 
         // Game Statistics
@@ -1708,202 +1309,6 @@
         // Current theme
         let currentTheme = 'purple';
 
-        // Achievements System
-        let achievements = {
-            firstWin: { 
-                id: 'firstWin',
-                name: 'First Victory', 
-                description: 'Win your first game', 
-                icon: '🎉',
-                unlocked: false,
-                progress: 0,
-                target: 1
-            },
-            speedDemon: { 
-                id: 'speedDemon',
-                name: 'Speed Demon', 
-                description: 'Complete a 4x4 game in under 30 seconds', 
-                icon: '⚡',
-                unlocked: false,
-                progress: 0,
-                target: 1
-            },
-            perfectGame: { 
-                id: 'perfectGame',
-                name: 'Perfect Memory', 
-                description: 'Remember every card - complete in ≤16 moves (4x4)', 
-                icon: '🧠',
-                unlocked: false,
-                progress: 0,
-                target: 1
-            },
-            veteran: { 
-                id: 'veteran',
-                name: 'Veteran Player', 
-                description: 'Play 10 games', 
-                icon: '🎮',
-                unlocked: false,
-                progress: 0,
-                target: 10
-            },
-            centurion: { 
-                id: 'centurion',
-                name: 'Centurion', 
-                description: 'Play 100 games', 
-                icon: '💯',
-                unlocked: false,
-                progress: 0,
-                target: 100
-            },
-            comboMaster: { 
-                id: 'comboMaster',
-                name: 'Combo Master', 
-                description: 'Achieve a 5x combo streak', 
-                icon: '🔥',
-                unlocked: false,
-                progress: 0,
-                target: 5
-            },
-            winStreak3: { 
-                id: 'winStreak3',
-                name: 'On a Roll', 
-                description: 'Win 3 games in a row', 
-                icon: '🎯',
-                unlocked: false,
-                progress: 0,
-                target: 3
-            },
-            winStreak10: { 
-                id: 'winStreak10',
-                name: 'Unstoppable', 
-                description: 'Win 10 games in a row', 
-                icon: '👑',
-                unlocked: false,
-                progress: 0,
-                target: 10
-            },
-            highScorer: { 
-                id: 'highScorer',
-                name: 'High Scorer', 
-                description: 'Score over 10,000 points in one game', 
-                icon: '🌟',
-                unlocked: false,
-                progress: 0,
-                target: 10000
-            },
-            sharpshooter: { 
-                id: 'sharpshooter',
-                name: 'Sharpshooter', 
-                description: 'Achieve 90% match accuracy', 
-                icon: '🎯',
-                unlocked: false,
-                progress: 0,
-                target: 90
-            },
-            gridMaster: { 
-                id: 'gridMaster',
-                name: 'Grid Master', 
-                description: 'Complete a game on each grid size', 
-                icon: '📐',
-                unlocked: false,
-                progress: 0,
-                target: 3,
-                gridSizes: new Set()
-            },
-            marathoner: { 
-                id: 'marathoner',
-                name: 'Marathoner', 
-                description: 'Play for 60 minutes total', 
-                icon: '⏰',
-                unlocked: false,
-                progress: 0,
-                target: 3600
-            },
-            themeCollector: { 
-                id: 'themeCollector',
-                name: 'Theme Collector', 
-                description: 'Try all 6 themes', 
-                icon: '🎨',
-                unlocked: false,
-                progress: 0,
-                target: 6,
-                themesUsed: new Set(['purple'])
-            },
-            iconExplorer: { 
-                id: 'iconExplorer',
-                name: 'Icon Explorer', 
-                description: 'Play with 5 different icon sets', 
-                icon: '🎭',
-                unlocked: false,
-                progress: 0,
-                target: 5,
-                iconSetsUsed: new Set(['gaming'])
-            },
-            dedication: { 
-                id: 'dedication',
-                name: 'Dedication', 
-                description: 'Win 50 games', 
-                icon: '🏆',
-                unlocked: false,
-                progress: 0,
-                target: 50
-            },
-            modeExplorer: { 
-                id: 'modeExplorer',
-                name: 'Mode Explorer', 
-                description: 'Try all 8 game modes', 
-                icon: '🎮',
-                unlocked: false,
-                progress: 0,
-                target: 8,
-                modesUsed: new Set(['normal'])
-            },
-            peekMaster: { 
-                id: 'peekMaster',
-                name: 'Quick Learner', 
-                description: 'Win a game in Peek Mode', 
-                icon: '👁️',
-                unlocked: false,
-                progress: 0,
-                target: 1
-            },
-            fadeWarrior: { 
-                id: 'fadeWarrior',
-                name: 'Fade Warrior', 
-                description: 'Win a game in Memory Fade mode', 
-                icon: '🌫️',
-                unlocked: false,
-                progress: 0,
-                target: 1
-            },
-            fortuneSeeker: { 
-                id: 'fortuneSeeker',
-                name: 'Fortune Seeker', 
-                description: 'Win a game in Fortune Teller mode', 
-                icon: '🔮',
-                unlocked: false,
-                progress: 0,
-                target: 1
-            },
-            chaosSurvivor: { 
-                id: 'chaosSurvivor',
-                name: 'Chaos Survivor', 
-                description: 'Win a game in Chaos Mode', 
-                icon: '🌀',
-                unlocked: false,
-                progress: 0,
-                target: 1
-            },
-            colorMaster: { 
-                id: 'colorMaster',
-                name: 'Color Master', 
-                description: 'Win a game in Color Chaos mode', 
-                icon: '🌈',
-                unlocked: false,
-                progress: 0,
-                target: 1
-            }
-        };
         let currentRotation = 0;
         let score = 0;
         let combo = 0;
@@ -2401,65 +1806,6 @@
             // Check achievement-specific conditions
             const gridSize = `${boardWidth}x${boardHeight}`;
             
-            // Speed Demon achievement
-            if (gridSize === '4x4' && timer < 30) {
-                achievements.speedDemon.progress = 1;
-                checkAchievement('speedDemon');
-            }
-            
-            // Perfect Memory achievement - Complete with realistic perfect play
-            // Perfect play means: remember every card you see and never make the same mistake twice
-            // This requires approximately 2x the number of pairs (discovering + matching)
-            const totalCards = boardWidth * boardHeight;
-            const perfectMoveCount = totalCards; // 16 for 4x4, 36 for 6x6, 64 for 8x8
-            
-            if (moves <= perfectMoveCount) {
-                achievements.perfectGame.progress = 1;
-                checkAchievement('perfectGame');
-            }
-            
-            // High Scorer achievement
-            if (finalScore >= 10000) {
-                achievements.highScorer.progress = finalScore;
-                checkAchievement('highScorer');
-            }
-            
-            // Grid Master achievement
-            achievements.gridMaster.gridSizes.add(gridSize);
-            achievements.gridMaster.progress = achievements.gridMaster.gridSizes.size;
-            checkAchievement('gridMaster');
-            
-            // Icon Explorer achievement
-            achievements.iconExplorer.iconSetsUsed.add(currentIconSet);
-            achievements.iconExplorer.progress = achievements.iconExplorer.iconSetsUsed.size;
-            checkAchievement('iconExplorer');
-            
-            // Mode Explorer achievement
-            achievements.modeExplorer.modesUsed.add(gameMode);
-            achievements.modeExplorer.progress = achievements.modeExplorer.modesUsed.size;
-            checkAchievement('modeExplorer');
-            
-            // Specific mode achievements
-            if (gameMode === 'peek') {
-                achievements.peekMaster.progress = 1;
-                checkAchievement('peekMaster');
-            } else if (gameMode === 'fade') {
-                achievements.fadeWarrior.progress = 1;
-                checkAchievement('fadeWarrior');
-            } else if (gameMode === 'fortune') {
-                achievements.fortuneSeeker.progress = 1;
-                checkAchievement('fortuneSeeker');
-            } else if (gameMode === 'chaos') {
-                achievements.chaosSurvivor.progress = 1;
-                checkAchievement('chaosSurvivor');
-            } else if (gameMode === 'color') {
-                achievements.colorMaster.progress = 1;
-                checkAchievement('colorMaster');
-            }
-            
-            // Check all other achievements
-            checkAllAchievements();
-            
             // Store game result temporarily
             lastGameResult = {
                 score: finalScore,
@@ -2497,10 +1843,35 @@
             
             // Add name to the game result
             lastGameResult.name = playerName;
-            
-            // Add to leaderboard
-            addToLeaderboard(lastGameResult);
-            
+
+            // Save to global leaderboard in localStorage
+            try {
+                // Get existing scores
+                let cardFlipScores = [];
+                const existingData = localStorage.getItem('cardFlipScores');
+                if (existingData) {
+                    cardFlipScores = JSON.parse(existingData);
+                }
+
+                // Add new score
+                cardFlipScores.push({
+                    name: lastGameResult.name,
+                    score: lastGameResult.score,
+                    date: lastGameResult.date
+                });
+
+                // Sort by score (descending)
+                cardFlipScores.sort((a, b) => b.score - a.score);
+
+                // Keep only top 100 scores
+                cardFlipScores = cardFlipScores.slice(0, 100);
+
+                // Save back to localStorage
+                localStorage.setItem('cardFlipScores', JSON.stringify(cardFlipScores));
+            } catch (e) {
+                console.error('Failed to save score to localStorage:', e);
+            }
+
             // Hide name input modal
             document.getElementById('modalOverlay').classList.remove('show');
             document.getElementById('nameInputModal').classList.remove('show');
@@ -2512,128 +1883,15 @@
             document.getElementById('winMessage').classList.add('show');
         }
 
-        function addToLeaderboard(result) {
-            leaderboard.push(result);
-            
-            // Sort by score (descending), then by time (ascending)
-            leaderboard.sort((a, b) => {
-                if (b.score !== a.score) return b.score - a.score;
-                return a.time - b.time;
-            });
-            
-            // Keep only top 50 scores
-            leaderboard = leaderboard.slice(0, 50);
-        }
-
-        function toggleLeaderboard() {
-            const panel = document.getElementById('leaderboardPanel');
-            const isShowing = panel.classList.contains('show');
-            
-            // Close all other panels
-            document.getElementById('settingsPanel').classList.remove('open');
-            document.getElementById('statsPanel').classList.remove('show');
-            document.getElementById('achievementsPanel').classList.remove('show');
-            
-            // Toggle this panel
-            panel.classList.toggle('show');
-            if (!isShowing) {
-                displayLeaderboard();
-            }
-        }
-
-        function showLeaderboardTab(tab) {
-            currentLeaderboardTab = tab;
-            document.querySelectorAll('.leaderboard-tab').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            displayLeaderboard();
-        }
-
-        function displayLeaderboard() {
-            const listEl = document.getElementById('leaderboardList');
-            listEl.innerHTML = '';
-            
-            let filteredScores = leaderboard;
-            
-            // Filter by grid size if not "all"
-            if (currentLeaderboardTab !== 'all') {
-                filteredScores = leaderboard.filter(score => score.gridSize === currentLeaderboardTab);
-            }
-            
-            // Limit to top 10
-            filteredScores = filteredScores.slice(0, 10);
-            
-            if (filteredScores.length === 0) {
-                listEl.innerHTML = '<div class="no-scores">No scores yet. Play a game to get on the leaderboard!</div>';
-                return;
-            }
-            
-            filteredScores.forEach((scoreData, index) => {
-                const li = document.createElement('li');
-                li.className = 'leaderboard-item';
-                
-                // Highlight if this is the most recent game
-                if (lastGameResult && 
-                    scoreData.date === lastGameResult.date && 
-                    scoreData.score === lastGameResult.score) {
-                    li.classList.add('new-record');
-                }
-                
-                const rank = index + 1;
-                let rankClass = '';
-                if (rank === 1) rankClass = 'gold';
-                else if (rank === 2) rankClass = 'silver';
-                else if (rank === 3) rankClass = 'bronze';
-                
-                const date = new Date(scoreData.date);
-                const timeAgo = getTimeAgo(date);
-                
-                // Get mode icon
-                const modeIcons = {
-                    'normal': '🎮',
-                    'peek': '👁️',
-                    'fade': '🌫️',
-                    'fortune': '🔮',
-                    'color': '🌈',
-                    'chaos': '🌀',
-                    'swap': '🔄',
-                    'rotate': '🔃'
-                };
-                const modeIcon = scoreData.gameMode ? modeIcons[scoreData.gameMode] || '🎮' : '🎮';
-                
-                li.innerHTML = `
-                    <div class="leaderboard-rank ${rankClass}">#${rank}</div>
-                    <div class="leaderboard-info">
-                        <div class="leaderboard-name">${scoreData.name}</div>
-                        <div class="leaderboard-score">${scoreData.score} pts</div>
-                        <div class="leaderboard-details">
-                            ${modeIcon} ${scoreData.gridSize} • ${scoreData.time}s • ${scoreData.moves} moves • ${timeAgo}
-                        </div>
-                    </div>
-                `;
-                
-                listEl.appendChild(li);
-            });
-        }
-
-        function getTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            
-            if (seconds < 60) return 'Just now';
-            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-            return `${Math.floor(seconds / 86400)}d ago`;
-        }
 
         // Statistics Functions
         function toggleStats() {
             const panel = document.getElementById('statsPanel');
             const isShowing = panel.classList.contains('show');
-            
+
             // Close all other panels
             document.getElementById('settingsPanel').classList.remove('open');
-            document.getElementById('leaderboardPanel').classList.remove('show');
-            document.getElementById('achievementsPanel').classList.remove('show');
-            
+
             // Toggle this panel
             panel.classList.toggle('show');
             if (!isShowing) {
@@ -2726,193 +1984,16 @@
             
             currentTheme = theme;
             
-            // Track theme for achievement
-            achievements.themeCollector.themesUsed.add(theme);
-            achievements.themeCollector.progress = achievements.themeCollector.themesUsed.size;
-            checkAchievement('themeCollector');
         }
 
-        // Achievements Functions
-        function toggleAchievements() {
-            const panel = document.getElementById('achievementsPanel');
-            const isShowing = panel.classList.contains('show');
-            
-            // Close all other panels
-            document.getElementById('settingsPanel').classList.remove('open');
-            document.getElementById('leaderboardPanel').classList.remove('show');
-            document.getElementById('statsPanel').classList.remove('show');
-            
-            // Toggle this panel
-            panel.classList.toggle('show');
-            if (!isShowing) {
-                displayAchievements();
-            }
-        }
-
-        function displayAchievements() {
-            const grid = document.getElementById('achievementsGrid');
-            grid.innerHTML = '';
-            
-            let unlockedCount = 0;
-            const totalCount = Object.keys(achievements).length;
-            
-            for (const key in achievements) {
-                const achievement = achievements[key];
-                if (achievement.unlocked) unlockedCount++;
-                
-                const card = document.createElement('div');
-                card.className = 'achievement-card' + (achievement.unlocked ? ' unlocked' : '');
-                
-                let progressBar = '';
-                if (!achievement.unlocked && achievement.target > 1) {
-                    const percentage = Math.min(100, (achievement.progress / achievement.target) * 100);
-                    progressBar = `
-                        <div class="achievement-progress-bar">
-                            <div class="achievement-progress-fill" style="width: ${percentage}%"></div>
-                        </div>
-                        <div class="achievement-progress-text">${achievement.progress} / ${achievement.target}</div>
-                    `;
-                }
-                
-                card.innerHTML = `
-                    <div class="achievement-icon">${achievement.icon}</div>
-                    <div class="achievement-name">${achievement.name}</div>
-                    <div class="achievement-description">${achievement.description}</div>
-                    ${progressBar}
-                `;
-                
-                grid.appendChild(card);
-            }
-            
-            document.getElementById('achievementsUnlocked').textContent = unlockedCount;
-            document.getElementById('achievementsTotal').textContent = totalCount;
-        }
-
-        function checkAchievement(achievementId) {
-            const achievement = achievements[achievementId];
-            
-            if (!achievement || achievement.unlocked) return;
-            
-            // Check if achievement criteria is met
-            let shouldUnlock = false;
-            
-            if (achievement.progress >= achievement.target) {
-                shouldUnlock = true;
-            }
-            
-            if (shouldUnlock) {
-                unlockAchievement(achievementId);
-            }
-        }
-
-        function unlockAchievement(achievementId) {
-            const achievement = achievements[achievementId];
-            
-            if (!achievement || achievement.unlocked) return;
-            
-            achievement.unlocked = true;
-            
-            // Show notification
-            showAchievementNotification(achievement);
-            
-            // Update display if panel is open
-            if (document.getElementById('achievementsPanel').classList.contains('show')) {
-                displayAchievements();
-            }
-        }
-
-        function showAchievementNotification(achievement) {
-            const notification = document.getElementById('achievementNotification');
-            document.getElementById('notifIcon').textContent = achievement.icon;
-            document.getElementById('notifName').textContent = achievement.name;
-            document.getElementById('notifDesc').textContent = achievement.description;
-            
-            notification.classList.add('show');
-            
-            // Play a celebratory sound
-            playCelebrationSound();
-            
-            // Hide after 4 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 4000);
-        }
-
-        function playCelebrationSound() {
-            if (sfxVolume === 0) return;
-            initAudio();
-            const now = audioContext.currentTime;
-            
-            // Play ascending notes
-            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-                const osc = audioContext.createOscillator();
-                osc.frequency.value = freq;
-                osc.type = 'sine';
-                
-                const gainNode = audioContext.createGain();
-                gainNode.gain.setValueAtTime(0.15, now + i * 0.1);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
-                
-                osc.connect(gainNode);
-                gainNode.connect(sfxGainNode);
-                
-                osc.start(now + i * 0.1);
-                osc.stop(now + i * 0.1 + 0.3);
-            });
-        }
-
-        function checkAllAchievements() {
-            // Check various achievements after game events
-            
-            // First Win
-            if (gameStats.gamesPlayed >= 1) {
-                achievements.firstWin.progress = 1;
-                checkAchievement('firstWin');
-            }
-            
-            // Veteran & Centurion
-            achievements.veteran.progress = gameStats.gamesPlayed;
-            checkAchievement('veteran');
-            achievements.centurion.progress = gameStats.gamesPlayed;
-            checkAchievement('centurion');
-            
-            // Dedication
-            achievements.dedication.progress = gameStats.gamesPlayed;
-            checkAchievement('dedication');
-            
-            // Win Streaks
-            achievements.winStreak3.progress = gameStats.currentStreak;
-            checkAchievement('winStreak3');
-            achievements.winStreak10.progress = gameStats.currentStreak;
-            checkAchievement('winStreak10');
-            
-            // Combo Master
-            if (gameStats.bestCombo >= 5) {
-                achievements.comboMaster.progress = gameStats.bestCombo;
-                checkAchievement('comboMaster');
-            }
-            
-            // Sharpshooter
-            if (gameStats.totalAttempts > 0) {
-                const accuracy = (gameStats.totalMatches / gameStats.totalAttempts) * 100;
-                achievements.sharpshooter.progress = Math.round(accuracy);
-                checkAchievement('sharpshooter');
-            }
-            
-            // Marathoner
-            achievements.marathoner.progress = gameStats.totalTime;
-            checkAchievement('marathoner');
-        }
 
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
             const isOpen = panel.classList.contains('open');
-            
+
             // Close all other panels
-            document.getElementById('leaderboardPanel').classList.remove('show');
             document.getElementById('statsPanel').classList.remove('show');
-            document.getElementById('achievementsPanel').classList.remove('show');
-            
+
             // Toggle this panel
             panel.classList.toggle('open');
         }

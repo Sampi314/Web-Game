@@ -138,6 +138,16 @@
             transform: translateY(-2px);
         }
 
+        .btn-leaderboard {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .btn-leaderboard:hover {
+            background: #8e44ad;
+            transform: translateY(-2px);
+        }
+
         .difficulty-info {
             text-align: center;
             margin-bottom: 15px;
@@ -532,6 +542,7 @@
             <button class="btn btn-new-game" onclick="newGame()">New Game</button>
             <button class="btn btn-shop" onclick="openShop()">Shop 🛒</button>
             <button class="btn btn-difficulty" onclick="changeDifficulty()">Change Difficulty</button>
+            <button class="btn btn-leaderboard" onclick="window.location.href='leaderboard.html'">🏆 View Leaderboard</button>
         </div>
 
         <div class="board-container">
@@ -1226,15 +1237,18 @@
             gameOver = true;
             gameWon = won;
             clearInterval(timerInterval);
-            
+
             if (won) {
                 // Award coins based on difficulty
                 const coinReward = difficulties[currentDifficulty].coinReward;
                 coins += coinReward;
                 updateCoins();
                 savedHearts = hearts; // Save hearts for next game
+
+                // Calculate score and save to leaderboard
+                saveScoreToLeaderboard();
             }
-            
+
             if (!won) {
                 // Reveal all mines
                 for (let [row, col] of mines) {
@@ -1242,7 +1256,7 @@
                 }
                 renderBoard();
             }
-            
+
             showGameOver(won);
         }
 
@@ -1375,6 +1389,73 @@
                 };
                 initGame();
                 showNotification('Everything has been reset!', '#e74c3c');
+            }
+        }
+
+        // Leaderboard functions
+        function calculateScore() {
+            // Score = (difficulty_multiplier * 1000) / time_in_seconds
+            // Easy: multiplier = 1, Medium: multiplier = 2, Hard: multiplier = 3
+            const difficultyMultipliers = [1, 2, 3];
+            const multiplier = difficultyMultipliers[currentDifficulty];
+            const timeInSeconds = seconds || 1; // Prevent division by zero
+            const score = Math.round((multiplier * 1000) / timeInSeconds);
+            return score;
+        }
+
+        function getPlayerName() {
+            // Check if player name is already stored
+            let playerName = localStorage.getItem('minesweeperPlayerName');
+
+            if (!playerName) {
+                // Prompt for player name
+                playerName = prompt('Congratulations! Enter your name for the leaderboard:');
+
+                if (!playerName || playerName.trim() === '') {
+                    playerName = 'Anonymous';
+                } else {
+                    playerName = playerName.trim();
+                    // Save the name for future games
+                    localStorage.setItem('minesweeperPlayerName', playerName);
+                }
+            }
+
+            return playerName;
+        }
+
+        function saveScoreToLeaderboard() {
+            const score = calculateScore();
+            const playerName = getPlayerName();
+
+            // Get existing scores
+            let scores = [];
+            try {
+                const storedScores = localStorage.getItem('minesweeperScores');
+                if (storedScores) {
+                    scores = JSON.parse(storedScores);
+                }
+            } catch (e) {
+                console.error('Error loading scores:', e);
+                scores = [];
+            }
+
+            // Add new score
+            const newScore = {
+                name: playerName,
+                score: score,
+                date: new Date().toISOString()
+            };
+            scores.push(newScore);
+
+            // Sort by score (descending) and keep top 100
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 100);
+
+            // Save back to localStorage
+            try {
+                localStorage.setItem('minesweeperScores', JSON.stringify(scores));
+            } catch (e) {
+                console.error('Error saving scores:', e);
             }
         }
 

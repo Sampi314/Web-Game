@@ -281,6 +281,7 @@
             <div class="controls">
                 <button onclick="surrenderGame()">🏳️ Surrender</button>
                 <button onclick="backToSetup()">⚙️ Setup</button>
+                <button onclick="viewLeaderboard()">🏆 View Leaderboard</button>
                 <button onclick="goHome()">🏠 Home</button>
             </div>
 
@@ -322,6 +323,8 @@
         let numPlayers = 1;
         let numBots = 1;
         let snakes = []; // Array of all snakes (human + AI)
+        let gameTimer = 60; // 60-second game timer
+        let timerInterval = null;
 
         // Snake colors
         const SNAKE_COLORS = ['#4ade80', '#ff6b6b', '#fbbf24', '#a78bfa'];
@@ -434,6 +437,7 @@
 
             gameActive = false;
             if (gameLoop) clearInterval(gameLoop);
+            if (timerInterval) clearInterval(timerInterval);
 
             document.getElementById('gameScreen').style.display = 'none';
             document.getElementById('setupScreen').style.display = 'block';
@@ -445,6 +449,21 @@
             if (confirm('Are you sure you want to surrender? Your current scores will be recorded.')) {
                 gameActive = false;
                 if (gameLoop) clearInterval(gameLoop);
+                if (timerInterval) clearInterval(timerInterval);
+
+                // Find the highest scoring human player
+                let highestHumanScore = 0;
+
+                snakes.forEach(snake => {
+                    if (snake.type === 'human' && snake.score > highestHumanScore) {
+                        highestHumanScore = snake.score;
+                    }
+                });
+
+                // Save to leaderboard if there's a score
+                if (highestHumanScore > 0) {
+                    saveToLeaderboard(highestHumanScore);
+                }
 
                 // Show scores for all players
                 let message = 'Final Scores:\n\n';
@@ -460,6 +479,7 @@
         function startGame() {
             gameActive = true;
             snakes = [];
+            gameTimer = 60; // Reset timer to 60 seconds
 
             // Spawn positions (corners and center regions)
             const spawnPositions = [
@@ -513,6 +533,19 @@
             // Start game loop
             if (gameLoop) clearInterval(gameLoop);
             gameLoop = setInterval(update, 100);
+
+            // Start timer countdown
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (gameActive && gameTimer > 0) {
+                    gameTimer--;
+                    updateScoreboard();
+
+                    if (gameTimer === 0) {
+                        endGame();
+                    }
+                }
+            }, 1000);
         }
 
         function update() {
@@ -871,6 +904,15 @@
             const scoreBoard = document.getElementById('scoreBoard');
             scoreBoard.innerHTML = '';
 
+            // Add timer display
+            const timerBox = document.createElement('div');
+            timerBox.className = 'stat-box';
+            timerBox.innerHTML = `
+                <div class="stat-label">⏱️ Time</div>
+                <div class="stat-value" style="color: ${gameTimer <= 10 ? '#ff6b6b' : '#ffd93d'}">${gameTimer}s</div>
+            `;
+            scoreBoard.appendChild(timerBox);
+
             snakes.forEach(snake => {
                 const statBox = document.createElement('div');
                 statBox.className = 'stat-box';
@@ -880,6 +922,122 @@
                 `;
                 scoreBoard.appendChild(statBox);
             });
+        }
+
+        function endGame() {
+            gameActive = false;
+            if (gameLoop) clearInterval(gameLoop);
+            if (timerInterval) clearInterval(timerInterval);
+
+            // Find the highest scoring human player
+            let highestHumanScore = 0;
+            let winningPlayer = null;
+
+            snakes.forEach(snake => {
+                if (snake.type === 'human' && snake.score > highestHumanScore) {
+                    highestHumanScore = snake.score;
+                    winningPlayer = snake;
+                }
+            });
+
+            // Display results
+            const modal = document.getElementById('gameOverModal');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            const nameInputSection = document.getElementById('nameInputSection');
+
+            resultTitle.textContent = 'Time\'s Up!';
+
+            // Build results message
+            let message = 'Final Scores:\n\n';
+            snakes.forEach(snake => {
+                message += `${snake.name}: ${snake.score} points\n`;
+            });
+
+            resultMessage.textContent = message;
+            resultMessage.style.whiteSpace = 'pre-line';
+
+            // Check if we should save to leaderboard (only for human players with score > 0)
+            if (highestHumanScore > 0) {
+                saveToLeaderboard(highestHumanScore);
+
+                // Show name input if it's a new entry
+                const playerName = localStorage.getItem('playerName');
+                if (!playerName) {
+                    nameInputSection.style.display = 'block';
+                } else {
+                    nameInputSection.style.display = 'none';
+                }
+            } else {
+                nameInputSection.style.display = 'none';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function saveToLeaderboard(score) {
+            // Get or prompt for player name
+            let playerName = localStorage.getItem('playerName');
+
+            // If name input is visible, get the value from there
+            const nameInput = document.getElementById('playerNameInput');
+            if (nameInput.value.trim()) {
+                playerName = nameInput.value.trim();
+                localStorage.setItem('playerName', playerName);
+            } else if (!playerName) {
+                // If no name stored and input is empty, use default
+                playerName = 'Anonymous';
+            }
+
+            // Create score entry
+            const scoreEntry = {
+                name: playerName,
+                score: score,
+                date: new Date().toISOString()
+            };
+
+            // Get existing scores
+            let scores = [];
+            try {
+                const storedScores = localStorage.getItem('snakeBattleScores');
+                if (storedScores) {
+                    scores = JSON.parse(storedScores);
+                }
+            } catch (e) {
+                console.error('Error loading scores:', e);
+                scores = [];
+            }
+
+            // Add new score
+            scores.push(scoreEntry);
+
+            // Sort by score (descending)
+            scores.sort((a, b) => b.score - a.score);
+
+            // Keep only top 100
+            scores = scores.slice(0, 100);
+
+            // Save back to localStorage
+            try {
+                localStorage.setItem('snakeBattleScores', JSON.stringify(scores));
+            } catch (e) {
+                console.error('Error saving scores:', e);
+            }
+        }
+
+        function closeModal() {
+            // Save name if provided in the input
+            const nameInput = document.getElementById('playerNameInput');
+            if (nameInput.value.trim()) {
+                localStorage.setItem('playerName', nameInput.value.trim());
+            }
+
+            const modal = document.getElementById('gameOverModal');
+            modal.classList.remove('active');
+            nameInput.value = ''; // Clear input for next time
+
+            // Return to setup screen
+            backToSetup();
         }
 
         function viewLeaderboard() {

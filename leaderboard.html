@@ -40,6 +40,39 @@
             opacity: 0.9;
         }
 
+        .time-filters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .time-filter-btn {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .time-filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .time-filter-btn.active {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            box-shadow: 0 6px 16px rgba(240, 147, 251, 0.4);
+        }
+
         .controls {
             display: flex;
             gap: 15px;
@@ -178,6 +211,16 @@
             background: linear-gradient(135deg, #ef4444, #dc2626);
         }
 
+        .period-indicator {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
         @media (max-width: 768px) {
             h1 { font-size: 2em; }
             .game-title { font-size: 1.5em; }
@@ -190,6 +233,11 @@
             .leaderboard-table td {
                 padding: 8px;
             }
+
+            .time-filter-btn {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
@@ -200,13 +248,22 @@
             <p class="subtitle">Top Players Across All Games</p>
         </header>
 
+        <div class="time-filters">
+            <button class="time-filter-btn active" onclick="setTimePeriod('all')" id="btnAllTime">📊 All Time</button>
+            <button class="time-filter-btn" onclick="setTimePeriod('daily')" id="btnDaily">📅 Daily</button>
+            <button class="time-filter-btn" onclick="setTimePeriod('weekly')" id="btnWeekly">📆 Weekly</button>
+            <button class="time-filter-btn" onclick="setTimePeriod('monthly')" id="btnMonthly">🗓️ Monthly</button>
+        </div>
+
         <div class="controls">
             <button onclick="showAll()" class="active" id="btnAll">All Games</button>
             <button onclick="filterGame('snakeBattle')" id="btnSnake">🐍 Snake Battle</button>
-            <button onclick="filterGame('flappyBird')" id="btnFlappy">🐦 Flappy Bird</button>
+            <button onclick="filterGame('gravitySwitch')" id="btnGravity">🌀 Gravity Switch</button>
             <button onclick="filterGame('cardFlip')" id="btnCard">🎴 Card Flip</button>
             <button onclick="filterGame('gomoku')" id="btnGomoku">⚫ Gomoku</button>
             <button onclick="filterGame('fourInRow')" id="btnFour">🔴 4 in a Row</button>
+            <button onclick="filterGame('wordChain')" id="btnWord">🔤 Word Chain</button>
+            <button onclick="filterGame('minesweeper')" id="btnMine">💣 Minesweeper</button>
             <button onclick="goHome()">🏠 Home</button>
         </div>
 
@@ -225,6 +282,8 @@
             </div>
         </div>
 
+        <div id="periodIndicator" class="period-indicator"></div>
+
         <div id="leaderboardContent"></div>
     </div>
 
@@ -234,9 +293,9 @@
                 name: '🐍 Snake Battle',
                 storageKey: 'snakeBattleScores'
             },
-            flappyBird: {
-                name: '🐦 Flappy Bird Style',
-                storageKey: 'flappyBirdScores'
+            gravitySwitch: {
+                name: '🌀 Gravity Switch',
+                storageKey: 'flappyBirdScores'  // Using existing key for backwards compatibility
             },
             cardFlip: {
                 name: '🎴 Card Flip Memory',
@@ -253,10 +312,15 @@
             wordChain: {
                 name: '🔤 Word Chain',
                 storageKey: 'wordChainScores'
+            },
+            minesweeper: {
+                name: '💣 Minesweeper',
+                storageKey: 'minesweeperScores'
             }
         };
 
         let currentFilter = 'all';
+        let currentTimePeriod = 'all';
 
         function getGameScores(gameKey) {
             const data = localStorage.getItem(GAMES[gameKey].storageKey);
@@ -278,6 +342,84 @@
             return allScores;
         }
 
+        function filterScoresByTimePeriod(scores, period) {
+            if (period === 'all') return scores;
+
+            const now = new Date();
+            const cutoffTime = getCutoffTime(now, period);
+
+            return scores.filter(score => {
+                if (!score.date) return false;
+                const scoreDate = new Date(score.date);
+                return scoreDate >= cutoffTime;
+            });
+        }
+
+        function getCutoffTime(now, period) {
+            const cutoff = new Date(now);
+
+            switch(period) {
+                case 'daily':
+                    cutoff.setHours(0, 0, 0, 0);
+                    break;
+                case 'weekly':
+                    const dayOfWeek = cutoff.getDay();
+                    const daysToMonday = (dayOfWeek + 6) % 7;
+                    cutoff.setDate(cutoff.getDate() - daysToMonday);
+                    cutoff.setHours(0, 0, 0, 0);
+                    break;
+                case 'monthly':
+                    cutoff.setDate(1);
+                    cutoff.setHours(0, 0, 0, 0);
+                    break;
+            }
+
+            return cutoff;
+        }
+
+        function getPeriodLabel(period) {
+            const now = new Date();
+            switch(period) {
+                case 'daily':
+                    return `Today (${now.toLocaleDateString()})`;
+                case 'weekly':
+                    const cutoff = getCutoffTime(now, 'weekly');
+                    return `This Week (Starting ${cutoff.toLocaleDateString()})`;
+                case 'monthly':
+                    return `This Month (${now.toLocaleString('default', { month: 'long', year: 'numeric' })})`;
+                case 'all':
+                default:
+                    return 'All Time Rankings';
+            }
+        }
+
+        function updatePeriodIndicator() {
+            const indicator = document.getElementById('periodIndicator');
+            indicator.textContent = getPeriodLabel(currentTimePeriod);
+        }
+
+        function setTimePeriod(period) {
+            currentTimePeriod = period;
+
+            // Update active button
+            document.querySelectorAll('.time-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const btnMap = {
+                'all': 'btnAllTime',
+                'daily': 'btnDaily',
+                'weekly': 'btnWeekly',
+                'monthly': 'btnMonthly'
+            };
+
+            const activeBtn = document.getElementById(btnMap[period]);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            updatePeriodIndicator();
+            renderLeaderboard(currentFilter);
+        }
+
         function renderLeaderboard(filter = 'all') {
             const content = document.getElementById('leaderboardContent');
             content.innerHTML = '';
@@ -286,22 +428,24 @@
                 // Show all games
                 for (const gameKey in GAMES) {
                     const scores = getGameScores(gameKey);
-                    if (scores.length > 0) {
-                        renderGameSection(gameKey, scores);
+                    const filteredScores = filterScoresByTimePeriod(scores, currentTimePeriod);
+                    if (filteredScores.length > 0) {
+                        renderGameSection(gameKey, filteredScores);
                     }
                 }
 
                 // Check if no scores at all
                 if (content.innerHTML === '') {
-                    content.innerHTML = '<div class="empty-state">No scores yet! Play some games to see your leaderboard.</div>';
+                    content.innerHTML = '<div class="empty-state">No scores for this time period! Play some games to see your leaderboard.</div>';
                 }
             } else {
                 // Show specific game
                 const scores = getGameScores(filter);
-                if (scores.length > 0) {
-                    renderGameSection(filter, scores);
+                const filteredScores = filterScoresByTimePeriod(scores, currentTimePeriod);
+                if (filteredScores.length > 0) {
+                    renderGameSection(filter, filteredScores);
                 } else {
-                    content.innerHTML = '<div class="empty-state">No scores for this game yet!</div>';
+                    content.innerHTML = '<div class="empty-state">No scores for this game in this time period!</div>';
                 }
             }
 
@@ -348,18 +492,19 @@
 
         function updateStats() {
             const allScores = getAllScores();
-            const uniquePlayers = new Set(allScores.map(s => s.name.toLowerCase()));
-            const highestScore = allScores.length > 0 ? Math.max(...allScores.map(s => s.score)) : 0;
+            const filteredScores = filterScoresByTimePeriod(allScores, currentTimePeriod);
+            const uniquePlayers = new Set(filteredScores.map(s => s.name.toLowerCase()));
+            const highestScore = filteredScores.length > 0 ? Math.max(...filteredScores.map(s => s.score)) : 0;
 
             document.getElementById('totalPlayers').textContent = uniquePlayers.size;
-            document.getElementById('totalScores').textContent = allScores.length;
+            document.getElementById('totalScores').textContent = filteredScores.length;
             document.getElementById('highestScore').textContent = highestScore;
         }
 
         function filterGame(gameKey) {
             currentFilter = gameKey;
             renderLeaderboard(gameKey);
-            updateActiveButton('btn' + gameKey.charAt(0).toUpperCase() + gameKey.slice(1).replace(/([A-Z])/g, match => match));
+            updateActiveButton('btn' + gameKey.charAt(0).toUpperCase() + gameKey.slice(1));
         }
 
         function showAll() {
@@ -415,6 +560,7 @@
         }
 
         // Initialize
+        updatePeriodIndicator();
         renderLeaderboard('all');
     </script>
 </body>
