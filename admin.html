@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Admin Panel - Web Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            min-width: 400px;
+        }
+
+        .login-box h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .login-box p {
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .login-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 107, 107, 0.8);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 1);
+            transform: scale(1.05);
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #4ade80;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .game-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .game-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-info {
+            flex: 1;
+        }
+
+        .game-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .game-stats {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .game-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(238, 90, 111, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 25px;
+            font-size: 1.1em;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .success-message, .info-message {
+            background: rgba(74, 222, 128, 0.2);
+            border: 2px solid #4ade80;
+            color: #4ade80;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .info-message {
+            background: rgba(96, 165, 250, 0.2);
+            border-color: #60a5fa;
+            color: #60a5fa;
+        }
+
+        .file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h1>🔐 Admin Panel</h1>
+            <p>Enter admin password to continue</p>
+            <input type="password" id="passwordInput" class="login-input" placeholder="Enter password" autocomplete="off">
+            <button class="login-btn" onclick="login()">Login</button>
+            <div class="error-message" id="errorMessage">Incorrect password. Please try again.</div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <button class="logout-btn" onclick="logout()">Logout</button>
+
+        <div class="container">
+            <header>
+                <h1>🎮 Admin Panel</h1>
+                <div class="subtitle">Leaderboard Management System</div>
+            </header>
+
+            <!-- Statistics Section -->
+            <div class="section">
+                <h2>📊 Statistics</h2>
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Stats will be populated here -->
+                </div>
+            </div>
+
+            <!-- Global Actions Section -->
+            <div class="section">
+                <h2>⚙️ Global Actions</h2>
+                <div class="action-buttons">
+                    <button class="btn-success" onclick="downloadBackup()">💾 Download Backup</button>
+                    <button class="btn-warning" onclick="document.getElementById('restoreInput').click()">📥 Restore Backup</button>
+                    <button class="btn-danger" onclick="confirmClearAll()">🗑️ Clear All Leaderboards</button>
+                </div>
+                <input type="file" id="restoreInput" class="file-input" accept=".json" onchange="restoreBackup(event)">
+                <div class="success-message" id="globalSuccessMessage"></div>
+                <div class="info-message" id="globalInfoMessage"></div>
+            </div>
+
+            <!-- Individual Games Section -->
+            <div class="section">
+                <h2>🎯 Individual Games</h2>
+                <div class="game-list" id="gameList">
+                    <!-- Games will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Confirm Action</h3>
+            <p id="modalMessage">Are you sure?</p>
+            <div class="modal-buttons">
+                <button class="btn-danger" onclick="executeConfirmedAction()">Yes, Delete</button>
+                <button class="btn-primary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Admin password (change this!)
+        const ADMIN_PASSWORD = 'admin123'; // TODO: Change this password!
+
+        const GAMES = {
+            snakeBattle: {
+                name: '🐍 Snake Battle',
+                storageKey: 'snakeBattleScores'
+            },
+            gravitySwitch: {
+                name: '🌀 Gravity Switch',
+                storageKey: 'flappyBirdScores'
+            },
+            cardFlip: {
+                name: '🎴 Card Flip Memory',
+                storageKey: 'cardFlipScores'
+            },
+            gomoku: {
+                name: '⚫ Gomoku',
+                storageKey: 'gomokuScores'
+            },
+            fourInRow: {
+                name: '🔴 4 in a Row',
+                storageKey: 'fourInRowScores'
+            },
+            wordChain: {
+                name: '🔤 Word Chain',
+                storageKey: 'wordChainScores'
+            },
+            minesweeper: {
+                name: '💣 Minesweeper',
+                storageKey: 'minesweeperScores'
+            }
+        };
+
+        let pendingAction = null;
+
+        // Login functionality
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                loadAdminPanel();
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+        }
+
+        // Check if already logged in
+        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadAdminPanel();
+        }
+
+        // Allow Enter key to login
+        document.getElementById('passwordInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        // Load admin panel data
+        function loadAdminPanel() {
+            loadStatistics();
+            loadGameList();
+        }
+
+        function loadStatistics() {
+            let totalScores = 0;
+            let totalGames = 0;
+            let oldestScore = null;
+            let newestScore = null;
+
+            Object.keys(GAMES).forEach(gameKey => {
+                const scores = getGameScores(gameKey);
+                totalScores += scores.length;
+                if (scores.length > 0) totalGames++;
+
+                scores.forEach(score => {
+                    const date = new Date(score.timestamp);
+                    if (!oldestScore || date < oldestScore) oldestScore = date;
+                    if (!newestScore || date > newestScore) newestScore = date;
+                });
+            });
+
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${totalScores}</div>
+                    <div class="stat-label">Total Scores</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${totalGames}</div>
+                    <div class="stat-label">Active Games</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${oldestScore ? formatDate(oldestScore) : 'N/A'}</div>
+                    <div class="stat-label">Oldest Record</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${newestScore ? formatDate(newestScore) : 'N/A'}</div>
+                    <div class="stat-label">Latest Record</div>
+                </div>
+            `;
+        }
+
+        function loadGameList() {
+            const gameList = document.getElementById('gameList');
+            gameList.innerHTML = '';
+
+            Object.keys(GAMES).forEach(gameKey => {
+                const game = GAMES[gameKey];
+                const scores = getGameScores(gameKey);
+
+                const gameItem = document.createElement('div');
+                gameItem.className = 'game-item';
+                gameItem.innerHTML = `
+                    <div class="game-info">
+                        <div class="game-name">${game.name}</div>
+                        <div class="game-stats">${scores.length} scores recorded</div>
+                    </div>
+                    <div class="game-actions">
+                        <button class="btn-primary" onclick="viewScores('${gameKey}')">👁️ View</button>
+                        <button class="btn-warning" onclick="downloadGameBackup('${gameKey}')">💾 Backup</button>
+                        <button class="btn-danger" onclick="confirmClearGame('${gameKey}')">🗑️ Clear</button>
+                    </div>
+                `;
+                gameList.appendChild(gameItem);
+            });
+        }
+
+        function getGameScores(gameKey) {
+            const data = localStorage.getItem(GAMES[gameKey].storageKey);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function formatDate(date) {
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${month}/${day}`;
+        }
+
+        // Confirmation modal
+        function confirmClearAll() {
+            document.getElementById('modalTitle').textContent = '⚠️ Clear All Leaderboards?';
+            document.getElementById('modalMessage').textContent = 'This will permanently delete ALL scores from ALL games. This action cannot be undone!';
+            pendingAction = 'clearAll';
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function confirmClearGame(gameKey) {
+            const gameName = GAMES[gameKey].name;
+            document.getElementById('modalTitle').textContent = `⚠️ Clear ${gameName}?`;
+            document.getElementById('modalMessage').textContent = `This will permanently delete all scores for ${gameName}. This action cannot be undone!`;
+            pendingAction = { action: 'clearGame', gameKey };
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+            pendingAction = null;
+        }
+
+        function executeConfirmedAction() {
+            if (pendingAction === 'clearAll') {
+                clearAllLeaderboards();
+            } else if (pendingAction?.action === 'clearGame') {
+                clearGameLeaderboard(pendingAction.gameKey);
+            }
+            closeModal();
+        }
+
+        // Clear functions
+        function clearAllLeaderboards() {
+            Object.keys(GAMES).forEach(gameKey => {
+                localStorage.removeItem(GAMES[gameKey].storageKey);
+            });
+
+            showGlobalMessage('✅ All leaderboards have been cleared successfully!', 'success');
+            loadAdminPanel();
+        }
+
+        function clearGameLeaderboard(gameKey) {
+            localStorage.removeItem(GAMES[gameKey].storageKey);
+            showGlobalMessage(`✅ ${GAMES[gameKey].name} leaderboard has been cleared!`, 'success');
+            loadAdminPanel();
+        }
+
+        // Backup and restore
+        function downloadBackup() {
+            const backup = {
+                version: '1.0',
+                timestamp: new Date().toISOString(),
+                data: {}
+            };
+
+            Object.keys(GAMES).forEach(gameKey => {
+                backup.data[GAMES[gameKey].storageKey] = getGameScores(gameKey);
+            });
+
+            const dataStr = JSON.stringify(backup, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `leaderboard-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+
+            showGlobalMessage('✅ Backup downloaded successfully!', 'success');
+        }
+
+        function downloadGameBackup(gameKey) {
+            const backup = {
+                version: '1.0',
+                timestamp: new Date().toISOString(),
+                game: gameKey,
+                data: getGameScores(gameKey)
+            };
+
+            const dataStr = JSON.stringify(backup, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${gameKey}-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+
+            showGlobalMessage(`✅ ${GAMES[gameKey].name} backup downloaded!`, 'success');
+        }
+
+        function restoreBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const backup = JSON.parse(e.target.result);
+
+                    if (backup.game && backup.data) {
+                        // Single game backup - check this first
+                        if (!GAMES[backup.game]) {
+                            showGlobalMessage('❌ Error: Unknown game type in backup', 'info');
+                            return;
+                        }
+                        const storageKey = GAMES[backup.game].storageKey;
+                        localStorage.setItem(storageKey, JSON.stringify(backup.data));
+                        showGlobalMessage(`✅ ${GAMES[backup.game].name} backup restored!`, 'success');
+                    } else if (backup.data) {
+                        // Full backup
+                        Object.keys(backup.data).forEach(storageKey => {
+                            localStorage.setItem(storageKey, JSON.stringify(backup.data[storageKey]));
+                        });
+                        showGlobalMessage('✅ Full backup restored successfully!', 'success');
+                    }
+
+                    loadAdminPanel();
+                } catch (error) {
+                    showGlobalMessage('❌ Error restoring backup: Invalid file format', 'info');
+                }
+            };
+            reader.readAsText(file);
+
+            // Reset file input
+            event.target.value = '';
+        }
+
+        function viewScores(gameKey) {
+            const scores = getGameScores(gameKey);
+            window.open(`leaderboard.html#${gameKey}`, '_blank');
+        }
+
+        function showGlobalMessage(message, type) {
+            const messageId = type === 'success' ? 'globalSuccessMessage' : 'globalInfoMessage';
+            const messageEl = document.getElementById(messageId);
+            messageEl.textContent = message;
+            messageEl.style.display = 'block';
+
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
