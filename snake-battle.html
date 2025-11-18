@@ -2,18 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Battle - Race the AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake Battle - Ultimate Edition</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* Mobile optimizations */
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            -webkit-user-select: none;
-            user-select: none;
         }
 
         body {
@@ -26,7 +21,7 @@
             justify-content: center;
             padding: 20px;
             color: white;
-            overscroll-behavior: none;
+            overflow-x: hidden;
         }
 
         .game-container {
@@ -35,7 +30,7 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 700px;
+            max-width: 900px;
             width: 100%;
         }
 
@@ -47,47 +42,81 @@
         }
 
         .game-info {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
             margin-bottom: 20px;
             padding: 20px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
-            flex-wrap: wrap;
-            gap: 15px;
         }
 
         .stat-box {
             text-align: center;
-            flex: 1;
-            min-width: 100px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
         }
 
         .stat-label {
-            font-size: 0.9em;
+            font-size: 0.85em;
             opacity: 0.8;
+            margin-bottom: 5px;
         }
 
         .stat-value {
-            font-size: 2em;
+            font-size: 1.8em;
             font-weight: bold;
-            margin-top: 5px;
         }
 
-        .player-score {
-            color: #4ade80;
+        .player-score { color: #4ade80; }
+        .ai-score { color: #ff6b6b; }
+        .time-warning { color: #ffa500; animation: pulse 0.5s infinite; }
+        .time-critical { color: #ff4444; animation: pulse 0.3s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
-        .ai-score {
-            color: #ff6b6b;
+        .power-ups-display {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            min-height: 50px;
+        }
+
+        .active-powerup {
+            background: rgba(255, 215, 0, 0.3);
+            border: 2px solid gold;
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 1.2em;
+            animation: glow 1s infinite;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+        }
+
+        .canvas-wrapper {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .canvas-container {
+            flex: 1;
             position: relative;
             background: #1a1a2e;
             border-radius: 10px;
             padding: 10px;
-            margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
@@ -98,30 +127,33 @@
             background: #0f0f1e;
         }
 
+        .minimap-container {
+            width: 150px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .minimap-title {
+            text-align: center;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        #minimap {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            width: 100%;
+            height: 130px;
+        }
+
         .controls {
             display: flex;
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
             margin-bottom: 20px;
-        }
-
-        .settings-toggle {
-            background: rgba(255, 255, 255, 0.3);
-            color: white;
-            border: 2px solid white;
-            padding: 12px 25px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-        }
-
-        .settings-toggle:hover {
-            background: rgba(255, 255, 255, 0.4);
         }
 
         button {
@@ -146,134 +178,18 @@
             transform: translateY(0);
         }
 
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .instructions {
             background: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 10px;
             text-align: center;
             font-size: 0.95em;
-        }
-
-        .setup-screen {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .setup-options {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-
-        .setup-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .setup-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .setup-group select {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.1em;
-            border-radius: 8px;
-            border: none;
-            background: rgba(255, 255, 255, 0.9);
-            cursor: pointer;
-        }
-
-        .controls-info {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-        }
-
-        .controls-info h3 {
-            margin-bottom: 15px;
-        }
-
-        .controls-info p {
-            margin: 8px 0;
-            font-size: 1em;
-        }
-
-        .player-customization {
-            margin-top: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .player-card {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .player-card h4 {
-            margin-bottom: 12px;
-            font-size: 1.1em;
-            color: #4ade80;
-        }
-
-        .player-card label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .player-card select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 12px;
-            border-radius: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-            font-size: 1em;
-        }
-
-        .color-options {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .color-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .color-btn:hover:not(.disabled) {
-            transform: scale(1.1);
-        }
-
-        .color-btn.selected {
-            border-color: white;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-        }
-
-        .color-btn.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
         }
 
         .modal {
@@ -283,7 +199,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -298,9 +214,11 @@
             padding: 40px;
             border-radius: 20px;
             text-align: center;
-            max-width: 400px;
+            max-width: 500px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             animation: modalSlideIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         @keyframes modalSlideIn {
@@ -314,153 +232,328 @@
         }
 
         .modal-content p {
-            font-size: 1.3em;
-            margin-bottom: 30px;
+            font-size: 1.2em;
+            margin-bottom: 20px;
         }
 
-        /* Mobile touch controls */
-        .touch-controls {
-            display: none;
-            grid-template-columns: repeat(3, 70px);
-            grid-template-rows: repeat(3, 70px);
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
+        .mode-selection, .difficulty-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
         }
 
-        .touch-btn {
+        .mode-btn, .difficulty-btn {
+            padding: 20px;
             background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 10px;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            color: white;
+        }
+
+        .mode-btn:hover, .difficulty-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .mode-btn.selected, .difficulty-btn.selected {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: gold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+        }
+
+        .pause-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 10px;
+        }
+
+        .pause-overlay.active {
+            display: flex;
+        }
+
+        .pause-menu {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .pause-menu h2 {
+            margin-bottom: 20px;
+        }
+
+        .pause-menu button {
+            margin: 5px;
+        }
+
+        .score-popup {
+            position: absolute;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: gold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            animation: scoreFloat 1s ease-out forwards;
+        }
+
+        @keyframes scoreFloat {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1.5); opacity: 0; }
+        }
+
+        /* Home Button */
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10000;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 16px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .home-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        /* Mobile D-Pad Controls */
+        .mobile-controls {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .dpad {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 5px;
+        }
+
+        .dpad-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 24px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 70px;
-            min-height: 70px;
             touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            transition: all 0.2s;
         }
 
-        .touch-btn:active {
-            background: rgba(255, 255, 255, 0.4);
+        .dpad-btn:active {
+            background: rgba(102, 126, 234, 0.8);
             transform: scale(0.95);
         }
 
-        .touch-btn.empty {
-            visibility: hidden;
-        }
+        .dpad-up { grid-column: 2; grid-row: 1; }
+        .dpad-left { grid-column: 1; grid-row: 2; }
+        .dpad-down { grid-column: 2; grid-row: 3; }
+        .dpad-right { grid-column: 3; grid-row: 2; }
 
         @media (max-width: 768px) {
             h1 { font-size: 2em; }
-            canvas { width: 100%; height: auto; }
-            .touch-controls { display: grid; }
+            .canvas-wrapper { flex-direction: column; }
+            .minimap-container { width: 100%; }
+            #minimap { height: 150px; }
+            .mobile-controls { display: block; }
+            .home-button {
+                top: 10px;
+                left: 10px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
         }
 
-        @media (hover: none) and (pointer: coarse) {
-            .touch-controls { display: grid; }
+        @media (max-width: 480px) {
+            .dpad {
+                grid-template-columns: repeat(3, 50px);
+                grid-template-rows: repeat(3, 50px);
+            }
+            .dpad-btn {
+                font-size: 20px;
+            }
+        }
+
+        /* Prevent text selection and context menu */
+        canvas, button, .home-button, .dpad-btn {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
     </style>
 </head>
 <body>
+    <a href="index.html" class="home-button">🏠 Home</a>
     <div class="game-container">
-        <h1>🐍 Snake Battle ⚔️</h1>
+        <h1>🐍 Snake Battle - Ultimate Edition ⚔️</h1>
 
-        <!-- Setup Screen -->
-        <div id="setupScreen" class="setup-screen">
-            <h2>🎮 Game Setup</h2>
-            <div class="setup-options">
-                <div class="setup-group">
-                    <label>Number of Players (Human):</label>
-                    <select id="numPlayers" onchange="updatePlayerControls()">
-                        <option value="1" selected>1 Player</option>
-                        <option value="2">2 Players</option>
-                        <option value="3">3 Players</option>
-                        <option value="4">4 Players</option>
-                    </select>
-                </div>
-                <div class="setup-group">
-                    <label>Number of AI Bots:</label>
-                    <select id="numBots">
-                        <option value="0">0 Bots</option>
-                        <option value="1" selected>1 Bot</option>
-                        <option value="2">2 Bots</option>
-                        <option value="3">3 Bots</option>
-                    </select>
-                </div>
+        <div class="game-info">
+            <div class="stat-box">
+                <div class="stat-label">⏰ Time</div>
+                <div class="stat-value" id="timeDisplay">60</div>
             </div>
-            <div id="playerCustomization" class="player-customization">
-                <!-- Player cards will be dynamically generated here -->
+            <div class="stat-box">
+                <div class="stat-label">🟢 Your Score</div>
+                <div class="stat-value player-score" id="playerScore">0</div>
             </div>
-            <button onclick="startGameFromSetup()" style="margin-top: 20px; padding: 15px 40px; font-size: 1.2em;">🚀 Start Battle!</button>
+            <div class="stat-box">
+                <div class="stat-label">🔴 AI Score</div>
+                <div class="stat-value ai-score" id="aiScore">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">🎯 Mode</div>
+                <div class="stat-value" id="modeDisplay" style="font-size: 1em;">-</div>
+            </div>
         </div>
 
-        <!-- Game Screen -->
-        <div id="gameScreen" style="display: none;">
-            <div class="controls">
-                <button class="settings-toggle" onclick="viewLeaderboard()">🏆 Leaderboard</button>
-                <button class="settings-toggle" onclick="toggleGameSettings()">⚙️ Settings</button>
-            </div>
+        <div class="power-ups-display" id="powerupsDisplay"></div>
 
-            <div class="controls" style="margin-top: 0; margin-bottom: 20px;">
-                <button onclick="startGame()">🔄 New Game</button>
-                <button onclick="surrenderGame()">🏳️ Surrender</button>
-                <button onclick="goHome()">🏠 Home</button>
-            </div>
-
-            <div class="instructions" id="gameSettingsPanel" style="display: none; margin-bottom: 20px;">
-                <h3 style="margin-bottom: 15px;">⚙️ Settings</h3>
-                <div style="text-align: center;">
-                    <button id="soundToggle" onclick="toggleSound()" style="font-size: 2em; padding: 15px 30px; margin: 10px;">
-                        🔊 Sound On
-                    </button>
-                    <br>
-                    <button onclick="backToSetup()" style="margin-top: 10px;">🔙 Back to Setup</button>
-                </div>
-            </div>
-
-            <div class="game-info" id="scoreBoard"></div>
-
+        <div class="canvas-wrapper">
             <div class="canvas-container">
                 <canvas id="gameCanvas" width="600" height="600"></canvas>
+                <div class="pause-overlay" id="pauseOverlay">
+                    <div class="pause-menu">
+                        <h2>⏸️ PAUSED</h2>
+                        <button onclick="resumeGame()">Resume</button>
+                        <button onclick="restartGame()">Restart</button>
+                        <button onclick="mainMenu()">Main Menu</button>
+                    </div>
+                </div>
             </div>
-
-            <div class="instructions">
-                <p>🍎 Eat apples to grow and score points</p>
-                <p>💀 Hit another snake's tail and you die - your score resets to 0!</p>
-                <p>🎁 Dead snakes drop special food (Golden 🟠 or Super 🔴)</p>
+            <div class="minimap-container">
+                <div class="minimap-title">📍 Minimap</div>
+                <canvas id="minimap"></canvas>
             </div>
+        </div>
 
-            <!-- Touch controls for mobile -->
-            <div class="touch-controls" id="touchControls">
-                <div class="touch-btn empty"></div>
-                <div class="touch-btn" ontouchstart="handleTouchControl('up')" onclick="handleTouchControl('up')">↑</div>
-                <div class="touch-btn empty"></div>
-                <div class="touch-btn" ontouchstart="handleTouchControl('left')" onclick="handleTouchControl('left')">←</div>
-                <div class="touch-btn empty"></div>
-                <div class="touch-btn" ontouchstart="handleTouchControl('right')" onclick="handleTouchControl('right')">→</div>
-                <div class="touch-btn empty"></div>
-                <div class="touch-btn" ontouchstart="handleTouchControl('down')" onclick="handleTouchControl('down')">↓</div>
-                <div class="touch-btn empty"></div>
+        <div class="controls">
+            <button onclick="showModeSelection()">🎮 Start Game</button>
+            <button onclick="toggleSound()" id="soundBtn">🔊 Sound ON</button>
+            <button onclick="goHome()">🏠 Home</button>
+        </div>
+
+        <div class="instructions">
+            <p>🎯 Arrow Keys / WASD to move • ESC to pause • Collect power-ups and apples!</p>
+            <p style="margin-top: 10px;">📱 On mobile: Use D-pad or swipe to control snake</p>
+        </div>
+    </div>
+
+    <!-- Mobile D-Pad Controls -->
+    <div class="mobile-controls">
+        <div class="dpad">
+            <button class="dpad-btn dpad-up" id="dpadUp">▲</button>
+            <button class="dpad-btn dpad-left" id="dpadLeft">◄</button>
+            <button class="dpad-btn dpad-down" id="dpadDown">▼</button>
+            <button class="dpad-btn dpad-right" id="dpadRight">►</button>
+        </div>
+    </div>
+
+    <!-- Mode Selection Modal -->
+    <div class="modal" id="modeSelectionModal">
+        <div class="modal-content">
+            <h2>🎮 Select Game Mode</h2>
+            <div class="mode-selection">
+                <button class="mode-btn" onclick="selectMode('timeAttack')">
+                    <div style="font-size: 2em;">⏱️</div>
+                    <div><strong>Time Attack</strong></div>
+                    <div style="font-size: 0.85em;">60 seconds battle</div>
+                </button>
+                <button class="mode-btn" onclick="selectMode('survival')">
+                    <div style="font-size: 2em;">💀</div>
+                    <div><strong>Survival</strong></div>
+                    <div style="font-size: 0.85em;">Last as long as you can</div>
+                </button>
+                <button class="mode-btn" onclick="selectMode('scoreRace')">
+                    <div style="font-size: 2em;">🏆</div>
+                    <div><strong>Score Race</strong></div>
+                    <div style="font-size: 0.85em;">First to 50 points</div>
+                </button>
+                <button class="mode-btn" onclick="selectMode('endless')">
+                    <div style="font-size: 2em;">♾️</div>
+                    <div><strong>Endless</strong></div>
+                    <div style="font-size: 0.85em;">Infinite highscore mode</div>
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- Difficulty Selection Modal -->
+    <div class="modal" id="difficultyModal">
+        <div class="modal-content">
+            <h2>⚙️ Select Difficulty</h2>
+            <div class="difficulty-selection">
+                <button class="difficulty-btn" onclick="selectDifficulty('easy')">
+                    <div style="font-size: 2em;">😊</div>
+                    <div><strong>Easy</strong></div>
+                    <div style="font-size: 0.85em;">Slower pace, fewer obstacles</div>
+                </button>
+                <button class="difficulty-btn" onclick="selectDifficulty('normal')">
+                    <div style="font-size: 2em;">😐</div>
+                    <div><strong>Normal</strong></div>
+                    <div style="font-size: 0.85em;">Balanced gameplay</div>
+                </button>
+                <button class="difficulty-btn" onclick="selectDifficulty('hard')">
+                    <div style="font-size: 2em;">😰</div>
+                    <div><strong>Hard</strong></div>
+                    <div style="font-size: 0.85em;">Faster, smarter AI</div>
+                </button>
+                <button class="difficulty-btn" onclick="selectDifficulty('insane')">
+                    <div style="font-size: 2em;">💀</div>
+                    <div><strong>Insane</strong></div>
+                    <div style="font-size: 0.85em;">Ultimate challenge!</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
     <div class="modal" id="gameOverModal">
         <div class="modal-content">
             <h2 id="resultTitle">Game Over!</h2>
             <p id="resultMessage"></p>
-            <div id="nameInputSection" style="margin: 20px 0; display: none;">
-                <p style="margin-bottom: 10px;">🎉 New high score! Enter your name:</p>
-                <input type="text" id="playerNameInput" maxlength="20" placeholder="Your name"
-                    style="padding: 10px; font-size: 1em; border-radius: 5px; border: none; width: 80%; margin-bottom: 15px;">
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="closeModal()">Play Again</button>
-                <button onclick="viewLeaderboard()">🏆 Leaderboard</button>
+            <div class="stats-grid" id="statsGrid"></div>
+            <div>
+                <button onclick="restartGame()">Play Again</button>
+                <button onclick="mainMenu()">Main Menu</button>
             </div>
         </div>
     </div>
@@ -468,499 +561,350 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const minimap = document.getElementById('minimap');
+        const minimapCtx = minimap.getContext('2d');
 
         // Game constants
         const GRID_SIZE = 20;
         const TILE_COUNT = canvas.width / GRID_SIZE;
 
-        // Audio System
-        let audioContext = null;
-        let soundEnabled = localStorage.getItem('snakeBattleSoundEnabled') !== 'false'; // Default to true
-        let timerWarningPlayed = false;
-
-        // Initialize Audio Context (mobile-compatible)
-        function initAudioContext() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            return audioContext;
-        }
-
-        // Play a sound effect with specified parameters
-        function playSound(type) {
-            if (!soundEnabled) return;
-
-            const ctx = initAudioContext();
-            const now = ctx.currentTime;
-
-            switch(type) {
-                case 'food':
-                    // Satisfying "nom" sound - quick frequency drop
-                    playTone(ctx, now, 800, 600, 0.1, 'sine', 0.3);
-                    break;
-
-                case 'golden':
-                    // Higher pitched, more exciting - ascending then descending
-                    playTone(ctx, now, 1000, 1200, 0.05, 'sine', 0.25);
-                    playTone(ctx, now + 0.05, 1200, 1000, 0.05, 'sine', 0.25);
-                    playTone(ctx, now + 0.1, 1000, 1200, 0.05, 'sine', 0.25);
-                    break;
-
-                case 'super':
-                    // Special power-up sound - rapid ascending tones
-                    playTone(ctx, now, 600, 800, 0.06, 'square', 0.2);
-                    playTone(ctx, now + 0.06, 800, 1000, 0.06, 'square', 0.2);
-                    playTone(ctx, now + 0.12, 1000, 1400, 0.08, 'square', 0.2);
-                    break;
-
-                case 'death':
-                    // Sad descending tone
-                    playTone(ctx, now, 400, 200, 0.3, 'sawtooth', 0.3);
-                    playTone(ctx, now + 0.15, 300, 150, 0.3, 'sawtooth', 0.25);
-                    break;
-
-                case 'win':
-                    // Celebratory ascending sequence
-                    playTone(ctx, now, 523, 523, 0.15, 'sine', 0.3);        // C
-                    playTone(ctx, now + 0.15, 659, 659, 0.15, 'sine', 0.3); // E
-                    playTone(ctx, now + 0.3, 784, 784, 0.15, 'sine', 0.3);  // G
-                    playTone(ctx, now + 0.45, 1047, 1047, 0.3, 'sine', 0.4); // C (octave higher)
-                    break;
-
-                case 'warning':
-                    // Urgent beep - pulsing
-                    playTone(ctx, now, 880, 880, 0.1, 'square', 0.4);
-                    playTone(ctx, now + 0.15, 880, 880, 0.1, 'square', 0.4);
-                    playTone(ctx, now + 0.3, 880, 880, 0.15, 'square', 0.4);
-                    break;
-            }
-        }
-
-        // Helper function to play a single tone
-        function playTone(ctx, startTime, startFreq, endFreq, duration, waveType, volume) {
-            const oscillator = ctx.createOscillator();
-            const gainNode = ctx.createGain();
-
-            oscillator.type = waveType;
-            oscillator.frequency.setValueAtTime(startFreq, startTime);
-            oscillator.frequency.exponentialRampToValueAtTime(endFreq, startTime + duration);
-
-            gainNode.gain.setValueAtTime(volume, startTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-
-            oscillator.connect(gainNode);
-            gainNode.connect(ctx.destination);
-
-            oscillator.start(startTime);
-            oscillator.stop(startTime + duration);
-        }
-
-        // Toggle sound on/off
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            localStorage.setItem('snakeBattleSoundEnabled', soundEnabled);
-            updateSoundButton();
-
-            // Play a test sound when enabling
-            if (soundEnabled) {
-                playSound('food');
-            }
-        }
-
-        // Update sound button appearance
-        function updateSoundButton() {
-            const btn = document.getElementById('soundToggle');
-            if (btn) {
-                btn.textContent = soundEnabled ? '🔊 Sound On' : '🔇 Sound Off';
-                btn.style.opacity = soundEnabled ? '1' : '0.7';
-            }
-        }
-
         // Game state
         let gameActive = false;
+        let gamePaused = false;
+        let timeRemaining = 60;
+        let playerScore = 0;
+        let aiScore = 0;
         let gameLoop = null;
-        let numPlayers = 1;
-        let numBots = 1;
-        let snakes = []; // Array of all snakes (human + AI)
-        let gameTimer = 60; // 60-second game timer
         let timerInterval = null;
+        let gameMode = 'timeAttack';
+        let difficulty = 'normal';
+        let soundEnabled = true;
+        let highScore = parseInt(localStorage.getItem('snakeBattleHighScore') || '0');
+        let totalApplesEaten = 0;
+        let totalPowerupsCollected = 0;
+        let gameStartTime = 0;
+        let lastFrameTime = 0;
+        let accumulator = 0;
 
-        // Snake colors
-        const SNAKE_COLORS = ['#4ade80', '#ff6b6b', '#fbbf24', '#a78bfa', '#60a5fa', '#f472b6', '#fb923c', '#34d399'];
-
-        // Control scheme presets
-        const CONTROL_PRESETS = {
-            arrows: { name: '↑↓←→ Arrow Keys', up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' },
-            wasd: { name: 'WASD', up: 'w', down: 's', left: 'a', right: 'd' },
-            ijkl: { name: 'IJKL', up: 'i', down: 'k', left: 'j', right: 'l' },
-            numpad: { name: 'Numpad 8456', up: '8', down: '5', left: '4', right: '6' }
+        // Difficulty settings
+        const difficultySettings = {
+            easy: { speed: 150, aiAccuracy: 0.5, obstacleCount: 3, powerupChance: 0.015 },
+            normal: { speed: 100, aiAccuracy: 0.7, obstacleCount: 5, powerupChance: 0.01 },
+            hard: { speed: 70, aiAccuracy: 0.85, obstacleCount: 7, powerupChance: 0.008 },
+            insane: { speed: 50, aiAccuracy: 0.95, obstacleCount: 10, powerupChance: 0.006 }
         };
 
-        // Player customizations
-        let playerSettings = [
-            { controlScheme: 'arrows', color: SNAKE_COLORS[0] },
-            { controlScheme: 'wasd', color: SNAKE_COLORS[1] },
-            { controlScheme: 'ijkl', color: SNAKE_COLORS[2] },
-            { controlScheme: 'numpad', color: SNAKE_COLORS[3] }
-        ];
+        // Snakes
+        let playerSnake = {
+            body: [{x: 10, y: 10}],
+            dx: 0, dy: 0,
+            nextDx: 0, nextDy: 0,
+            color: '#4ade80',
+            powerups: {},
+            trail: []
+        };
 
-        // Control schemes for each player (will be set from playerSettings)
-        const CONTROLS = {};
+        let aiSnake = {
+            body: [{x: 20, y: 20}],
+            dx: 0, dy: 0,
+            color: '#ff6b6b',
+            powerups: {},
+            trail: []
+        };
 
-        // Apples
+        // Game objects
         let apples = [];
+        let powerups = [];
+        let obstacles = [];
+        let particles = [];
+        let scorePopups = [];
+        let shrinkZone = null;
 
-        // Special food types
-        const FOOD_TYPES = {
-            normal: { color: '#ffd93d', points: 1, growth: 1 },
-            golden: { color: '#FFD700', points: 3, growth: 2 }, // Dropped when snake dies
-            super: { color: '#FF6347', points: 5, growth: 3 }   // Rare drop
+        // Power-up types
+        const POWERUP_TYPES = {
+            speed: { emoji: '⚡', name: 'Speed Boost', duration: 5000, color: '#ffd93d' },
+            slow: { emoji: '🐌', name: 'Slow Motion', duration: 5000, color: '#90EE90' },
+            magnet: { emoji: '🧲', name: 'Magnet', duration: 8000, color: '#FF69B4' },
+            shield: { emoji: '🛡️', name: 'Shield', duration: 5000, color: '#87CEEB' },
+            doublePoints: { emoji: '⭐', name: 'Double Points', duration: 10000, color: '#FFD700' },
+            shrink: { emoji: '📏', name: 'Shrink', duration: 0, color: '#FF6347' }
         };
 
-        // Touch control handler for mobile
-        function handleTouchControl(direction) {
-            if (!gameActive || numPlayers === 0) return;
+        // Audio Context
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
 
-            const snake = snakes[0]; // Control Player 1 with touch
-            if (!snake || snake.type === 'ai') return;
+        // Sound effects
+        function playSound(frequency, duration, type = 'sine') {
+            if (!soundEnabled) return;
 
-            switch(direction) {
-                case 'up':
-                    if (snake.dy !== 1) {
-                        snake.nextDx = 0;
-                        snake.nextDy = -1;
-                    }
-                    break;
-                case 'down':
-                    if (snake.dy !== -1) {
-                        snake.nextDx = 0;
-                        snake.nextDy = 1;
-                    }
-                    break;
-                case 'left':
-                    if (snake.dx !== 1) {
-                        snake.nextDx = -1;
-                        snake.nextDy = 0;
-                    }
-                    break;
-                case 'right':
-                    if (snake.dx !== -1) {
-                        snake.nextDx = 1;
-                        snake.nextDy = 0;
-                    }
-                    break;
-            }
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + duration);
         }
 
-        // Prevent context menu
-        canvas.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
+        function playEatSound() {
+            playSound(800, 0.1);
+            setTimeout(() => playSound(1000, 0.1), 50);
+        }
+
+        function playPowerupSound() {
+            playSound(600, 0.1);
+            setTimeout(() => playSound(800, 0.1), 50);
+            setTimeout(() => playSound(1000, 0.1), 100);
+        }
+
+        function playCollisionSound() {
+            playSound(100, 0.3, 'sawtooth');
+        }
+
+        function playVictorySound() {
+            playSound(500, 0.15);
+            setTimeout(() => playSound(600, 0.15), 100);
+            setTimeout(() => playSound(800, 0.3), 200);
+        }
+
+        function playDefeatSound() {
+            playSound(400, 0.15);
+            setTimeout(() => playSound(300, 0.15), 100);
+            setTimeout(() => playSound(200, 0.3), 200);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundBtn').textContent = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
+        }
 
         // Input handling
         document.addEventListener('keydown', (e) => {
-            if (!gameActive) return;
+            if (e.key === 'Escape') {
+                if (gameActive) togglePause();
+                return;
+            }
 
-            const key = e.key.toLowerCase();
+            if (!gameActive || gamePaused) return;
 
-            // Handle controls for each human player
-            for (let i = 0; i < numPlayers; i++) {
-                const snake = snakes[i];
-                if (!snake || snake.type === 'ai') continue;
-
-                const controls = CONTROLS[i];
-
-                if ((key === controls.up.toLowerCase() || e.key === controls.up) && snake.dy !== 1) {
-                    snake.nextDx = 0;
-                    snake.nextDy = -1;
-                }
-                if ((key === controls.down.toLowerCase() || e.key === controls.down) && snake.dy !== -1) {
-                    snake.nextDx = 0;
-                    snake.nextDy = 1;
-                }
-                if ((key === controls.left.toLowerCase() || e.key === controls.left) && snake.dx !== 1) {
-                    snake.nextDx = -1;
-                    snake.nextDy = 0;
-                }
-                if ((key === controls.right.toLowerCase() || e.key === controls.right) && snake.dx !== -1) {
-                    snake.nextDx = 1;
-                    snake.nextDy = 0;
-                }
+            if ((e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') && playerSnake.dy !== 1) {
+                playerSnake.nextDx = 0; playerSnake.nextDy = -1;
+            }
+            if ((e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') && playerSnake.dy !== -1) {
+                playerSnake.nextDx = 0; playerSnake.nextDy = 1;
+            }
+            if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') && playerSnake.dx !== 1) {
+                playerSnake.nextDx = -1; playerSnake.nextDy = 0;
+            }
+            if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') && playerSnake.dx !== -1) {
+                playerSnake.nextDx = 1; playerSnake.nextDy = 0;
             }
         });
 
-        // Setup screen functions
-        function updatePlayerControls() {
-            numPlayers = parseInt(document.getElementById('numPlayers').value);
-            const container = document.getElementById('playerCustomization');
-            container.innerHTML = '';
-
-            for (let i = 0; i < numPlayers; i++) {
-                const card = document.createElement('div');
-                card.className = 'player-card';
-                card.innerHTML = `
-                    <h4>🎮 Player ${i + 1}</h4>
-                    <label>Controls:</label>
-                    <select onchange="setPlayerControl(${i}, this.value)">
-                        <option value="arrows" ${playerSettings[i].controlScheme === 'arrows' ? 'selected' : ''}>↑↓←→ Arrow Keys</option>
-                        <option value="wasd" ${playerSettings[i].controlScheme === 'wasd' ? 'selected' : ''}>WASD</option>
-                        <option value="ijkl" ${playerSettings[i].controlScheme === 'ijkl' ? 'selected' : ''}>IJKL</option>
-                        <option value="numpad" ${playerSettings[i].controlScheme === 'numpad' ? 'selected' : ''}>Numpad 8456</option>
-                    </select>
-                    <label>Snake Color:</label>
-                    <div class="color-options" id="colorOptions${i}"></div>
-                `;
-                container.appendChild(card);
-
-                // Add color buttons
-                const colorOptions = document.getElementById(`colorOptions${i}`);
-                SNAKE_COLORS.forEach((color, colorIndex) => {
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.backgroundColor = color;
-                    btn.onclick = () => setPlayerColor(i, color);
-                    if (playerSettings[i].color === color) {
-                        btn.classList.add('selected');
-                    }
-                    colorOptions.appendChild(btn);
-                });
-            }
-
-            updateColorAvailability();
+        function showModeSelection() {
+            document.getElementById('modeSelectionModal').classList.add('active');
         }
 
-        function setPlayerControl(playerIndex, scheme) {
-            playerSettings[playerIndex].controlScheme = scheme;
+        function selectMode(mode) {
+            gameMode = mode;
+            document.getElementById('modeSelectionModal').classList.remove('active');
+            document.getElementById('difficultyModal').classList.add('active');
         }
 
-        function setPlayerColor(playerIndex, color) {
-            // Check if color is already used by another player
-            const usedByOther = playerSettings.some((setting, idx) =>
-                idx !== playerIndex && setting.color === color && idx < numPlayers
-            );
-
-            if (usedByOther) {
-                alert('This color is already in use by another player!');
-                return;
-            }
-
-            playerSettings[playerIndex].color = color;
-            updatePlayerControls();
-        }
-
-        function updateColorAvailability() {
-            const usedColors = playerSettings.slice(0, numPlayers).map(s => s.color);
-
-            for (let i = 0; i < numPlayers; i++) {
-                const colorOptions = document.getElementById(`colorOptions${i}`);
-                if (!colorOptions) continue;
-
-                const buttons = colorOptions.querySelectorAll('.color-btn');
-                buttons.forEach((btn) => {
-                    const color = btn.style.backgroundColor;
-                    const hexColor = rgbToHex(color);
-                    const isUsed = usedColors.includes(hexColor) && hexColor !== playerSettings[i].color;
-
-                    btn.classList.toggle('disabled', isUsed);
-                    btn.classList.toggle('selected', hexColor === playerSettings[i].color);
-                });
-            }
-        }
-
-        function rgbToHex(rgb) {
-            const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-            if (!match) return rgb;
-            return '#' + [match[1], match[2], match[3]].map(x => {
-                const hex = parseInt(x).toString(16);
-                return hex.length === 1 ? '0' + hex : hex;
-            }).join('');
-        }
-
-        function startGameFromSetup() {
-            numPlayers = parseInt(document.getElementById('numPlayers').value);
-            numBots = parseInt(document.getElementById('numBots').value);
-
-            const totalSnakes = numPlayers + numBots;
-            if (totalSnakes < 1 || totalSnakes > 4) {
-                alert('Total number of players and bots must be between 1 and 4!');
-                return;
-            }
-
-            // Hide setup, show game
-            document.getElementById('setupScreen').style.display = 'none';
-            document.getElementById('gameScreen').style.display = 'block';
-
+        function selectDifficulty(diff) {
+            difficulty = diff;
+            document.getElementById('difficultyModal').classList.remove('active');
             startGame();
         }
 
-        function backToSetup() {
-            if (gameActive && !confirm('Are you sure you want to quit the current game?')) {
-                return;
-            }
-
-            gameActive = false;
-            if (gameLoop) clearInterval(gameLoop);
-            if (timerInterval) clearInterval(timerInterval);
-
-            document.getElementById('gameScreen').style.display = 'none';
-            document.getElementById('setupScreen').style.display = 'block';
+        function mainMenu() {
+            document.getElementById('gameOverModal').classList.remove('active');
+            document.getElementById('pauseOverlay').classList.remove('active');
+            gamePaused = false;
+            showModeSelection();
         }
 
-        function surrenderGame() {
-            if (!gameActive) return;
+        function togglePause() {
+            gamePaused = !gamePaused;
+            document.getElementById('pauseOverlay').classList.toggle('active');
+        }
 
-            if (confirm('Are you sure you want to surrender? Your current scores will be recorded.')) {
-                gameActive = false;
-                if (gameLoop) clearInterval(gameLoop);
-                if (timerInterval) clearInterval(timerInterval);
+        function resumeGame() {
+            gamePaused = false;
+            document.getElementById('pauseOverlay').classList.remove('active');
+        }
 
-                // Find the highest scoring human player
-                let highestHumanScore = 0;
-
-                snakes.forEach(snake => {
-                    if (snake.type === 'human' && snake.score > highestHumanScore) {
-                        highestHumanScore = snake.score;
-                    }
-                });
-
-                // Save to leaderboard if there's a score
-                if (highestHumanScore > 0) {
-                    saveToLeaderboard(highestHumanScore);
-                }
-
-                // Show scores for all players
-                let message = 'Final Scores:\n\n';
-                snakes.forEach(snake => {
-                    message += `${snake.name}: ${snake.score} points\n`;
-                });
-
-                alert(message);
-                backToSetup();
-            }
+        function restartGame() {
+            document.getElementById('gameOverModal').classList.remove('active');
+            document.getElementById('pauseOverlay').classList.remove('active');
+            gamePaused = false;
+            startGame();
         }
 
         function startGame() {
             gameActive = true;
-            snakes = [];
-            gameTimer = 60; // Reset timer to 60 seconds
+            gamePaused = false;
+            gameStartTime = Date.now();
+            totalApplesEaten = 0;
+            totalPowerupsCollected = 0;
 
-            // Set up controls from player settings
-            for (let i = 0; i < numPlayers; i++) {
-                const preset = CONTROL_PRESETS[playerSettings[i].controlScheme];
-                CONTROLS[i] = {
-                    up: preset.up,
-                    down: preset.down,
-                    left: preset.left,
-                    right: preset.right
-                };
+            // Set time based on mode
+            if (gameMode === 'timeAttack') {
+                timeRemaining = 60;
+            } else if (gameMode === 'survival') {
+                timeRemaining = 0;
+            } else if (gameMode === 'scoreRace' || gameMode === 'endless') {
+                timeRemaining = 0;
             }
 
-            // Spawn positions (corners and center regions)
-            const spawnPositions = [
-                {x: 10, y: 10},
-                {x: TILE_COUNT - 10, y: TILE_COUNT - 10},
-                {x: 10, y: TILE_COUNT - 10},
-                {x: TILE_COUNT - 10, y: 10}
-            ];
+            playerScore = 0;
+            aiScore = 0;
 
-            // Get available colors for bots (colors not used by players)
-            const usedColors = playerSettings.slice(0, numPlayers).map(s => s.color);
-            const availableColors = SNAKE_COLORS.filter(c => !usedColors.includes(c));
+            // Reset snakes
+            playerSnake = {
+                body: [{x: 10, y: 10}],
+                dx: 1, dy: 0,
+                nextDx: 1, nextDy: 0,
+                color: '#4ade80',
+                powerups: {},
+                trail: []
+            };
 
-            // Create human player snakes
-            for (let i = 0; i < numPlayers; i++) {
-                snakes.push({
-                    name: `Player ${i + 1}`,
-                    type: 'human',
-                    body: [{...spawnPositions[i]}],
-                    dx: 1,
-                    dy: 0,
-                    nextDx: 1,
-                    nextDy: 0,
-                    score: 0,
-                    color: playerSettings[i].color,
-                    alive: true
-                });
-            }
+            aiSnake = {
+                body: [{x: 20, y: 20}],
+                dx: -1, dy: 0,
+                color: '#ff6b6b',
+                powerups: {},
+                trail: []
+            };
 
-            // Create AI bot snakes
-            for (let i = 0; i < numBots; i++) {
-                const snakeIndex = numPlayers + i;
-                snakes.push({
-                    name: `Bot ${i + 1}`,
-                    type: 'ai',
-                    body: [{...spawnPositions[snakeIndex]}],
-                    dx: -1,
-                    dy: 0,
-                    nextDx: -1,
-                    nextDy: 0,
-                    score: 0,
-                    color: availableColors[i] || SNAKE_COLORS[snakeIndex],
-                    alive: true
-                });
-            }
+            // Reset game objects
+            apples = [];
+            powerups = [];
+            obstacles = [];
+            particles = [];
+            scorePopups = [];
+            shrinkZone = null;
 
             // Spawn initial apples
-            apples = [];
             for (let i = 0; i < 5; i++) {
                 spawnApple();
             }
 
-            updateScoreboard();
+            // Spawn obstacles
+            const settings = difficultySettings[difficulty];
+            for (let i = 0; i < settings.obstacleCount; i++) {
+                spawnObstacle();
+            }
 
-            // Start game loop
-            if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, 100);
+            updateDisplay();
+            updateModeDisplay();
 
-            // Start timer countdown
+            // Start game loop with requestAnimationFrame
+            if (gameLoop) cancelAnimationFrame(gameLoop);
+            lastFrameTime = performance.now();
+            gameLoop = requestAnimationFrame(gameLoopRAF);
+
+            // Start timer
             if (timerInterval) clearInterval(timerInterval);
-            timerWarningPlayed = false; // Reset warning flag
-            timerInterval = setInterval(() => {
-                if (gameActive && gameTimer > 0) {
-                    gameTimer--;
-                    updateScoreboard();
+            if (gameMode === 'timeAttack') {
+                timerInterval = setInterval(updateTimer, 1000);
+            } else if (gameMode === 'survival' || gameMode === 'scoreRace' || gameMode === 'endless') {
+                timerInterval = setInterval(() => {
+                    timeRemaining++;
+                    updateDisplay();
+                }, 1000);
+            }
+        }
 
-                    // Play warning sound at 10 seconds
-                    if (gameTimer === 10 && !timerWarningPlayed) {
-                        playSound('warning');
-                        timerWarningPlayed = true;
-                    }
-
-                    if (gameTimer === 0) {
-                        endGame();
-                    }
+        function gameLoopRAF(currentTime) {
+            if (!gameActive || gamePaused) {
+                if (gameActive && gamePaused) {
+                    gameLoop = requestAnimationFrame(gameLoopRAF);
                 }
-            }, 1000);
+                return;
+            }
+
+            const deltaTime = currentTime - lastFrameTime;
+            lastFrameTime = currentTime;
+
+            const settings = difficultySettings[difficulty];
+            accumulator += deltaTime;
+
+            // Fixed timestep updates
+            while (accumulator >= settings.speed) {
+                update();
+                accumulator -= settings.speed;
+            }
+
+            gameLoop = requestAnimationFrame(gameLoopRAF);
         }
 
         function update() {
-            if (!gameActive) return;
+            if (!gameActive || gamePaused) return;
 
-            // Update all snake directions and move them
-            snakes.forEach((snake, index) => {
-                if (!snake.alive) return;
+            // Update player direction
+            playerSnake.dx = playerSnake.nextDx;
+            playerSnake.dy = playerSnake.nextDy;
 
-                // Update direction
-                snake.dx = snake.nextDx;
-                snake.dy = snake.nextDy;
+            // Move snakes
+            const playerSpeed = playerSnake.powerups.speed ? 2 : 1;
+            const aiSpeed = aiSnake.powerups.slow ? 0.5 : 1;
 
-                // AI decision making
-                if (snake.type === 'ai') {
-                    updateAI(snake);
-                }
+            for (let i = 0; i < playerSpeed; i++) {
+                moveSnake(playerSnake);
+                addTrail(playerSnake);
+            }
 
-                // Move snake
-                moveSnake(snake);
-            });
+            if (Math.random() < aiSpeed) {
+                updateAI();
+                moveSnake(aiSnake);
+                addTrail(aiSnake);
+            }
 
-            // Check collisions between all snakes
-            checkAllCollisions();
+            // Update moving obstacles
+            updateObstacles();
+
+            // Check collisions
+            if (checkCollisions()) return;
 
             // Check apple collisions
             checkAppleCollisions();
 
+            // Check powerup collisions
+            checkPowerupCollisions();
+
+            // Spawn powerups randomly
+            const settings = difficultySettings[difficulty];
+            if (Math.random() < settings.powerupChance) {
+                spawnPowerup();
+            }
+
+            // Update powerups
+            updatePowerups();
+
+            // Update particles
+            updateParticles();
+
+            // Update score popups
+            updateScorePopups();
+
+            // Shrink zone in survival mode
+            if (gameMode === 'survival' && timeRemaining > 30 && timeRemaining % 15 === 0) {
+                updateShrinkZone();
+            }
+
             // Draw everything
             draw();
+            drawMinimap();
         }
 
         function moveSnake(snake) {
@@ -969,194 +913,424 @@
                 y: snake.body[0].y + snake.dy
             };
 
-            // Wrap around walls
-            if (head.x < 0) head.x = TILE_COUNT - 1;
-            if (head.x >= TILE_COUNT) head.x = 0;
-            if (head.y < 0) head.y = TILE_COUNT - 1;
-            if (head.y >= TILE_COUNT) head.y = 0;
+            // Wrap around or die based on mode
+            if (gameMode === 'survival' && shrinkZone) {
+                if (head.x < shrinkZone.left || head.x >= shrinkZone.right ||
+                    head.y < shrinkZone.top || head.y >= shrinkZone.bottom) {
+                    if (snake === playerSnake) {
+                        endGame('You hit the boundary!');
+                    }
+                    return;
+                }
+            } else {
+                if (head.x < 0) head.x = TILE_COUNT - 1;
+                if (head.x >= TILE_COUNT) head.x = 0;
+                if (head.y < 0) head.y = TILE_COUNT - 1;
+                if (head.y >= TILE_COUNT) head.y = 0;
+            }
 
             snake.body.unshift(head);
             snake.body.pop();
         }
 
-        function updateAI(snake) {
+        function addTrail(snake) {
+            if (snake.body.length > 0) {
+                snake.trail.push({
+                    x: snake.body[0].x * GRID_SIZE + GRID_SIZE / 2,
+                    y: snake.body[0].y * GRID_SIZE + GRID_SIZE / 2,
+                    life: 1
+                });
+                // Reduced from 20 to 12 for performance
+                if (snake.trail.length > 12) {
+                    snake.trail.shift();
+                }
+            }
+        }
+
+        function updateAI() {
             if (apples.length === 0) return;
 
-            // Find nearest apple
-            let nearestApple = apples[0];
+            const settings = difficultySettings[difficulty];
+
+            // Find target (apple or powerup)
+            let target = null;
+
+            // Sometimes chase powerups
+            if (powerups.length > 0 && Math.random() < settings.aiAccuracy) {
+                target = findNearestItem(aiSnake.body[0], powerups);
+            }
+
+            if (!target) {
+                target = findNearestItem(aiSnake.body[0], apples);
+            }
+
+            if (!target) return;
+
+            // Use A* pathfinding for hard and insane
+            if (difficulty === 'hard' || difficulty === 'insane') {
+                const path = aStarPathfinding(aiSnake.body[0], target);
+                if (path && path.length > 1) {
+                    const next = path[1];
+                    const dx = next.x - aiSnake.body[0].x;
+                    const dy = next.y - aiSnake.body[0].y;
+
+                    if (dx !== 0 && aiSnake.dx !== -dx) {
+                        aiSnake.dx = dx;
+                        aiSnake.dy = 0;
+                    } else if (dy !== 0 && aiSnake.dy !== -dy) {
+                        aiSnake.dx = 0;
+                        aiSnake.dy = dy;
+                    }
+                }
+            } else {
+                // Simple pathfinding for easy/normal
+                const dx = target.x - aiSnake.body[0].x;
+                const dy = target.y - aiSnake.body[0].y;
+
+                if (Math.random() < settings.aiAccuracy) {
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        if (dx > 0 && aiSnake.dx !== -1) {
+                            aiSnake.dx = 1; aiSnake.dy = 0;
+                        } else if (dx < 0 && aiSnake.dx !== 1) {
+                            aiSnake.dx = -1; aiSnake.dy = 0;
+                        }
+                    } else {
+                        if (dy > 0 && aiSnake.dy !== -1) {
+                            aiSnake.dx = 0; aiSnake.dy = 1;
+                        } else if (dy < 0 && aiSnake.dy !== 1) {
+                            aiSnake.dx = 0; aiSnake.dy = -1;
+                        }
+                    }
+                }
+            }
+        }
+
+        function findNearestItem(pos, items) {
+            let nearest = null;
             let minDist = Infinity;
 
-            for (let apple of apples) {
-                const dist = Math.abs(snake.body[0].x - apple.x) +
-                            Math.abs(snake.body[0].y - apple.y);
+            for (let item of items) {
+                const dist = Math.abs(pos.x - item.x) + Math.abs(pos.y - item.y);
                 if (dist < minDist) {
                     minDist = dist;
-                    nearestApple = apple;
+                    nearest = item;
                 }
             }
 
-            // Simple AI: move towards nearest apple
-            const dx = nearestApple.x - snake.body[0].x;
-            const dy = nearestApple.y - snake.body[0].y;
-
-            // AI makes more mistakes now (65% optimal instead of 80%)
-            if (Math.random() > 0.35) {
-                if (Math.abs(dx) > Math.abs(dy)) {
-                    if (dx > 0 && snake.dx !== -1) {
-                        snake.nextDx = 1;
-                        snake.nextDy = 0;
-                    } else if (dx < 0 && snake.dx !== 1) {
-                        snake.nextDx = -1;
-                        snake.nextDy = 0;
-                    } else if (dy > 0 && snake.dy !== -1) {
-                        snake.nextDx = 0;
-                        snake.nextDy = 1;
-                    } else if (dy < 0 && snake.dy !== 1) {
-                        snake.nextDx = 0;
-                        snake.nextDy = -1;
-                    }
-                } else {
-                    if (dy > 0 && snake.dy !== -1) {
-                        snake.nextDx = 0;
-                        snake.nextDy = 1;
-                    } else if (dy < 0 && snake.dy !== 1) {
-                        snake.nextDx = 0;
-                        snake.nextDy = -1;
-                    } else if (dx > 0 && snake.dx !== -1) {
-                        snake.nextDx = 1;
-                        snake.nextDy = 0;
-                    } else if (dx < 0 && snake.dx !== 1) {
-                        snake.nextDx = -1;
-                        snake.nextDy = 0;
-                    }
-                }
-            }
+            return nearest;
         }
 
-        function checkAllCollisions() {
-            // Check each snake against all other snakes
-            snakes.forEach((snake, index) => {
-                if (!snake.alive) return;
+        function aStarPathfinding(start, goal) {
+            const openSet = [start];
+            const cameFrom = new Map();
+            const gScore = new Map();
+            const fScore = new Map();
 
-                const head = snake.body[0];
+            const key = (pos) => `${pos.x},${pos.y}`;
 
-                // Check collision with all other snakes' bodies
-                snakes.forEach((otherSnake, otherIndex) => {
-                    if (index === otherIndex || !otherSnake.alive) return;
+            gScore.set(key(start), 0);
+            fScore.set(key(start), heuristic(start, goal));
 
-                    // Check if this snake's head hits any part of the other snake's body
-                    for (let segment of otherSnake.body) {
-                        if (head.x === segment.x && head.y === segment.y) {
-                            // Collision detected! Respawn this snake
-                            respawnSnake(snake);
-                            return;
+            let iterations = 0;
+            const maxIterations = 50; // Reduced from 100 for performance
+
+            while (openSet.length > 0 && iterations < maxIterations) {
+                iterations++;
+
+                // Find node with lowest fScore
+                let current = openSet[0];
+                let currentIdx = 0;
+                for (let i = 1; i < openSet.length; i++) {
+                    if (fScore.get(key(openSet[i])) < fScore.get(key(current))) {
+                        current = openSet[i];
+                        currentIdx = i;
+                    }
+                }
+
+                if (current.x === goal.x && current.y === goal.y) {
+                    return reconstructPath(cameFrom, current);
+                }
+
+                openSet.splice(currentIdx, 1);
+
+                const neighbors = getNeighbors(current);
+                for (let neighbor of neighbors) {
+                    const tentativeGScore = gScore.get(key(current)) + 1;
+
+                    if (!gScore.has(key(neighbor)) || tentativeGScore < gScore.get(key(neighbor))) {
+                        cameFrom.set(key(neighbor), current);
+                        gScore.set(key(neighbor), tentativeGScore);
+                        fScore.set(key(neighbor), tentativeGScore + heuristic(neighbor, goal));
+
+                        if (!openSet.some(n => n.x === neighbor.x && n.y === neighbor.y)) {
+                            openSet.push(neighbor);
                         }
                     }
-                });
-            });
+                }
+            }
+
+            return null;
         }
 
-        function respawnSnake(snake) {
-            // Play death sound
-            playSound('death');
+        function heuristic(a, b) {
+            return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+        }
 
-            // Spawn special food at death location
-            spawnSpecialFood(snake.body[0].x, snake.body[0].y);
+        function getNeighbors(pos) {
+            const neighbors = [];
+            const dirs = [{x: 0, y: -1}, {x: 0, y: 1}, {x: -1, y: 0}, {x: 1, y: 0}];
 
-            // Reset score to 0 (not -1 like before)
-            snake.score = 0;
+            for (let dir of dirs) {
+                const neighbor = {x: pos.x + dir.x, y: pos.y + dir.y};
 
-            // Find a safe respawn position
-            let newX, newY, safe;
+                // Wrap around
+                if (neighbor.x < 0) neighbor.x = TILE_COUNT - 1;
+                if (neighbor.x >= TILE_COUNT) neighbor.x = 0;
+                if (neighbor.y < 0) neighbor.y = TILE_COUNT - 1;
+                if (neighbor.y >= TILE_COUNT) neighbor.y = 0;
+
+                // Check if walkable
+                if (!isObstacle(neighbor)) {
+                    neighbors.push(neighbor);
+                }
+            }
+
+            return neighbors;
+        }
+
+        function reconstructPath(cameFrom, current) {
+            const path = [current];
+            const key = (pos) => `${pos.x},${pos.y}`;
+
+            while (cameFrom.has(key(current))) {
+                current = cameFrom.get(key(current));
+                path.unshift(current);
+            }
+
+            return path;
+        }
+
+        function isObstacle(pos) {
+            for (let obstacle of obstacles) {
+                if (obstacle.x === pos.x && obstacle.y === pos.y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function spawnObstacle() {
+            // Random obstacle type
+            const type = Math.random() < 0.7 ? 'static' : 'moving';
+
+            let obstacle;
+            let valid = false;
             let attempts = 0;
 
-            do {
-                safe = true;
-                newX = Math.floor(Math.random() * TILE_COUNT);
-                newY = Math.floor(Math.random() * TILE_COUNT);
-
-                // Make sure it's not too close to other snakes (at least 10 tiles away)
-                for (let otherSnake of snakes) {
-                    if (otherSnake === snake || !otherSnake.alive) continue;
-
-                    const dist = Math.abs(newX - otherSnake.body[0].x) + Math.abs(newY - otherSnake.body[0].y);
-                    if (dist < 10) {
-                        safe = false;
-                        break;
-                    }
-
-                    // Make sure it doesn't spawn on any other snake
-                    for (let segment of otherSnake.body) {
-                        if (segment.x === newX && segment.y === newY) {
-                            safe = false;
-                            break;
-                        }
-                    }
-                    if (!safe) break;
-                }
-
+            while (!valid && attempts < 50) {
                 attempts++;
-            } while (!safe && attempts < 100);
+                const x = Math.floor(Math.random() * TILE_COUNT);
+                const y = Math.floor(Math.random() * TILE_COUNT);
 
-            // Reset snake to new position (back to length 1)
-            snake.body = [{x: newX, y: newY}];
-            snake.dx = Math.random() > 0.5 ? 1 : -1;
-            snake.dy = 0;
-            snake.nextDx = snake.dx;
-            snake.nextDy = snake.dy;
+                valid = true;
 
-            updateScoreboard();
+                // Check distance from snakes
+                if (Math.abs(x - 10) < 5 && Math.abs(y - 10) < 5) valid = false;
+                if (Math.abs(x - 20) < 5 && Math.abs(y - 20) < 5) valid = false;
+
+                if (valid) {
+                    obstacle = { x, y, type };
+
+                    if (type === 'moving') {
+                        obstacle.dx = Math.random() < 0.5 ? 1 : -1;
+                        obstacle.dy = 0;
+                        obstacle.moveCounter = 0;
+                    }
+                }
+            }
+
+            if (valid) {
+                obstacles.push(obstacle);
+            }
         }
 
-        function spawnSpecialFood(x, y) {
-            // 70% chance golden, 30% chance super
-            const type = Math.random() < 0.7 ? 'golden' : 'super';
+        function updateObstacles() {
+            for (let obstacle of obstacles) {
+                if (obstacle.type === 'moving') {
+                    obstacle.moveCounter++;
 
-            apples.push({
-                x: x,
-                y: y,
-                type: type
-            });
+                    if (obstacle.moveCounter % 3 === 0) {
+                        obstacle.x += obstacle.dx;
+                        obstacle.y += obstacle.dy;
+
+                        // Wrap around
+                        if (obstacle.x < 0) obstacle.x = TILE_COUNT - 1;
+                        if (obstacle.x >= TILE_COUNT) obstacle.x = 0;
+                        if (obstacle.y < 0) obstacle.y = TILE_COUNT - 1;
+                        if (obstacle.y >= TILE_COUNT) obstacle.y = 0;
+
+                        // Random direction change
+                        if (Math.random() < 0.1) {
+                            const dirs = [{dx: 1, dy: 0}, {dx: -1, dy: 0}, {dx: 0, dy: 1}, {dx: 0, dy: -1}];
+                            const dir = dirs[Math.floor(Math.random() * dirs.length)];
+                            obstacle.dx = dir.dx;
+                            obstacle.dy = dir.dy;
+                        }
+                    }
+                }
+            }
+        }
+
+        function updateShrinkZone() {
+            if (!shrinkZone) {
+                shrinkZone = { left: 0, top: 0, right: TILE_COUNT, bottom: TILE_COUNT };
+            }
+
+            // Shrink by 2 tiles from each side
+            shrinkZone.left = Math.min(shrinkZone.left + 2, TILE_COUNT / 2 - 5);
+            shrinkZone.top = Math.min(shrinkZone.top + 2, TILE_COUNT / 2 - 5);
+            shrinkZone.right = Math.max(shrinkZone.right - 2, TILE_COUNT / 2 + 5);
+            shrinkZone.bottom = Math.max(shrinkZone.bottom - 2, TILE_COUNT / 2 + 5);
+        }
+
+        function checkCollisions() {
+            // Check obstacle collision for player
+            if (!playerSnake.powerups.shield) {
+                for (let obstacle of obstacles) {
+                    if (obstacle.x === playerSnake.body[0].x && obstacle.y === playerSnake.body[0].y) {
+                        createExplosion(playerSnake.body[0].x, playerSnake.body[0].y, playerSnake.color);
+                        playCollisionSound();
+                        endGame('You hit an obstacle!');
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         function checkAppleCollisions() {
-            // Check each snake for apple collisions
-            snakes.forEach(snake => {
-                if (!snake.alive) return;
+            // Player
+            for (let i = apples.length - 1; i >= 0; i--) {
+                const magnetRange = playerSnake.powerups.magnet ? 3 : 0;
+                const dist = Math.abs(apples[i].x - playerSnake.body[0].x) +
+                            Math.abs(apples[i].y - playerSnake.body[0].y);
 
-                for (let i = apples.length - 1; i >= 0; i--) {
-                    if (apples[i].x === snake.body[0].x &&
-                        apples[i].y === snake.body[0].y) {
-                        const apple = apples[i];
-                        const foodType = FOOD_TYPES[apple.type || 'normal'];
+                if (dist === 0 || (magnetRange > 0 && dist <= magnetRange)) {
+                    const points = playerSnake.powerups.doublePoints ? 2 : 1;
+                    playerScore += points;
+                    totalApplesEaten++;
+                    playerSnake.body.push({...playerSnake.body[playerSnake.body.length - 1]});
+                    createScorePopup(apples[i].x, apples[i].y, `+${points}`);
+                    createParticles(apples[i].x, apples[i].y, '#ffd93d');
+                    apples.splice(i, 1);
+                    spawnApple();
+                    playEatSound();
+                    updateDisplay();
 
-                        snake.score += foodType.points;
-
-                        // Grow snake based on food type
-                        for (let j = 0; j < foodType.growth; j++) {
-                            snake.body.push({...snake.body[snake.body.length - 1]});
-                        }
-
-                        // Play appropriate sound based on food type
-                        if (apple.type === 'golden') {
-                            playSound('golden');
-                        } else if (apple.type === 'super') {
-                            playSound('super');
-                        } else {
-                            playSound('food');
-                        }
-
-                        apples.splice(i, 1);
-
-                        // Only spawn new apple if it was a normal one
-                        if (!apple.type || apple.type === 'normal') {
-                            spawnApple();
-                        }
-
-                        updateScoreboard();
+                    // Check win condition for score race
+                    if (gameMode === 'scoreRace' && playerScore >= 50) {
+                        endGame('You reached 50 points first!');
                     }
                 }
-            });
+            }
+
+            // AI
+            for (let i = apples.length - 1; i >= 0; i--) {
+                const magnetRange = aiSnake.powerups.magnet ? 3 : 0;
+                const dist = Math.abs(apples[i].x - aiSnake.body[0].x) +
+                            Math.abs(apples[i].y - aiSnake.body[0].y);
+
+                if (dist === 0 || (magnetRange > 0 && dist <= magnetRange)) {
+                    const points = aiSnake.powerups.doublePoints ? 2 : 1;
+                    aiScore += points;
+                    aiSnake.body.push({...aiSnake.body[aiSnake.body.length - 1]});
+                    createParticles(apples[i].x, apples[i].y, '#ffd93d');
+                    apples.splice(i, 1);
+                    spawnApple();
+                    updateDisplay();
+
+                    // Check win condition for score race
+                    if (gameMode === 'scoreRace' && aiScore >= 50) {
+                        endGame('AI reached 50 points first!');
+                    }
+                }
+            }
+        }
+
+        function checkPowerupCollisions() {
+            // Player
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                if (powerups[i].x === playerSnake.body[0].x &&
+                    powerups[i].y === playerSnake.body[0].y) {
+                    applyPowerup(playerSnake, powerups[i].type);
+                    totalPowerupsCollected++;
+                    createParticles(powerups[i].x, powerups[i].y, POWERUP_TYPES[powerups[i].type].color);
+                    powerups.splice(i, 1);
+                    playPowerupSound();
+                }
+            }
+
+            // AI
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                if (powerups[i].x === aiSnake.body[0].x &&
+                    powerups[i].y === aiSnake.body[0].y) {
+                    applyPowerup(aiSnake, powerups[i].type);
+                    createParticles(powerups[i].x, powerups[i].y, POWERUP_TYPES[powerups[i].type].color);
+                    powerups.splice(i, 1);
+                }
+            }
+        }
+
+        function applyPowerup(snake, type) {
+            const powerup = POWERUP_TYPES[type];
+
+            if (type === 'shrink' && snake.body.length > 3) {
+                // Shrink snake by half
+                const newLength = Math.max(3, Math.floor(snake.body.length / 2));
+                snake.body = snake.body.slice(0, newLength);
+            } else if (type === 'slow') {
+                // Apply to opponent
+                const opponent = snake === playerSnake ? aiSnake : playerSnake;
+                opponent.powerups.slow = Date.now() + powerup.duration;
+            } else {
+                snake.powerups[type] = Date.now() + powerup.duration;
+            }
+
+            updatePowerupDisplay();
+        }
+
+        function updatePowerups() {
+            const now = Date.now();
+
+            // Remove expired powerups
+            for (let key in playerSnake.powerups) {
+                if (playerSnake.powerups[key] < now) {
+                    delete playerSnake.powerups[key];
+                }
+            }
+
+            for (let key in aiSnake.powerups) {
+                if (aiSnake.powerups[key] < now) {
+                    delete aiSnake.powerups[key];
+                }
+            }
+
+            updatePowerupDisplay();
+        }
+
+        function updatePowerupDisplay() {
+            const display = document.getElementById('powerupsDisplay');
+            display.innerHTML = '';
+
+            for (let key in playerSnake.powerups) {
+                if (key === 'slow') continue;
+                const timeLeft = Math.ceil((playerSnake.powerups[key] - Date.now()) / 1000);
+                const div = document.createElement('div');
+                div.className = 'active-powerup';
+                div.innerHTML = `${POWERUP_TYPES[key].emoji} ${POWERUP_TYPES[key].name} (${timeLeft}s)`;
+                display.appendChild(div);
+            }
         }
 
         function spawnApple() {
@@ -1166,32 +1340,30 @@
             while (!valid) {
                 apple = {
                     x: Math.floor(Math.random() * TILE_COUNT),
-                    y: Math.floor(Math.random() * TILE_COUNT),
-                    type: 'normal'
+                    y: Math.floor(Math.random() * TILE_COUNT)
                 };
 
                 valid = true;
 
-                // Check collision with all snakes
-                for (let snake of snakes) {
-                    if (!snake.alive) continue;
-
-                    for (let segment of snake.body) {
-                        if (segment.x === apple.x && segment.y === apple.y) {
-                            valid = false;
-                            break;
-                        }
+                // Check collisions
+                for (let segment of playerSnake.body) {
+                    if (segment.x === apple.x && segment.y === apple.y) {
+                        valid = false;
+                        break;
                     }
-                    if (!valid) break;
                 }
 
-                // Check collision with other apples
-                if (valid) {
-                    for (let other of apples) {
-                        if (other.x === apple.x && other.y === apple.y) {
-                            valid = false;
-                            break;
-                        }
+                for (let segment of aiSnake.body) {
+                    if (segment.x === apple.x && segment.y === apple.y) {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                for (let obstacle of obstacles) {
+                    if (obstacle.x === apple.x && obstacle.y === apple.y) {
+                        valid = false;
+                        break;
                     }
                 }
             }
@@ -1199,10 +1371,140 @@
             apples.push(apple);
         }
 
+        function spawnPowerup() {
+            if (powerups.length >= 3) return;
+
+            let powerup;
+            let valid = false;
+
+            while (!valid) {
+                const types = Object.keys(POWERUP_TYPES);
+                const type = types[Math.floor(Math.random() * types.length)];
+
+                powerup = {
+                    x: Math.floor(Math.random() * TILE_COUNT),
+                    y: Math.floor(Math.random() * TILE_COUNT),
+                    type: type,
+                    spawnTime: Date.now()
+                };
+
+                valid = true;
+
+                // Check collisions
+                for (let segment of playerSnake.body) {
+                    if (segment.x === powerup.x && segment.y === powerup.y) {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                for (let segment of aiSnake.body) {
+                    if (segment.x === powerup.x && segment.y === powerup.y) {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                for (let obstacle of obstacles) {
+                    if (obstacle.x === powerup.x && obstacle.y === powerup.y) {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+
+            powerups.push(powerup);
+        }
+
+        function createParticles(gridX, gridY, color) {
+            const x = gridX * GRID_SIZE + GRID_SIZE / 2;
+            const y = gridY * GRID_SIZE + GRID_SIZE / 2;
+
+            // Reduced from 8 to 6 particles for performance
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI * 2 * i) / 6;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * 3,
+                    vy: Math.sin(angle) * 3,
+                    life: 1,
+                    color: color
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].x += particles[i].vx;
+                particles[i].y += particles[i].vy;
+                particles[i].life -= 0.02;
+
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function createExplosion(gridX, gridY, color) {
+            const x = gridX * GRID_SIZE + GRID_SIZE / 2;
+            const y = gridY * GRID_SIZE + GRID_SIZE / 2;
+
+            // Reduced from 20 to 12 particles for performance
+            for (let i = 0; i < 12; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5 + 2;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 1,
+                    color: color
+                });
+            }
+        }
+
+        function createScorePopup(gridX, gridY, text) {
+            const x = gridX * GRID_SIZE + GRID_SIZE / 2;
+            const y = gridY * GRID_SIZE + GRID_SIZE / 2;
+
+            scorePopups.push({
+                x: x,
+                y: y,
+                text: text,
+                life: 1
+            });
+        }
+
+        function updateScorePopups() {
+            for (let i = scorePopups.length - 1; i >= 0; i--) {
+                scorePopups[i].life -= 0.01;
+
+                if (scorePopups[i].life <= 0) {
+                    scorePopups.splice(i, 1);
+                }
+            }
+        }
+
         function draw() {
             // Clear canvas
             ctx.fillStyle = '#0f0f1e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw shrink zone warning
+            if (shrinkZone) {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#0f0f1e';
+                ctx.fillRect(
+                    shrinkZone.left * GRID_SIZE,
+                    shrinkZone.top * GRID_SIZE,
+                    (shrinkZone.right - shrinkZone.left) * GRID_SIZE,
+                    (shrinkZone.bottom - shrinkZone.top) * GRID_SIZE
+                );
+            }
 
             // Draw grid
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
@@ -1219,24 +1521,48 @@
                 ctx.stroke();
             }
 
-            // Draw apples
-            for (let apple of apples) {
-                const foodType = FOOD_TYPES[apple.type || 'normal'];
-                const radius = apple.type === 'normal' ? GRID_SIZE / 2 - 2 : GRID_SIZE / 2;
+            // Draw obstacles
+            for (let obstacle of obstacles) {
+                ctx.fillStyle = obstacle.type === 'moving' ? '#ff4444' : '#666';
+                ctx.fillRect(
+                    obstacle.x * GRID_SIZE + 1,
+                    obstacle.y * GRID_SIZE + 1,
+                    GRID_SIZE - 2,
+                    GRID_SIZE - 2
+                );
 
-                ctx.fillStyle = foodType.color;
+                // Draw movement indicator for moving obstacles
+                if (obstacle.type === 'moving') {
+                    ctx.fillStyle = '#fff';
+                    const centerX = obstacle.x * GRID_SIZE + GRID_SIZE / 2;
+                    const centerY = obstacle.y * GRID_SIZE + GRID_SIZE / 2;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Draw trails
+            drawTrail(playerSnake);
+            drawTrail(aiSnake);
+
+            // Draw apples with glow
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ffd93d';
+            for (let apple of apples) {
+                ctx.fillStyle = '#ffd93d';
                 ctx.beginPath();
                 ctx.arc(
                     apple.x * GRID_SIZE + GRID_SIZE / 2,
                     apple.y * GRID_SIZE + GRID_SIZE / 2,
-                    radius,
+                    GRID_SIZE / 2 - 2,
                     0,
                     Math.PI * 2
                 );
                 ctx.fill();
 
-                // Apple shine
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                // Shine
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
                 ctx.beginPath();
                 ctx.arc(
                     apple.x * GRID_SIZE + GRID_SIZE / 3,
@@ -1246,37 +1572,117 @@
                     Math.PI * 2
                 );
                 ctx.fill();
-
-                // Special indicator for golden/super food
-                if (apple.type !== 'normal') {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.arc(
-                        apple.x * GRID_SIZE + GRID_SIZE / 2,
-                        apple.y * GRID_SIZE + GRID_SIZE / 2,
-                        radius + 3,
-                        0,
-                        Math.PI * 2
-                    );
-                    ctx.stroke();
-                }
             }
+            ctx.shadowBlur = 0;
 
-            // Draw all snakes
-            snakes.forEach(snake => {
-                if (snake.alive) {
-                    drawSnake(snake);
-                }
-            });
+            // Draw powerups with glow
+            for (let powerup of powerups) {
+                const type = POWERUP_TYPES[powerup.type];
+                const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
+
+                ctx.shadowBlur = 15 * pulse;
+                ctx.shadowColor = type.color;
+                ctx.fillStyle = type.color;
+                ctx.beginPath();
+                ctx.arc(
+                    powerup.x * GRID_SIZE + GRID_SIZE / 2,
+                    powerup.y * GRID_SIZE + GRID_SIZE / 2,
+                    GRID_SIZE / 2 - 2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+
+                // Draw emoji
+                ctx.shadowBlur = 0;
+                ctx.font = `${GRID_SIZE - 4}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(
+                    type.emoji,
+                    powerup.x * GRID_SIZE + GRID_SIZE / 2,
+                    powerup.y * GRID_SIZE + GRID_SIZE / 2
+                );
+            }
+            ctx.shadowBlur = 0;
+
+            // Draw snakes
+            drawSnake(playerSnake);
+            drawSnake(aiSnake);
+
+            // Draw particles
+            for (let particle of particles) {
+                ctx.globalAlpha = particle.life;
+                ctx.fillStyle = particle.color;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            // Draw score popups
+            for (let popup of scorePopups) {
+                ctx.globalAlpha = popup.life;
+                ctx.font = 'bold 20px Arial';
+                ctx.fillStyle = '#ffd700';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 3;
+                ctx.strokeText(popup.text, popup.x, popup.y - (1 - popup.life) * 30);
+                ctx.fillText(popup.text, popup.x, popup.y - (1 - popup.life) * 30);
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        function drawTrail(snake) {
+            for (let i = 0; i < snake.trail.length; i++) {
+                const trail = snake.trail[i];
+                ctx.globalAlpha = trail.life * 0.3 * (i / snake.trail.length);
+                ctx.fillStyle = snake.color;
+                ctx.beginPath();
+                ctx.arc(trail.x, trail.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
         }
 
         function drawSnake(snake) {
             for (let i = 0; i < snake.body.length; i++) {
                 const segment = snake.body[i];
+                const isHead = i === 0;
 
-                // Body
-                ctx.fillStyle = snake.color;
+                // Shield effect
+                if (isHead && snake.powerups.shield) {
+                    const pulse = Math.sin(Date.now() / 100) * 0.3 + 0.7;
+                    ctx.strokeStyle = 'rgba(135, 206, 235, ' + pulse + ')';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(
+                        segment.x * GRID_SIZE,
+                        segment.y * GRID_SIZE,
+                        GRID_SIZE,
+                        GRID_SIZE
+                    );
+                }
+
+                // Body with gradient
+                const gradient = ctx.createLinearGradient(
+                    segment.x * GRID_SIZE,
+                    segment.y * GRID_SIZE,
+                    segment.x * GRID_SIZE + GRID_SIZE,
+                    segment.y * GRID_SIZE + GRID_SIZE
+                );
+
+                const alpha = 1 - (i / snake.body.length) * 0.3;
+                if (snake.color === '#4ade80') {
+                    gradient.addColorStop(0, `rgba(74, 222, 128, ${alpha})`);
+                    gradient.addColorStop(1, `rgba(34, 197, 94, ${alpha})`);
+                } else {
+                    gradient.addColorStop(0, `rgba(255, 107, 107, ${alpha})`);
+                    gradient.addColorStop(1, `rgba(239, 68, 68, ${alpha})`);
+                }
+
+                ctx.fillStyle = gradient;
                 ctx.fillRect(
                     segment.x * GRID_SIZE + 1,
                     segment.y * GRID_SIZE + 1,
@@ -1285,182 +1691,306 @@
                 );
 
                 // Head highlight
-                if (i === 0) {
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                if (isHead) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
                     ctx.fillRect(
-                        segment.x * GRID_SIZE + 3,
-                        segment.y * GRID_SIZE + 3,
-                        GRID_SIZE - 6,
-                        GRID_SIZE - 6
+                        segment.x * GRID_SIZE + 4,
+                        segment.y * GRID_SIZE + 4,
+                        GRID_SIZE - 8,
+                        GRID_SIZE - 8
+                    );
+
+                    // Eyes
+                    ctx.fillStyle = '#000';
+                    const eyeSize = 2;
+                    ctx.fillRect(
+                        segment.x * GRID_SIZE + 6,
+                        segment.y * GRID_SIZE + 6,
+                        eyeSize,
+                        eyeSize
+                    );
+                    ctx.fillRect(
+                        segment.x * GRID_SIZE + GRID_SIZE - 6 - eyeSize,
+                        segment.y * GRID_SIZE + 6,
+                        eyeSize,
+                        eyeSize
                     );
                 }
             }
         }
 
-        function updateScoreboard() {
-            const scoreBoard = document.getElementById('scoreBoard');
-            scoreBoard.innerHTML = '';
+        function drawMinimap() {
+            const scale = minimap.width / canvas.width;
+            minimapCtx.fillStyle = '#0f0f1e';
+            minimapCtx.fillRect(0, 0, minimap.width, minimap.height);
 
-            // Add timer display
-            const timerBox = document.createElement('div');
-            timerBox.className = 'stat-box';
-            timerBox.innerHTML = `
-                <div class="stat-label">⏱️ Time</div>
-                <div class="stat-value" style="color: ${gameTimer <= 10 ? '#ff6b6b' : '#ffd93d'}">${gameTimer}s</div>
-            `;
-            scoreBoard.appendChild(timerBox);
+            // Draw apples
+            minimapCtx.fillStyle = '#ffd93d';
+            for (let apple of apples) {
+                minimapCtx.fillRect(
+                    apple.x * GRID_SIZE * scale,
+                    apple.y * GRID_SIZE * scale,
+                    Math.max(2, GRID_SIZE * scale),
+                    Math.max(2, GRID_SIZE * scale)
+                );
+            }
 
-            snakes.forEach(snake => {
-                const statBox = document.createElement('div');
-                statBox.className = 'stat-box';
-                statBox.innerHTML = `
-                    <div class="stat-label" style="color: ${snake.color}">${snake.name}</div>
-                    <div class="stat-value" style="color: ${snake.color}">${snake.score}</div>
-                `;
-                scoreBoard.appendChild(statBox);
-            });
+            // Draw powerups
+            minimapCtx.fillStyle = '#ff69b4';
+            for (let powerup of powerups) {
+                minimapCtx.fillRect(
+                    powerup.x * GRID_SIZE * scale,
+                    powerup.y * GRID_SIZE * scale,
+                    Math.max(2, GRID_SIZE * scale),
+                    Math.max(2, GRID_SIZE * scale)
+                );
+            }
+
+            // Draw obstacles
+            minimapCtx.fillStyle = '#666';
+            for (let obstacle of obstacles) {
+                minimapCtx.fillRect(
+                    obstacle.x * GRID_SIZE * scale,
+                    obstacle.y * GRID_SIZE * scale,
+                    Math.max(2, GRID_SIZE * scale),
+                    Math.max(2, GRID_SIZE * scale)
+                );
+            }
+
+            // Draw player snake
+            minimapCtx.fillStyle = '#4ade80';
+            for (let segment of playerSnake.body) {
+                minimapCtx.fillRect(
+                    segment.x * GRID_SIZE * scale,
+                    segment.y * GRID_SIZE * scale,
+                    Math.max(2, GRID_SIZE * scale),
+                    Math.max(2, GRID_SIZE * scale)
+                );
+            }
+
+            // Draw AI snake
+            minimapCtx.fillStyle = '#ff6b6b';
+            for (let segment of aiSnake.body) {
+                minimapCtx.fillRect(
+                    segment.x * GRID_SIZE * scale,
+                    segment.y * GRID_SIZE * scale,
+                    Math.max(2, GRID_SIZE * scale),
+                    Math.max(2, GRID_SIZE * scale)
+                );
+            }
         }
 
-        function endGame() {
-            gameActive = false;
-            if (gameLoop) clearInterval(gameLoop);
-            if (timerInterval) clearInterval(timerInterval);
+        function updateTimer() {
+            timeRemaining--;
+            updateDisplay();
 
-            // Play win sound
-            playSound('win');
+            if (timeRemaining <= 0) {
+                endGame();
+            }
+        }
 
-            // Find the highest scoring human player
-            let highestHumanScore = 0;
-            let winningPlayer = null;
+        function updateDisplay() {
+            const timeDisplay = document.getElementById('timeDisplay');
 
-            snakes.forEach(snake => {
-                if (snake.type === 'human' && snake.score > highestHumanScore) {
-                    highestHumanScore = snake.score;
-                    winningPlayer = snake;
-                }
-            });
+            if (gameMode === 'timeAttack') {
+                timeDisplay.textContent = timeRemaining;
+                timeDisplay.className = 'stat-value';
 
-            // Display results
-            const modal = document.getElementById('gameOverModal');
-            const resultTitle = document.getElementById('resultTitle');
-            const resultMessage = document.getElementById('resultMessage');
-            const nameInputSection = document.getElementById('nameInputSection');
-
-            resultTitle.textContent = 'Time\'s Up!';
-
-            // Build results message
-            let message = 'Final Scores:\n\n';
-            snakes.forEach(snake => {
-                message += `${snake.name}: ${snake.score} points\n`;
-            });
-
-            resultMessage.textContent = message;
-            resultMessage.style.whiteSpace = 'pre-line';
-
-            // Check if we should save to leaderboard (only for human players with score > 0)
-            if (highestHumanScore > 0) {
-                saveToLeaderboard(highestHumanScore);
-
-                // Show name input if it's a new entry
-                const playerName = localStorage.getItem('playerName');
-                if (!playerName) {
-                    nameInputSection.style.display = 'block';
-                } else {
-                    nameInputSection.style.display = 'none';
+                if (timeRemaining <= 10) {
+                    timeDisplay.className = 'stat-value time-critical';
+                } else if (timeRemaining <= 20) {
+                    timeDisplay.className = 'stat-value time-warning';
                 }
             } else {
-                nameInputSection.style.display = 'none';
+                timeDisplay.textContent = timeRemaining;
             }
 
-            modal.classList.add('active');
+            document.getElementById('playerScore').textContent = playerScore;
+            document.getElementById('aiScore').textContent = aiScore;
         }
 
-        function saveToLeaderboard(score) {
-            // Get or prompt for player name
-            let playerName = localStorage.getItem('playerName');
-
-            // If name input is visible, get the value from there
-            const nameInput = document.getElementById('playerNameInput');
-            if (nameInput.value.trim()) {
-                playerName = nameInput.value.trim();
-                localStorage.setItem('playerName', playerName);
-            } else if (!playerName) {
-                // If no name stored and input is empty, use default
-                playerName = 'Anonymous';
-            }
-
-            // Create score entry
-            const scoreEntry = {
-                name: playerName,
-                score: score,
-                date: new Date().toISOString()
+        function updateModeDisplay() {
+            const modeNames = {
+                timeAttack: 'Time Attack',
+                survival: 'Survival',
+                scoreRace: 'Score Race',
+                endless: 'Endless'
             };
-
-            // Get existing scores
-            let scores = [];
-            try {
-                const storedScores = localStorage.getItem('snakeBattleScores');
-                if (storedScores) {
-                    scores = JSON.parse(storedScores);
-                }
-            } catch (e) {
-                console.error('Error loading scores:', e);
-                scores = [];
-            }
-
-            // Add new score
-            scores.push(scoreEntry);
-
-            // Sort by score (descending)
-            scores.sort((a, b) => b.score - a.score);
-
-            // Keep only top 100
-            scores = scores.slice(0, 100);
-
-            // Save back to localStorage
-            try {
-                localStorage.setItem('snakeBattleScores', JSON.stringify(scores));
-            } catch (e) {
-                console.error('Error saving scores:', e);
-            }
+            const diffNames = {
+                easy: '😊 Easy',
+                normal: '😐 Normal',
+                hard: '😰 Hard',
+                insane: '💀 Insane'
+            };
+            document.getElementById('modeDisplay').innerHTML =
+                `${modeNames[gameMode]}<br><span style="font-size: 0.8em;">${diffNames[difficulty]}</span>`;
         }
 
-        function closeModal() {
-            // Save name if provided in the input
-            const nameInput = document.getElementById('playerNameInput');
-            if (nameInput.value.trim()) {
-                localStorage.setItem('playerName', nameInput.value.trim());
-            }
+        function endGame(message = null) {
+            gameActive = false;
+            cancelAnimationFrame(gameLoop);
+            clearInterval(timerInterval);
 
             const modal = document.getElementById('gameOverModal');
-            modal.classList.remove('active');
-            nameInput.value = ''; // Clear input for next time
+            const title = document.getElementById('resultTitle');
+            const resultMsg = document.getElementById('resultMessage');
+            const statsGrid = document.getElementById('statsGrid');
 
-            // Return to setup screen
-            backToSetup();
-        }
+            let titleText = '';
+            let messageText = '';
 
-        function viewLeaderboard() {
-            window.location.href = 'leaderboard.html';
+            if (message) {
+                titleText = '💀 Game Over';
+                messageText = message;
+                playDefeatSound();
+            } else if (gameMode === 'scoreRace') {
+                if (playerScore >= 50) {
+                    titleText = '🎉 You Win! 🎉';
+                    messageText = 'You reached 50 points first!';
+                    playVictorySound();
+                } else {
+                    titleText = '🤖 AI Wins!';
+                    messageText = 'AI reached 50 points first!';
+                    playDefeatSound();
+                }
+            } else {
+                if (playerScore > aiScore) {
+                    titleText = '🎉 You Win! 🎉';
+                    messageText = `Your Score: ${playerScore} | AI Score: ${aiScore}`;
+                    playVictorySound();
+                } else if (aiScore > playerScore) {
+                    titleText = '🤖 AI Wins!';
+                    messageText = `AI Score: ${aiScore} | Your Score: ${playerScore}`;
+                    playDefeatSound();
+                } else {
+                    titleText = '🤝 It\'s a Tie!';
+                    messageText = `Both scored ${playerScore} points!`;
+                    playDefeatSound();
+                }
+            }
+
+            title.textContent = titleText;
+            resultMsg.textContent = messageText;
+
+            // Update highscore
+            if (playerScore > highScore) {
+                highScore = playerScore;
+                localStorage.setItem('snakeBattleHighScore', highScore);
+            }
+
+            // Display stats
+            const gameDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+            statsGrid.innerHTML = `
+                <div>🏆 High Score:</div><div><strong>${highScore}</strong></div>
+                <div>⏱️ Time Played:</div><div><strong>${gameDuration}s</strong></div>
+                <div>🍎 Apples Eaten:</div><div><strong>${totalApplesEaten}</strong></div>
+                <div>⚡ Powerups Collected:</div><div><strong>${totalPowerupsCollected}</strong></div>
+                <div>📏 Final Length:</div><div><strong>${playerSnake.body.length}</strong></div>
+                <div>🎯 Difficulty:</div><div><strong>${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</strong></div>
+            `;
+
+            modal.classList.add('active');
         }
 
         function goHome() {
             window.location.href = 'index.html';
         }
 
-        function toggleGameSettings() {
-            const panel = document.getElementById('gameSettingsPanel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        }
+        // Mobile touch controls - Swipe gestures
+        let touchStartXPos = 0;
+        let touchStartYPos = 0;
+        let touchEndXPos = 0;
+        let touchEndYPos = 0;
+        const minSwipeDistance = 30;
 
-        // Initialize sound button and player customization on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            updateSoundButton();
-            updatePlayerControls();
+        canvas.addEventListener('touchstart', (e) => {
+            touchStartXPos = e.touches[0].clientX;
+            touchStartYPos = e.touches[0].clientY;
+        }, { passive: true });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Prevent scrolling
+            touchEndXPos = e.touches[0].clientX;
+            touchEndYPos = e.touches[0].clientY;
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            if (!gameActive || gamePaused) return;
+
+            const deltaX = touchEndXPos - touchStartXPos;
+            const deltaY = touchEndYPos - touchStartYPos;
+
+            // Determine swipe direction
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+                // Horizontal swipe
+                if (deltaX > 0 && playerSnake.dx !== -1) {
+                    // Swipe right
+                    playerSnake.nextDx = 1;
+                    playerSnake.nextDy = 0;
+                } else if (deltaX < 0 && playerSnake.dx !== 1) {
+                    // Swipe left
+                    playerSnake.nextDx = -1;
+                    playerSnake.nextDy = 0;
+                }
+            } else if (Math.abs(deltaY) > minSwipeDistance) {
+                // Vertical swipe
+                if (deltaY > 0 && playerSnake.dy !== -1) {
+                    // Swipe down
+                    playerSnake.nextDx = 0;
+                    playerSnake.nextDy = 1;
+                } else if (deltaY < 0 && playerSnake.dy !== 1) {
+                    // Swipe up
+                    playerSnake.nextDx = 0;
+                    playerSnake.nextDy = -1;
+                }
+            }
+        }, { passive: true });
+
+        // D-Pad button controls
+        document.getElementById('dpadUp')?.addEventListener('click', () => {
+            if (!gameActive || gamePaused) return;
+            if (playerSnake.dy !== 1) {
+                playerSnake.nextDx = 0;
+                playerSnake.nextDy = -1;
+            }
+        });
+
+        document.getElementById('dpadDown')?.addEventListener('click', () => {
+            if (!gameActive || gamePaused) return;
+            if (playerSnake.dy !== -1) {
+                playerSnake.nextDx = 0;
+                playerSnake.nextDy = 1;
+            }
+        });
+
+        document.getElementById('dpadLeft')?.addEventListener('click', () => {
+            if (!gameActive || gamePaused) return;
+            if (playerSnake.dx !== 1) {
+                playerSnake.nextDx = -1;
+                playerSnake.nextDy = 0;
+            }
+        });
+
+        document.getElementById('dpadRight')?.addEventListener('click', () => {
+            if (!gameActive || gamePaused) return;
+            if (playerSnake.dx !== -1) {
+                playerSnake.nextDx = 1;
+                playerSnake.nextDy = 0;
+            }
+        });
+
+        // Touch events for D-pad buttons (faster response)
+        ['dpadUp', 'dpadDown', 'dpadLeft', 'dpadRight'].forEach(id => {
+            document.getElementById(id)?.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const event = new Event('click');
+                e.target.dispatchEvent(event);
+            });
         });
 
         // Initial draw
         draw();
+        drawMinimap();
     </script>
 </body>
 </html>
