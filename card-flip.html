@@ -446,7 +446,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 15px;
-            font-size: 3em;
+            font-size: clamp(1.5em, 5vw, 3em);
             transition: transform 0.8s ease-in-out;
         }
 
@@ -462,7 +462,7 @@
 
         .card-back::after {
             content: "?";
-            font-size: 3em;
+            font-size: clamp(1.5em, 5vw, 3em);
             color: white;
             font-weight: bold;
         }
@@ -529,11 +529,15 @@
             .game-board {
                 gap: 10px;
             }
-            
+
             .card-face {
-                font-size: 2em;
+                font-size: clamp(1em, 4vw, 2em);
             }
-            
+
+            .card-back::after {
+                font-size: clamp(1em, 4vw, 2em);
+            }
+
             h1 {
                 font-size: 2em;
             }
