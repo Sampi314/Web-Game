@@ -2248,6 +2248,112 @@
                 padding: 10px;
             }
         }
+
+        /* Name input modal */
+        .name-input-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(15, 32, 39, 0.98);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1001;
+            transition: transform 0.3s;
+            text-align: center;
+            min-width: 400px;
+            max-width: 90vw;
+            border: 2px solid var(--accent-primary);
+        }
+
+        .name-input-modal.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .name-input-modal h3 {
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .name-input-modal p {
+            color: var(--accent-light);
+            margin-bottom: 20px;
+        }
+
+        .name-input-modal input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border: 2px solid var(--accent-primary);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            background: rgba(32, 58, 67, 0.8);
+            color: var(--accent-light);
+        }
+
+        .name-input-modal input:focus {
+            outline: none;
+            border-color: var(--accent-secondary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .name-input-modal button {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .name-input-modal button:hover {
+            background: linear-gradient(135deg, #2a5298 0%, #3764c7 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.5);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show {
+            display: block;
+        }
+
+        .leaderboard-btn {
+            background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .leaderboard-btn:hover {
+            background: linear-gradient(135deg, #3d6b1f 0%, #4d8528 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(61, 107, 31, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -2267,6 +2373,11 @@
                 <button class="new-game-btn" onclick="resetGame()">
                     🔄 New Game
                 </button>
+                <a href="leaderboard.html" style="text-decoration: none;">
+                    <button class="leaderboard-btn">
+                        🏆 View Leaderboard
+                    </button>
+                </a>
             </div>
 
             <div class="settings-panel" id="settingsPanel" style="display: none;">
@@ -2521,6 +2632,15 @@
         </div>
     </div>
 
+    <!-- Name Input Modal -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="name-input-modal" id="nameInputModal">
+        <h3>🎉 Congratulations!</h3>
+        <p>Enter your name for the leaderboard:</p>
+        <input type="text" id="playerNameInput" placeholder="Enter your name" maxlength="20" />
+        <button onclick="submitScore()">Submit Score</button>
+    </div>
+
     <script>
         const BOARD_SIZE = 19;
         let board = [];
@@ -2536,6 +2656,7 @@
         let botStyle = null; // 'aggressive', 'defensive', 'balanced', 'tricky', 'patient'
         let botLevel = 'medium'; // 'easy', 'medium', 'hard', 'expert'
         let botStylePreference = 'random'; // User's style preference
+        let lastGameResult = null; // Store winner info for leaderboard
 
         // Star points positions for 19x19 Go board
         const STAR_POINTS = [
@@ -3073,12 +3194,15 @@
             if (checkWin(row, col)) {
                 gameOver = true;
                 const winner = currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1);
-                
+
+                // Store result for leaderboard
+                let shouldPromptForName = false;
+
                 // In bot mode, show correct win message and update colors for next game
                 if (gameMode === 'pvb') {
                     // Check who won BEFORE swapping colors
                     const humanWon = currentPlayer === humanColor;
-                    
+
                     // Now update colors so loser starts next game
                     const loserColor = currentPlayer === 'black' ? 'white' : 'black';
                     // Loser gets black (starts first) in next game
@@ -3089,22 +3213,46 @@
                         botColor = 'black';
                         humanColor = 'white';
                     }
-                    
+
                     // Display win message based on who won
                     if (humanWon) {
                         document.getElementById('message').innerHTML = `🎉 You (${winner}) Win!`;
+                        shouldPromptForName = true;
                     } else {
                         document.getElementById('message').innerHTML = `🎉 Bot (${winner}) Wins!`;
                     }
                 } else {
                     document.getElementById('message').innerHTML = `🎉 ${winner} Wins!`;
+                    shouldPromptForName = true;
                 }
-                
+
                 // Play win sound
                 playWinSound();
-                
+
                 document.getElementById('message').classList.add('win-message');
                 updateThreats(); // Clear threats on game over
+
+                // Prompt for name and save to leaderboard if human won
+                if (shouldPromptForName) {
+                    lastGameResult = {
+                        winner: winner,
+                        date: new Date().toISOString()
+                    };
+
+                    // Show name input modal
+                    document.getElementById('modalOverlay').classList.add('show');
+                    document.getElementById('nameInputModal').classList.add('show');
+                    document.getElementById('playerNameInput').value = '';
+                    document.getElementById('playerNameInput').focus();
+
+                    // Allow Enter key to submit
+                    document.getElementById('playerNameInput').onkeypress = function(e) {
+                        if (e.key === 'Enter') {
+                            submitScore();
+                        }
+                    };
+                }
+
                 return;
             }
             
@@ -4080,6 +4228,55 @@
         // Reset the game
         function resetGame() {
             initGame();
+        }
+
+        // Submit score to leaderboard
+        function submitScore() {
+            if (!lastGameResult) {
+                return;
+            }
+
+            let playerName = document.getElementById('playerNameInput').value.trim();
+            if (!playerName) {
+                playerName = 'Anonymous';
+            }
+
+            // Save to global leaderboard in localStorage
+            try {
+                // Get existing scores
+                let gomokuScores = [];
+                const existingData = localStorage.getItem('gomokuScores');
+                if (existingData) {
+                    gomokuScores = JSON.parse(existingData);
+                }
+
+                // Add new score (each win is 1 point)
+                gomokuScores.push({
+                    name: playerName,
+                    score: 1,
+                    date: lastGameResult.date
+                });
+
+                // Sort by score (descending), then by date (most recent first)
+                gomokuScores.sort((a, b) => {
+                    if (b.score !== a.score) {
+                        return b.score - a.score;
+                    }
+                    return new Date(b.date) - new Date(a.date);
+                });
+
+                // Keep only top 100 scores
+                gomokuScores = gomokuScores.slice(0, 100);
+
+                // Save back to localStorage
+                localStorage.setItem('gomokuScores', JSON.stringify(gomokuScores));
+            } catch (e) {
+                console.error('Failed to save score to localStorage:', e);
+            }
+
+            // Hide name input modal
+            document.getElementById('modalOverlay').classList.remove('show');
+            document.getElementById('nameInputModal').classList.remove('show');
         }
 
         // Start the game

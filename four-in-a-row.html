@@ -423,6 +423,7 @@
             <button onclick="resetGame()">🔄 New Game</button>
             <button onclick="resetScores()">📊 Reset Scores</button>
             <button onclick="toggleStats()">📈 Statistics</button>
+            <button onclick="viewLeaderboard()">🏆 View Leaderboard</button>
         </div>
 
         <div class="stats-panel" id="statsPanel" style="display: none;">
@@ -453,6 +454,11 @@
             <h2 id="winMessage">🎉 Winner! 🎉</h2>
             <div class="winner-circle" id="winnerCircle"></div>
             <p id="winDetails"></p>
+            <div id="nameInputSection" style="margin: 20px 0; display: none;">
+                <p style="margin-bottom: 10px;">🎉 Enter winner's name for the leaderboard:</p>
+                <input type="text" id="playerNameInput" maxlength="20" placeholder="Winner's name"
+                    style="padding: 10px; font-size: 1em; border-radius: 5px; border: none; width: 80%; margin-bottom: 15px;">
+            </div>
             <button onclick="closeModal()">Play Again</button>
         </div>
     </div>
@@ -765,10 +771,22 @@
             const message = document.getElementById('winMessage');
             const circle = document.getElementById('winnerCircle');
             const details = document.getElementById('winDetails');
+            const nameInputSection = document.getElementById('nameInputSection');
 
             message.textContent = winner === PLAYERS.RED ? '🎉 Red Wins! 🎉' : '🎉 Yellow Wins! 🎉';
             circle.className = `winner-circle ${winner}`;
             details.textContent = `${winner === PLAYERS.RED ? 'Red' : 'Yellow'} has won the game!`;
+
+            // Save to leaderboard
+            saveToLeaderboard(winner);
+
+            // Show name input if no player name is stored
+            const playerName = localStorage.getItem('playerName');
+            if (!playerName) {
+                nameInputSection.style.display = 'block';
+            } else {
+                nameInputSection.style.display = 'none';
+            }
 
             modal.classList.add('active');
             updateCellStates(); // Disable cells when game ends
@@ -796,9 +814,81 @@
 
         // Close modal
         function closeModal() {
+            // Save name if provided in the input
+            const nameInput = document.getElementById('playerNameInput');
+            if (nameInput.value.trim()) {
+                localStorage.setItem('playerName', nameInput.value.trim());
+            }
+
             const modal = document.getElementById('winModal');
             modal.classList.remove('active');
+            nameInput.value = ''; // Clear input for next time
             resetGame();
+        }
+
+        // Save to global leaderboard
+        function saveToLeaderboard(winner) {
+            // Get or prompt for player name
+            let playerName = localStorage.getItem('playerName');
+
+            // If name input is visible, get the value from there
+            const nameInput = document.getElementById('playerNameInput');
+            if (nameInput.value.trim()) {
+                playerName = nameInput.value.trim();
+                localStorage.setItem('playerName', playerName);
+            } else if (!playerName) {
+                // If no name stored and input is empty, use default
+                playerName = 'Anonymous';
+            }
+
+            // Create score entry (each win is worth 1 point)
+            const scoreEntry = {
+                name: playerName,
+                score: 1,
+                date: new Date().toISOString()
+            };
+
+            // Get existing scores from fourInRowScores (note: without "A")
+            let scores = [];
+            try {
+                const storedScores = localStorage.getItem('fourInRowScores');
+                if (storedScores) {
+                    scores = JSON.parse(storedScores);
+                    if (!Array.isArray(scores)) {
+                        scores = [];
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading leaderboard scores:', e);
+                scores = [];
+            }
+
+            // Add new score
+            scores.push(scoreEntry);
+
+            // Sort by score (descending), then by date (most recent first)
+            scores.sort((a, b) => {
+                if (b.score !== a.score) {
+                    return b.score - a.score;
+                }
+                return new Date(b.date) - new Date(a.date);
+            });
+
+            // Keep only top 100 scores
+            scores = scores.slice(0, 100);
+
+            // Save back to localStorage
+            try {
+                localStorage.setItem('fourInRowScores', JSON.stringify(scores));
+                debug('Score saved to leaderboard', scoreEntry);
+            } catch (e) {
+                console.error('Error saving leaderboard scores:', e);
+            }
+        }
+
+        // View leaderboard
+        function viewLeaderboard() {
+            window.location.href = 'leaderboard.html';
         }
 
         // Reset game
