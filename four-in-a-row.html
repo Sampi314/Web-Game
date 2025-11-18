@@ -511,10 +511,10 @@
         <h1>🎮 4 in a Row 🎮</h1>
 
         <div class="controls">
-            <button class="settings-toggle" onclick="toggleStats()">📊 Statistics</button>
             <a href="leaderboard.html" style="display: inline-block;">
                 <button class="settings-toggle" style="margin-bottom: 0;">🏆 Global Leaderboard</button>
             </a>
+            <button class="settings-toggle" onclick="toggleSettings()">⚙️ Settings</button>
         </div>
 
         <div class="controls" style="margin-top: 0; margin-bottom: 20px;">
@@ -542,16 +542,24 @@
                     <span class="score-value" id="drawScore">0</span>
                 </div>
             </div>
+        </div>
 
-            <div class="sound-controls">
-                <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound">
-                    <span id="soundIcon">🔊</span>
-                </button>
-                <div class="volume-control">
-                    <span class="volume-label" id="volumeLabel">70%</span>
-                    <input type="range" class="volume-slider" id="volumeSlider"
-                           min="0" max="100" value="70"
-                           oninput="updateVolume(this.value)">
+        <div class="stats-panel" id="settingsPanel" style="display: none;">
+            <h3>⚙️ Settings</h3>
+            <div style="padding: 15px;">
+                <div class="sound-controls" style="justify-content: center; flex-wrap: wrap;">
+                    <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound">
+                        <span id="soundIcon">🔊</span>
+                    </button>
+                    <div class="volume-control">
+                        <span class="volume-label" id="volumeLabel">70%</span>
+                        <input type="range" class="volume-slider" id="volumeSlider"
+                               min="0" max="100" value="70"
+                               oninput="updateVolume(this.value)">
+                    </div>
+                </div>
+                <div style="margin-top: 15px; text-align: center;">
+                    <button onclick="toggleStats()">📊 View Statistics</button>
                 </div>
             </div>
         </div>
@@ -1334,11 +1342,24 @@
             saveScores();
         }
 
+        // Toggle settings panel
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
         // Toggle statistics panel
         function toggleStats() {
-            const panel = document.getElementById('statsPanel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-            if (panel.style.display === 'block') {
+            const statsPanel = document.getElementById('statsPanel');
+            const settingsPanel = document.getElementById('settingsPanel');
+
+            // Close settings if open
+            if (settingsPanel.style.display === 'block') {
+                settingsPanel.style.display = 'none';
+            }
+
+            statsPanel.style.display = statsPanel.style.display === 'none' ? 'block' : 'none';
+            if (statsPanel.style.display === 'block') {
                 updateStatsDisplay();
             }
         }
