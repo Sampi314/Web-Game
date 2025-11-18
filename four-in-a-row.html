@@ -203,11 +203,30 @@
         }
 
         .controls {
-            margin-top: 30px;
+            margin-top: 20px;
+            margin-bottom: 15px;
             display: flex;
-            gap: 15px;
+            gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
+        }
+
+        .settings-toggle {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .settings-toggle:hover {
+            background: rgba(255, 255, 255, 0.4);
         }
 
         button {
@@ -532,10 +551,15 @@
         </div>
 
         <div class="controls">
+            <button class="settings-toggle" onclick="toggleStats()">📊 Statistics</button>
+            <a href="leaderboard.html" style="display: inline-block;">
+                <button class="settings-toggle" style="margin-bottom: 0;">🏆 Global Leaderboard</button>
+            </a>
+        </div>
+
+        <div class="controls" style="margin-top: 15px;">
             <button onclick="resetGame()">🔄 New Game</button>
             <button onclick="resetScores()">📊 Reset Scores</button>
-            <button onclick="toggleStats()">📈 Statistics</button>
-            <button onclick="viewLeaderboard()">🏆 View Leaderboard</button>
         </div>
 
         <div class="stats-panel" id="statsPanel" style="display: none;">
@@ -668,14 +692,17 @@
 
         // Sound effects
         const sounds = {
-            // Piece drop sound - satisfying "plop"
+            // Coin drop sound - metallic bounce
             drop: function() {
                 initAudioContext();
                 if (!soundEnabled) return;
 
-                // Two-tone drop sound
-                playTone(400, 0.08, 'sine', 0.5);
-                setTimeout(() => playTone(300, 0.12, 'sine', 0.6), 40);
+                // Metallic coin drop with bounce effect
+                playTone(1200, 0.05, 'square', 0.4); // Initial metallic clink
+                setTimeout(() => playTone(800, 0.08, 'triangle', 0.5), 30); // First bounce
+                setTimeout(() => playTone(600, 0.06, 'triangle', 0.4), 80); // Second bounce
+                setTimeout(() => playTone(500, 0.05, 'triangle', 0.3), 120); // Third bounce
+                setTimeout(() => playTone(450, 0.04, 'sine', 0.2), 150); // Final settle
             },
 
             // Click/hover sound - subtle tick
@@ -686,28 +713,32 @@
                 playTone(800, 0.05, 'sine', 0.3);
             },
 
-            // Win sound - celebratory ascending tones
+            // Win sound - celebratory fanfare
             win: function() {
                 initAudioContext();
                 if (!soundEnabled) return;
 
-                // Triumphant chord progression
-                const notes = [
-                    [523.25, 659.25, 783.99], // C major chord
-                    [587.33, 739.99, 880.00], // D major chord
-                    [659.25, 830.61, 987.77]  // E major chord
+                // Triumphant fanfare with coins
+                const melody = [
+                    { freq: 523.25, duration: 0.15, delay: 0 },    // C
+                    { freq: 659.25, duration: 0.15, delay: 150 },  // E
+                    { freq: 783.99, duration: 0.15, delay: 300 },  // G
+                    { freq: 1046.50, duration: 0.4, delay: 450 }   // High C (sustained)
                 ];
 
-                notes.forEach((chord, index) => {
+                // Play melody
+                melody.forEach(note => {
                     setTimeout(() => {
-                        playChord(chord, 0.4, 'sine', 0.6);
-                    }, index * 250);
+                        playTone(note.freq, note.duration, 'sine', 0.7);
+                    }, note.delay);
                 });
 
-                // Final high note
-                setTimeout(() => {
-                    playTone(1046.50, 0.6, 'sine', 0.7); // High C
-                }, 750);
+                // Add coin sparkle effects
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        playTone(1200 + (i * 200), 0.1, 'triangle', 0.3);
+                    }, 500 + (i * 100));
+                }
             },
 
             // Draw sound - neutral, balanced tone

@@ -5,7 +5,6 @@
 ### *Fun, Free Browser Games - No Downloads Required!*
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://sampi314.github.io/Web-Game/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](#-license)
 [![Made with](https://img.shields.io/badge/made%20with-vanilla%20JS-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 [🎯 Play Now](https://sampi314.github.io/Web-Game/) • [🎮 Games](#-games-library) • [🚀 Features](#-key-features) • [💻 Development](#-local-development)
@@ -26,7 +25,6 @@
 - [Repository Structure](#-repository-structure)
 - [Contributing](#-contributing)
 - [FAQ](#-frequently-asked-questions)
-- [License](#-license)
 
 ---
 
@@ -66,7 +64,7 @@ All games feature:
 
 > **Test your memory with this feature-rich card matching game!**
 
-**[▶ Play Now](https://sampi314.github.io/Web-Game/card-flip-game-with-leaderboard.html)**
+**[▶ Play Now](https://sampi314.github.io/Web-Game/card-flip.html)**
 
 #### Features
 - **8 Game Modes:** Normal, Peek, Fade, Fortune, Chaos, Swap, Rotate, Color
@@ -356,7 +354,7 @@ Web-Game/
 ├── 📄 index.html                              # Main landing page/game hub
 │
 ├── 🎮 Game Files (Self-contained)
-│   ├── card-flip-game-with-leaderboard.html  # Memory card game
+│   ├── card-flip.html  # Memory card game
 │   ├── four-in-a-row.html                     # Connect Four game
 │   ├── gomoku.html                            # Gomoku/Five-in-a-Row
 │   ├── word-chain.html                        # Word association game
@@ -481,32 +479,6 @@ A: Fork the repo, create your game in a single HTML file, and submit a pull requ
 
 **Q: What if I find a bug?**
 A: Please report it on our [GitHub Issues](https://github.com/Sampi314/Web-Game/issues) page.
-
----
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
-```
-MIT License
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software.
-
-Copyright (c) 2024 Web Games Collection
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
-```
-
-**You are free to:**
-- ✅ Use commercially
-- ✅ Modify and distribute
-- ✅ Use privately
-- ✅ Sublicense
 
 ---
 
