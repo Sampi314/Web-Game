@@ -583,6 +583,8 @@
         let totalApplesEaten = 0;
         let totalPowerupsCollected = 0;
         let gameStartTime = 0;
+        let lastFrameTime = 0;
+        let accumulator = 0;
 
         // Difficulty settings
         const difficultySettings = {
@@ -806,9 +808,10 @@
             updateDisplay();
             updateModeDisplay();
 
-            // Start game loop
-            if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, settings.speed);
+            // Start game loop with requestAnimationFrame
+            if (gameLoop) cancelAnimationFrame(gameLoop);
+            lastFrameTime = performance.now();
+            gameLoop = requestAnimationFrame(gameLoopRAF);
 
             // Start timer
             if (timerInterval) clearInterval(timerInterval);
@@ -820,6 +823,29 @@
                     updateDisplay();
                 }, 1000);
             }
+        }
+
+        function gameLoopRAF(currentTime) {
+            if (!gameActive || gamePaused) {
+                if (gameActive && gamePaused) {
+                    gameLoop = requestAnimationFrame(gameLoopRAF);
+                }
+                return;
+            }
+
+            const deltaTime = currentTime - lastFrameTime;
+            lastFrameTime = currentTime;
+
+            const settings = difficultySettings[difficulty];
+            accumulator += deltaTime;
+
+            // Fixed timestep updates
+            while (accumulator >= settings.speed) {
+                update();
+                accumulator -= settings.speed;
+            }
+
+            gameLoop = requestAnimationFrame(gameLoopRAF);
         }
 
         function update() {
@@ -914,7 +940,8 @@
                     y: snake.body[0].y * GRID_SIZE + GRID_SIZE / 2,
                     life: 1
                 });
-                if (snake.trail.length > 20) {
+                // Reduced from 20 to 12 for performance
+                if (snake.trail.length > 12) {
                     snake.trail.shift();
                 }
             }
@@ -1005,7 +1032,7 @@
             fScore.set(key(start), heuristic(start, goal));
 
             let iterations = 0;
-            const maxIterations = 100;
+            const maxIterations = 50; // Reduced from 100 for performance
 
             while (openSet.length > 0 && iterations < maxIterations) {
                 iterations++;
@@ -1393,8 +1420,9 @@
             const x = gridX * GRID_SIZE + GRID_SIZE / 2;
             const y = gridY * GRID_SIZE + GRID_SIZE / 2;
 
-            for (let i = 0; i < 8; i++) {
-                const angle = (Math.PI * 2 * i) / 8;
+            // Reduced from 8 to 6 particles for performance
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI * 2 * i) / 6;
                 particles.push({
                     x: x,
                     y: y,
@@ -1422,7 +1450,8 @@
             const x = gridX * GRID_SIZE + GRID_SIZE / 2;
             const y = gridY * GRID_SIZE + GRID_SIZE / 2;
 
-            for (let i = 0; i < 20; i++) {
+            // Reduced from 20 to 12 particles for performance
+            for (let i = 0; i < 12; i++) {
                 const angle = Math.random() * Math.PI * 2;
                 const speed = Math.random() * 5 + 2;
                 particles.push({
@@ -1799,7 +1828,7 @@
 
         function endGame(message = null) {
             gameActive = false;
-            clearInterval(gameLoop);
+            cancelAnimationFrame(gameLoop);
             clearInterval(timerInterval);
 
             const modal = document.getElementById('gameOverModal');

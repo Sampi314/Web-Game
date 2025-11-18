@@ -1821,9 +1821,9 @@
                 case 'medium':
                     return getBestMove(board, aiPlayer, 2);
                 case 'hard':
-                    return getBestMove(board, aiPlayer, 4);
+                    return getBestMove(board, aiPlayer, 3); // Reduced from 4 for performance
                 case 'expert':
-                    return getBestMove(board, aiPlayer, 6);
+                    return getBestMove(board, aiPlayer, 5); // Reduced from 6 for performance
                 default:
                     return getRandomMove();
             }
@@ -1852,10 +1852,18 @@
         function getBestMove(gameBoard, player, depth) {
             let bestScore = -Infinity;
             let bestMove = null;
-            const alpha = -Infinity;
+            let alpha = -Infinity;
             const beta = Infinity;
 
-            for (let col = 0; col < COLS; col++) {
+            // Move ordering: check center columns first for better pruning
+            const centerCol = Math.floor(COLS / 2);
+            const columnOrder = [centerCol];
+            for (let offset = 1; offset < COLS; offset++) {
+                if (centerCol + offset < COLS) columnOrder.push(centerCol + offset);
+                if (centerCol - offset >= 0) columnOrder.push(centerCol - offset);
+            }
+
+            for (let col of columnOrder) {
                 if (gameBoard[0][col] === null) {
                     const row = getAvailableRowForBoard(gameBoard, col);
                     if (row !== -1) {
@@ -1868,6 +1876,7 @@
                             bestScore = score;
                             bestMove = col;
                         }
+                        alpha = Math.max(alpha, score);
                     }
                 }
             }
@@ -1886,9 +1895,17 @@
                 return evaluatePosition(gameBoard, player);
             }
 
+            // Move ordering for better pruning
+            const centerCol = Math.floor(COLS / 2);
+            const columnOrder = [centerCol];
+            for (let offset = 1; offset < COLS; offset++) {
+                if (centerCol + offset < COLS) columnOrder.push(centerCol + offset);
+                if (centerCol - offset >= 0) columnOrder.push(centerCol - offset);
+            }
+
             if (isMaximizing) {
                 let maxScore = -Infinity;
-                for (let col = 0; col < COLS; col++) {
+                for (let col of columnOrder) {
                     if (gameBoard[0][col] === null) {
                         const row = getAvailableRowForBoard(gameBoard, col);
                         if (row !== -1) {
@@ -1906,7 +1923,7 @@
                 return maxScore;
             } else {
                 let minScore = Infinity;
-                for (let col = 0; col < COLS; col++) {
+                for (let col of columnOrder) {
                     if (gameBoard[0][col] === null) {
                         const row = getAvailableRowForBoard(gameBoard, col);
                         if (row !== -1) {

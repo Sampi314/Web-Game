@@ -1009,10 +1009,10 @@
             player.velocityY += player.gravity * player.gravityDirection;
             player.y += player.velocityY;
 
-            // Trail effect
+            // Trail effect (reduced from 20 to 12 for performance)
             if (settings.particles) {
                 player.trail.push({ x: player.x + player.size / 2, y: player.y + player.size / 2, life: 10 });
-                if (player.trail.length > 20) player.trail.shift();
+                if (player.trail.length > 12) player.trail.shift();
             }
 
             // Check boundaries
@@ -1374,6 +1374,8 @@
         }
 
         function createParticles(x, y, color, count = 10) {
+            // Reduce count by 30% for performance
+            count = Math.ceil(count * 0.7);
             for (let i = 0; i < count; i++) {
                 particles.push({
                     x: x,
@@ -1390,8 +1392,9 @@
 
         function createExplosion(x, y) {
             if (!settings.particles) return;
-            for (let i = 0; i < 30; i++) {
-                const angle = (Math.PI * 2 * i) / 30;
+            // Reduced from 30 to 20 for performance
+            for (let i = 0; i < 20; i++) {
+                const angle = (Math.PI * 2 * i) / 20;
                 const speed = 3 + Math.random() * 5;
                 particles.push({
                     x: x,
@@ -1429,7 +1432,8 @@
         }
 
         function createBackgroundParticles() {
-            for (let i = 0; i < 50; i++) {
+            // Reduced from 50 to 30 for performance
+            for (let i = 0; i < 30; i++) {
                 backgroundParticles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
