@@ -2248,9 +2248,45 @@
                     padding: 10px;
                 }
             }
+
+            /* Home Button */
+            .home-button {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                padding: 12px 20px;
+                background: rgba(255, 255, 255, 0.95);
+                color: var(--accent-primary);
+                text-decoration: none;
+                border-radius: 10px;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 10000;
+                transition: all 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 16px;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .home-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            }
+
+            @media (max-width: 768px) {
+                .home-button {
+                    top: 10px;
+                    left: 10px;
+                    padding: 10px 16px;
+                    font-size: 14px;
+                }
+            }
         </style>
     </head>
     <body>
+        <a href="index.html" class="home-button">🏠 Home</a>
         <div class="game-container">
             <h1>🎯 CARO GAME</h1>
             <div class="subtitle">Five in a Row • 19×19 Grid</div>
