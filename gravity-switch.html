@@ -214,11 +214,21 @@
 
         <div class="controls">
             <button class="settings-toggle" onclick="viewLeaderboard()">🏆 Leaderboard</button>
+            <button class="settings-toggle" onclick="toggleSettings()">⚙️ Settings</button>
         </div>
 
         <div class="controls" style="margin-top: 0; margin-bottom: 20px;">
+            <button onclick="restartGame()">🔄 New Game</button>
             <button onclick="goHome()">🏠 Home</button>
-            <button id="soundToggle" onclick="toggleSound()">🔊 Sound: ON</button>
+        </div>
+
+        <div class="instructions" id="settingsPanel" style="display: none; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 15px;">⚙️ Settings</h3>
+            <div style="text-align: center;">
+                <button id="soundToggle" onclick="toggleSound()" style="font-size: 2em; padding: 15px 30px; margin: 10px;">
+                    🔊 Sound: ON
+                </button>
+            </div>
         </div>
 
         <div class="game-info">
@@ -979,6 +989,23 @@
 
         function goHome() {
             window.location.href = 'index.html';
+        }
+
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function restartGame() {
+            gameActive = false;
+            gameStarted = false;
+            score = 0;
+            bird.y = canvas.height / 2;
+            bird.velocity = 0;
+            pipes = [];
+            pipesPassed.clear();
+            updateScore();
+            draw();
         }
 
         // Initial draw
