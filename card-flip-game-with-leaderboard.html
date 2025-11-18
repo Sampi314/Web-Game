@@ -9,6 +9,9 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            /* Mobile optimizations */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         body {
@@ -20,6 +23,9 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overscroll-behavior: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .container {
@@ -389,6 +395,8 @@
             transform-style: preserve-3d;
             transition: transform 0.6s;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            /* Prevent context menu on long press */
+            -webkit-touch-callout: none;
         }
 
         .card.animating {
@@ -479,6 +487,9 @@
             font-weight: bold;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             transition: transform 0.2s, box-shadow 0.2s;
+            /* Ensure minimum touch target size */
+            min-width: 44px;
+            min-height: 44px;
         }
 
         button:hover {
@@ -1445,6 +1456,18 @@
                     <div class="card-face card-front">${emoji}</div>
                 `;
                 card.addEventListener('click', flipCard);
+
+                // Add touch event support for mobile
+                card.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    flipCard.call(card);
+                }, { passive: false });
+
+                // Prevent context menu on long press
+                card.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                });
+
                 board.appendChild(card);
             });
         }

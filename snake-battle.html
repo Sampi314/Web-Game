@@ -9,6 +9,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            /* Mobile optimizations */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -21,6 +26,7 @@
             justify-content: center;
             padding: 20px;
             color: white;
+            overscroll-behavior: none;
         }
 
         .game-container {
@@ -227,9 +233,50 @@
             margin-bottom: 30px;
         }
 
+        /* Mobile touch controls */
+        .touch-controls {
+            display: none;
+            grid-template-columns: repeat(3, 70px);
+            grid-template-rows: repeat(3, 70px);
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .touch-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 70px;
+            min-height: 70px;
+            touch-action: manipulation;
+        }
+
+        .touch-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0.95);
+        }
+
+        .touch-btn.empty {
+            visibility: hidden;
+        }
+
         @media (max-width: 768px) {
             h1 { font-size: 2em; }
             canvas { width: 100%; height: auto; }
+            .touch-controls { display: grid; }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .touch-controls { display: grid; }
         }
     </style>
 </head>
@@ -279,6 +326,7 @@
             </div>
 
             <div class="controls">
+                <button id="soundToggle" onclick="toggleSound()">🔊 Sound On</button>
                 <button onclick="surrenderGame()">🏳️ Surrender</button>
                 <button onclick="backToSetup()">⚙️ Setup</button>
                 <button onclick="viewLeaderboard()">🏆 View Leaderboard</button>
@@ -289,6 +337,19 @@
                 <p>🍎 Eat apples to grow and score points</p>
                 <p>💀 Hit another snake's tail and you die - your score resets to 0!</p>
                 <p>🎁 Dead snakes drop special food (Golden 🟠 or Super 🔴)</p>
+            </div>
+
+            <!-- Touch controls for mobile -->
+            <div class="touch-controls" id="touchControls">
+                <div class="touch-btn empty"></div>
+                <div class="touch-btn" ontouchstart="handleTouchControl('up')" onclick="handleTouchControl('up')">↑</div>
+                <div class="touch-btn empty"></div>
+                <div class="touch-btn" ontouchstart="handleTouchControl('left')" onclick="handleTouchControl('left')">←</div>
+                <div class="touch-btn empty"></div>
+                <div class="touch-btn" ontouchstart="handleTouchControl('right')" onclick="handleTouchControl('right')">→</div>
+                <div class="touch-btn empty"></div>
+                <div class="touch-btn" ontouchstart="handleTouchControl('down')" onclick="handleTouchControl('down')">↓</div>
+                <div class="touch-btn empty"></div>
             </div>
         </div>
     </div>
@@ -316,6 +377,109 @@
         // Game constants
         const GRID_SIZE = 20;
         const TILE_COUNT = canvas.width / GRID_SIZE;
+
+        // Audio System
+        let audioContext = null;
+        let soundEnabled = localStorage.getItem('snakeBattleSoundEnabled') !== 'false'; // Default to true
+        let timerWarningPlayed = false;
+
+        // Initialize Audio Context (mobile-compatible)
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
+
+        // Play a sound effect with specified parameters
+        function playSound(type) {
+            if (!soundEnabled) return;
+
+            const ctx = initAudioContext();
+            const now = ctx.currentTime;
+
+            switch(type) {
+                case 'food':
+                    // Satisfying "nom" sound - quick frequency drop
+                    playTone(ctx, now, 800, 600, 0.1, 'sine', 0.3);
+                    break;
+
+                case 'golden':
+                    // Higher pitched, more exciting - ascending then descending
+                    playTone(ctx, now, 1000, 1200, 0.05, 'sine', 0.25);
+                    playTone(ctx, now + 0.05, 1200, 1000, 0.05, 'sine', 0.25);
+                    playTone(ctx, now + 0.1, 1000, 1200, 0.05, 'sine', 0.25);
+                    break;
+
+                case 'super':
+                    // Special power-up sound - rapid ascending tones
+                    playTone(ctx, now, 600, 800, 0.06, 'square', 0.2);
+                    playTone(ctx, now + 0.06, 800, 1000, 0.06, 'square', 0.2);
+                    playTone(ctx, now + 0.12, 1000, 1400, 0.08, 'square', 0.2);
+                    break;
+
+                case 'death':
+                    // Sad descending tone
+                    playTone(ctx, now, 400, 200, 0.3, 'sawtooth', 0.3);
+                    playTone(ctx, now + 0.15, 300, 150, 0.3, 'sawtooth', 0.25);
+                    break;
+
+                case 'win':
+                    // Celebratory ascending sequence
+                    playTone(ctx, now, 523, 523, 0.15, 'sine', 0.3);        // C
+                    playTone(ctx, now + 0.15, 659, 659, 0.15, 'sine', 0.3); // E
+                    playTone(ctx, now + 0.3, 784, 784, 0.15, 'sine', 0.3);  // G
+                    playTone(ctx, now + 0.45, 1047, 1047, 0.3, 'sine', 0.4); // C (octave higher)
+                    break;
+
+                case 'warning':
+                    // Urgent beep - pulsing
+                    playTone(ctx, now, 880, 880, 0.1, 'square', 0.4);
+                    playTone(ctx, now + 0.15, 880, 880, 0.1, 'square', 0.4);
+                    playTone(ctx, now + 0.3, 880, 880, 0.15, 'square', 0.4);
+                    break;
+            }
+        }
+
+        // Helper function to play a single tone
+        function playTone(ctx, startTime, startFreq, endFreq, duration, waveType, volume) {
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+
+            oscillator.type = waveType;
+            oscillator.frequency.setValueAtTime(startFreq, startTime);
+            oscillator.frequency.exponentialRampToValueAtTime(endFreq, startTime + duration);
+
+            gainNode.gain.setValueAtTime(volume, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration);
+        }
+
+        // Toggle sound on/off
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('snakeBattleSoundEnabled', soundEnabled);
+            updateSoundButton();
+
+            // Play a test sound when enabling
+            if (soundEnabled) {
+                playSound('food');
+            }
+        }
+
+        // Update sound button appearance
+        function updateSoundButton() {
+            const btn = document.getElementById('soundToggle');
+            if (btn) {
+                btn.textContent = soundEnabled ? '🔊 Sound On' : '🔇 Sound Off';
+                btn.style.opacity = soundEnabled ? '1' : '0.7';
+            }
+        }
 
         // Game state
         let gameActive = false;
@@ -366,6 +530,46 @@
             golden: { color: '#FFD700', points: 3, growth: 2 }, // Dropped when snake dies
             super: { color: '#FF6347', points: 5, growth: 3 }   // Rare drop
         };
+
+        // Touch control handler for mobile
+        function handleTouchControl(direction) {
+            if (!gameActive || numPlayers === 0) return;
+
+            const snake = snakes[0]; // Control Player 1 with touch
+            if (!snake || snake.type === 'ai') return;
+
+            switch(direction) {
+                case 'up':
+                    if (snake.dy !== 1) {
+                        snake.nextDx = 0;
+                        snake.nextDy = -1;
+                    }
+                    break;
+                case 'down':
+                    if (snake.dy !== -1) {
+                        snake.nextDx = 0;
+                        snake.nextDy = 1;
+                    }
+                    break;
+                case 'left':
+                    if (snake.dx !== 1) {
+                        snake.nextDx = -1;
+                        snake.nextDy = 0;
+                    }
+                    break;
+                case 'right':
+                    if (snake.dx !== -1) {
+                        snake.nextDx = 1;
+                        snake.nextDy = 0;
+                    }
+                    break;
+            }
+        }
+
+        // Prevent context menu
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
 
         // Input handling
         document.addEventListener('keydown', (e) => {
@@ -536,10 +740,17 @@
 
             // Start timer countdown
             if (timerInterval) clearInterval(timerInterval);
+            timerWarningPlayed = false; // Reset warning flag
             timerInterval = setInterval(() => {
                 if (gameActive && gameTimer > 0) {
                     gameTimer--;
                     updateScoreboard();
+
+                    // Play warning sound at 10 seconds
+                    if (gameTimer === 10 && !timerWarningPlayed) {
+                        playSound('warning');
+                        timerWarningPlayed = true;
+                    }
 
                     if (gameTimer === 0) {
                         endGame();
@@ -672,6 +883,9 @@
         }
 
         function respawnSnake(snake) {
+            // Play death sound
+            playSound('death');
+
             // Spawn special food at death location
             spawnSpecialFood(snake.body[0].x, snake.body[0].y);
 
@@ -747,6 +961,15 @@
                         // Grow snake based on food type
                         for (let j = 0; j < foodType.growth; j++) {
                             snake.body.push({...snake.body[snake.body.length - 1]});
+                        }
+
+                        // Play appropriate sound based on food type
+                        if (apple.type === 'golden') {
+                            playSound('golden');
+                        } else if (apple.type === 'super') {
+                            playSound('super');
+                        } else {
+                            playSound('food');
                         }
 
                         apples.splice(i, 1);
@@ -929,6 +1152,9 @@
             if (gameLoop) clearInterval(gameLoop);
             if (timerInterval) clearInterval(timerInterval);
 
+            // Play win sound
+            playSound('win');
+
             // Find the highest scoring human player
             let highestHumanScore = 0;
             let winningPlayer = null;
@@ -1047,6 +1273,11 @@
         function goHome() {
             window.location.href = 'index.html';
         }
+
+        // Initialize sound button on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateSoundButton();
+        });
 
         // Initial draw
         draw();

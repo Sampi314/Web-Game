@@ -9,6 +9,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            /* Mobile optimizations */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -21,6 +26,7 @@
             justify-content: center;
             padding: 20px;
             color: white;
+            overscroll-behavior: none;
         }
 
         .game-container {
@@ -206,6 +212,7 @@
         <div class="controls">
             <button onclick="goHome()">🏠 Home</button>
             <button onclick="viewLeaderboard()">🏆 Leaderboard</button>
+            <button id="soundToggle" onclick="toggleSound()">🔊 Sound: ON</button>
         </div>
 
         <div class="instructions">
@@ -234,6 +241,169 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Audio System using Web Audio API
+        let audioContext = null;
+        let soundEnabled = localStorage.getItem('gravitySoundEnabled') !== 'false'; // Default to true
+
+        // Initialize audio context on first user interaction
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            // Resume audio context if it's suspended (mobile requirement)
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        // Jump/Flip Sound - Satisfying "woosh"
+        function playJumpSound() {
+            if (!soundEnabled || !audioContext) return;
+
+            const now = audioContext.currentTime;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            // Swoosh sound: descending frequency
+            oscillator.frequency.setValueAtTime(400, now);
+            oscillator.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+            oscillator.type = 'sine';
+            oscillator.start(now);
+            oscillator.stop(now + 0.15);
+        }
+
+        // Score Sound - Positive ping
+        function playScoreSound() {
+            if (!soundEnabled || !audioContext) return;
+
+            const now = audioContext.currentTime;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            // Bright ping sound
+            oscillator.frequency.setValueAtTime(800, now);
+            oscillator.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+
+            oscillator.type = 'square';
+            oscillator.start(now);
+            oscillator.stop(now + 0.1);
+        }
+
+        // Death/Crash Sound - Harsh crash
+        function playDeathSound() {
+            if (!soundEnabled || !audioContext) return;
+
+            const now = audioContext.currentTime;
+
+            // Main crash oscillator
+            const oscillator1 = audioContext.createOscillator();
+            const oscillator2 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const noiseGain = audioContext.createGain();
+
+            oscillator1.connect(gainNode);
+            oscillator2.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            // Low rumble
+            oscillator1.frequency.setValueAtTime(100, now);
+            oscillator1.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+            oscillator1.type = 'sawtooth';
+
+            // Higher crash tone
+            oscillator2.frequency.setValueAtTime(300, now);
+            oscillator2.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+            oscillator2.type = 'square';
+
+            gainNode.gain.setValueAtTime(0.4, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+            oscillator1.start(now);
+            oscillator2.start(now);
+            oscillator1.stop(now + 0.4);
+            oscillator2.stop(now + 0.4);
+
+            // Add white noise for crash effect
+            const bufferSize = audioContext.sampleRate * 0.3;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const noiseSource = audioContext.createBufferSource();
+            noiseSource.buffer = buffer;
+            noiseSource.connect(noiseGain);
+            noiseGain.connect(audioContext.destination);
+
+            noiseGain.gain.setValueAtTime(0.2, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+            noiseSource.start(now);
+        }
+
+        // High Score Sound - Celebratory fanfare
+        function playHighScoreSound() {
+            if (!soundEnabled || !audioContext) return;
+
+            const now = audioContext.currentTime;
+
+            // Ascending arpeggio for celebration
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+
+            notes.forEach((frequency, index) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                const startTime = now + (index * 0.1);
+                oscillator.frequency.setValueAtTime(frequency, startTime);
+
+                gainNode.gain.setValueAtTime(0, startTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.02);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+
+                oscillator.type = 'triangle';
+                oscillator.start(startTime);
+                oscillator.stop(startTime + 0.2);
+            });
+        }
+
+        // Toggle sound function
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('gravitySoundEnabled', soundEnabled);
+
+            const button = document.getElementById('soundToggle');
+            button.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+
+            // Initialize audio context if enabling sound
+            if (soundEnabled) {
+                initAudio();
+            }
+        }
+
+        // Update sound button on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const button = document.getElementById('soundToggle');
+            button.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+        });
 
         // Game state
         let gameActive = false;
@@ -275,6 +445,9 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === ' ' && !spacePressed) {
                 spacePressed = true;
+                // Initialize audio on first interaction (mobile compatibility)
+                initAudio();
+
                 if (!gameActive) {
                     startGame();
                 } else {
@@ -290,6 +463,9 @@
         });
 
         canvas.addEventListener('click', () => {
+            // Initialize audio on first interaction (mobile compatibility)
+            initAudio();
+
             if (!gameActive) {
                 startGame();
             } else {
@@ -297,10 +473,30 @@
             }
         });
 
+        // Add touch event support for mobile
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            initAudio();
+
+            if (!gameActive) {
+                startGame();
+            } else {
+                flipGravity();
+            }
+        }, { passive: false });
+
+        // Prevent context menu on canvas
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
         // Update high score display
         document.getElementById('highScoreDisplay').textContent = highScore;
 
         function startGame() {
+            // Initialize audio context on first user interaction (mobile compatibility)
+            initAudio();
+
             gameActive = true;
             score = 0;
             obstacleTimer = 0;
@@ -362,6 +558,9 @@
                     obstacles.splice(i, 1);
                     score += 10;
                     updateDisplay();
+
+                    // Play score sound for passing through pipes
+                    playScoreSound();
                 }
             }
 
@@ -387,6 +586,9 @@
             // Flappy Bird style jump
             player.velocityY = player.jumpStrength;
             createParticles(player.x + player.size / 2, player.y + player.size / 2);
+
+            // Play jump sound
+            playJumpSound();
         }
 
         function spawnObstacle() {
@@ -631,13 +833,22 @@
             gameActive = false;
             cancelAnimationFrame(gameLoop);
 
+            // Play death sound
+            playDeathSound();
+
             const finalScore = Math.floor(score / 10);
 
             // Update high score
-            if (finalScore > highScore) {
+            const isNewHighScore = finalScore > highScore;
+            if (isNewHighScore) {
                 highScore = finalScore;
                 localStorage.setItem('gravityHighScore', highScore);
                 document.getElementById('highScoreDisplay').textContent = highScore;
+
+                // Play high score sound with slight delay after death sound
+                setTimeout(() => {
+                    playHighScoreSound();
+                }, 500);
             }
 
             const modal = document.getElementById('gameOverModal');
