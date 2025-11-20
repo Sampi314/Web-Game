@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -40,11 +41,13 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .setup-screen, .game-screen {
+        .setup-screen,
+        .game-screen {
             display: none;
         }
 
-        .setup-screen.active, .game-screen.active {
+        .setup-screen.active,
+        .game-screen.active {
             display: block;
         }
 
@@ -234,11 +237,25 @@
             align-items: center;
         }
 
-        .word-item.player1 { border-left: 4px solid #4ade80; }
-        .word-item.player2 { border-left: 4px solid #60a5fa; }
-        .word-item.player3 { border-left: 4px solid #fbbf24; }
-        .word-item.player4 { border-left: 4px solid #f472b6; }
-        .word-item.bot { border-left: 4px solid #ff6b6b; }
+        .word-item.player1 {
+            border-left: 4px solid #4ade80;
+        }
+
+        .word-item.player2 {
+            border-left: 4px solid #60a5fa;
+        }
+
+        .word-item.player3 {
+            border-left: 4px solid #fbbf24;
+        }
+
+        .word-item.player4 {
+            border-left: 4px solid #f472b6;
+        }
+
+        .word-item.bot {
+            border-left: 4px solid #ff6b6b;
+        }
 
         .controls {
             display: flex;
@@ -307,8 +324,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal {
@@ -339,8 +363,15 @@
         }
 
         @keyframes modalSlideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-content h2 {
@@ -379,7 +410,7 @@
             text-decoration: none;
             border-radius: 10px;
             font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             z-index: 10000;
             transition: all 0.3s;
             display: flex;
@@ -389,27 +420,41 @@
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
+
         .home-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
         }
 
         @media (max-width: 768px) {
-            h1 { font-size: 2em; }
-            .current-word { font-size: 2em; }
+            h1 {
+                font-size: 2em;
+            }
+
+            .current-word {
+                font-size: 2em;
+            }
+
             input[type="text"] {
                 font-size: 1.2em;
-                min-height: 44px; /* Touch-friendly minimum */
+                min-height: 44px;
+                /* Touch-friendly minimum */
             }
-            .player-box { min-width: 100px; }
+
+            .player-box {
+                min-width: 100px;
+            }
+
             .selector-btn {
                 min-height: 44px;
                 min-width: 60px;
             }
+
             button {
                 min-height: 44px;
                 padding: 12px 20px;
             }
+
             .home-button {
                 top: 10px;
                 left: 10px;
@@ -419,7 +464,9 @@
         }
 
         /* Prevent text selection on buttons */
-        button, .selector-btn, .home-button {
+        button,
+        .selector-btn,
+        .home-button {
             -webkit-user-select: none;
             -moz-user-select: none;
             user-select: none;
@@ -429,11 +476,13 @@
         /* Prevent zoom on input focus for iOS */
         @media screen and (max-width: 768px) {
             input[type="text"] {
-                font-size: 16px; /* Prevents zoom on iOS */
+                font-size: 16px;
+                /* Prevents zoom on iOS */
             }
         }
     </style>
 </head>
+
 <body>
     <a href="index.html" class="home-button">🏠 Home</a>
     <div class="game-container">
@@ -475,6 +524,15 @@
                 </div>
 
                 <div class="setup-group">
+                    <label>🧠 Bot Difficulty:</label>
+                    <div class="player-selector" id="difficultySelector">
+                        <button class="selector-btn" onclick="selectDifficulty('easy')">Easy</button>
+                        <button class="selector-btn active" onclick="selectDifficulty('medium')">Medium</button>
+                        <button class="selector-btn" onclick="selectDifficulty('hard')">Hard</button>
+                    </div>
+                </div>
+
+                <div class="setup-group">
                     <p style="text-align: center; font-size: 1.1em; opacity: 0.8;">
                         Total Players: <span id="totalPlayers" style="font-weight: bold; color: #4ade80;">1</span>
                     </p>
@@ -505,12 +563,7 @@
                 </div>
 
                 <div class="input-area">
-                    <input
-                        type="text"
-                        id="wordInput"
-                        placeholder="Type your word here..."
-                        autocomplete="off"
-                    >
+                    <input type="text" id="wordInput" placeholder="Type your word here..." autocomplete="off">
                 </div>
 
                 <div id="messageArea"></div>
@@ -538,6 +591,7 @@
         </div>
     </div>
 
+    <script src="js/dictionary.js"></script>
     <script>
         // Word dictionary - Comprehensive Oxford Dictionary-style word list with 10,000+ words
         const wordDictionary = new Set([
@@ -1103,7 +1157,7 @@
         let currentWord = "START";
         let requiredLetter = "T";
         let usedWords = new Set(['start']);
-        let wordHistory = [{word: 'START', player: 'System', index: -1}];
+        let wordHistory = [{ word: 'START', player: 'System', index: -1 }];
         let gameActive = false;
         let chainLength = 1;
 
@@ -1111,7 +1165,7 @@
         const playerColors = ['#4ade80', '#60a5fa', '#fbbf24', '#f472b6'];
 
         // Initialize
-        document.getElementById('wordInput').addEventListener('keypress', function(e) {
+        document.getElementById('wordInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter' && gameActive) {
                 submitWord();
             }
@@ -1144,6 +1198,18 @@
                 btn.classList.remove('active');
                 if (btn.textContent.toLowerCase() === difficulty) {
                     btn.classList.add('active');
+                }
+            });
+        }
+
+        function selectDifficulty(level) {
+            botDifficulty = level;
+            const buttons = document.getElementById('difficultySelector').querySelectorAll('.selector-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.toLowerCase() === level) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
                 }
             });
         }
@@ -1204,7 +1270,7 @@
             currentWord = "START";
             requiredLetter = "T";
             usedWords = new Set(['start']);
-            wordHistory = [{word: 'START', player: 'System', index: -1}];
+            wordHistory = [{ word: 'START', player: 'System', index: -1 }];
             gameActive = true;
             chainLength = 1;
 
@@ -1325,7 +1391,7 @@
 
         function processWord(word, player, playerIndex) {
             usedWords.add(word);
-            wordHistory.push({word: word, player: player.name, index: playerIndex});
+            wordHistory.push({ word: word, player: player.name, index: playerIndex });
             player.score += word.length;
             chainLength++;
             currentWord = word.toUpperCase();
@@ -1483,14 +1549,14 @@
 
         function showRules() {
             alert('📖 Word Chain Rules:\n\n' +
-                  '1. Players take turns typing words\n' +
-                  '2. Each word must start with the last letter of the previous word\n' +
-                  '3. Words must be at least 3 letters long\n' +
-                  '4. No repeated words allowed\n' +
-                  '5. Longer words = more points!\n' +
-                  '6. If you can\'t make a word, you\'re eliminated\n' +
-                  '7. Last player standing wins!\n' +
-                  '8. Bots make moves automatically');
+                '1. Players take turns typing words\n' +
+                '2. Each word must start with the last letter of the previous word\n' +
+                '3. Words must be at least 3 letters long\n' +
+                '4. No repeated words allowed\n' +
+                '5. Longer words = more points!\n' +
+                '6. If you can\'t make a word, you\'re eliminated\n' +
+                '7. Last player standing wins!\n' +
+                '8. Bots make moves automatically');
         }
 
         function goHome() {
@@ -1501,4 +1567,5 @@
         updateTotalPlayers();
     </script>
 </body>
+
 </html>
