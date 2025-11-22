@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -69,14 +70,34 @@
             font-weight: bold;
         }
 
-        .player-score { color: #4ade80; }
-        .ai-score { color: #ff6b6b; }
-        .time-warning { color: #ffa500; animation: pulse 0.5s infinite; }
-        .time-critical { color: #ff4444; animation: pulse 0.3s infinite; }
+        .player-score {
+            color: #4ade80;
+        }
+
+        .ai-score {
+            color: #ff6b6b;
+        }
+
+        .time-warning {
+            color: #ffa500;
+            animation: pulse 0.5s infinite;
+        }
+
+        .time-critical {
+            color: #ff4444;
+            animation: pulse 0.3s infinite;
+        }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
         }
 
         .power-ups-display {
@@ -101,8 +122,15 @@
         }
 
         @keyframes glow {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            }
         }
 
         .canvas-wrapper {
@@ -125,6 +153,15 @@
             border-radius: 5px;
             display: block;
             background: #0f0f1e;
+            max-width: 100%;
+            height: auto;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            aspect-ratio: 1 / 1;
         }
 
         .minimap-container {
@@ -222,8 +259,15 @@
         }
 
         @keyframes modalSlideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-content h2 {
@@ -236,14 +280,16 @@
             margin-bottom: 20px;
         }
 
-        .mode-selection, .difficulty-selection {
+        .mode-selection,
+        .difficulty-selection {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin: 20px 0;
         }
 
-        .mode-btn, .difficulty-btn {
+        .mode-btn,
+        .difficulty-btn {
             padding: 20px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.3);
@@ -254,12 +300,14 @@
             color: white;
         }
 
-        .mode-btn:hover, .difficulty-btn:hover {
+        .mode-btn:hover,
+        .difficulty-btn:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: scale(1.05);
         }
 
-        .mode-btn.selected, .difficulty-btn.selected {
+        .mode-btn.selected,
+        .difficulty-btn.selected {
             background: rgba(255, 215, 0, 0.3);
             border-color: gold;
         }
@@ -317,8 +365,15 @@
         }
 
         @keyframes scoreFloat {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-50px) scale(1.5); opacity: 0; }
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-50px) scale(1.5);
+                opacity: 0;
+            }
         }
 
         /* Home Button */
@@ -332,7 +387,7 @@
             text-decoration: none;
             border-radius: 10px;
             font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             z-index: 10000;
             transition: all 0.3s;
             display: flex;
@@ -342,9 +397,10 @@
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
+
         .home-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
         }
 
         /* Mobile D-Pad Controls */
@@ -383,37 +439,184 @@
             transform: scale(0.95);
         }
 
-        .dpad-up { grid-column: 2; grid-row: 1; }
-        .dpad-left { grid-column: 1; grid-row: 2; }
-        .dpad-down { grid-column: 2; grid-row: 3; }
-        .dpad-right { grid-column: 3; grid-row: 2; }
+        .dpad-up {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .dpad-left {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .dpad-down {
+            grid-column: 2;
+            grid-row: 3;
+        }
+
+        .dpad-right {
+            grid-column: 3;
+            grid-row: 2;
+        }
 
         @media (max-width: 768px) {
-            h1 { font-size: 2em; }
-            .canvas-wrapper { flex-direction: column; }
-            .minimap-container { width: 100%; }
-            #minimap { height: 150px; }
-            .mobile-controls { display: block; }
+            body {
+                padding: 10px;
+            }
+
+            .game-container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: clamp(1.5em, 5vw, 2em);
+                margin-bottom: 15px;
+            }
+
+            .canvas-wrapper {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .canvas-container {
+                padding: 8px;
+            }
+
+            #gameCanvas {
+                max-width: 100%;
+            }
+
+            .minimap-container {
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto;
+            }
+
+            #minimap {
+                height: 150px;
+                width: 100%;
+            }
+
+            .mobile-controls {
+                display: block;
+            }
+
             .home-button {
                 top: 10px;
                 left: 10px;
                 padding: 10px 16px;
                 font-size: 14px;
             }
+
+            .game-info {
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .stat-box {
+                padding: 8px;
+            }
+
+            .stat-value {
+                font-size: 1.5em;
+            }
+
+            button {
+                padding: 12px 24px;
+                font-size: 1em;
+            }
+
+            .controls {
+                gap: 10px;
+            }
         }
 
         @media (max-width: 480px) {
-            .dpad {
-                grid-template-columns: repeat(3, 50px);
-                grid-template-rows: repeat(3, 50px);
+            .game-container {
+                padding: 15px 10px;
             }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .canvas-container {
+                padding: 6px;
+            }
+
+            .dpad {
+                grid-template-columns: repeat(3, clamp(45px, 12vw, 55px));
+                grid-template-rows: repeat(3, clamp(45px, 12vw, 55px));
+                gap: 4px;
+            }
+
             .dpad-btn {
                 font-size: 20px;
+            }
+
+            .mobile-controls {
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .game-info {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .stat-label {
+                font-size: 0.75em;
+            }
+
+            .stat-value {
+                font-size: 1.3em;
+            }
+
+            button {
+                padding: 10px 18px;
+                font-size: 0.95em;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+                width: 95%;
+                max-height: 85vh;
+            }
+
+            .modal-content h2 {
+                font-size: 2em;
+            }
+
+            .instructions p {
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .dpad {
+                grid-template-columns: repeat(3, 42px);
+                grid-template-rows: repeat(3, 42px);
+            }
+
+            .dpad-btn {
+                font-size: 18px;
+            }
+
+            .game-info {
+                padding: 10px;
+            }
+
+            .stat-value {
+                font-size: 1.2em;
             }
         }
 
         /* Prevent text selection and context menu */
-        canvas, button, .home-button, .dpad-btn {
+        canvas,
+        button,
+        .home-button,
+        .dpad-btn {
             -webkit-user-select: none;
             -moz-user-select: none;
             user-select: none;
@@ -421,6 +624,7 @@
         }
     </style>
 </head>
+
 <body>
     <a href="index.html" class="home-button">🏠 Home</a>
     <div class="game-container">
@@ -566,9 +770,36 @@
 
         // Game constants
         const GRID_SIZE = 20;
-        const TILE_COUNT = canvas.width / GRID_SIZE;
+        let TILE_COUNT = 30; // Will be adjusted based on canvas size
 
-        // Game state
+        // Responsive canvas sizing
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const containerWidth = container.clientWidth - 20; // Account for padding
+            const maxSize = Math.min(containerWidth, 600);
+
+            canvas.width = maxSize;
+            canvas.height = maxSize;
+            TILE_COUNT = Math.floor(maxSize / GRID_SIZE);
+
+            // Also resize minimap proportionally
+            const minimapSize = Math.min(150, containerWidth * 0.25);
+            minimap.width = minimapSize;
+            minimap.height = minimapSize;
+        }
+
+        // Initial resize
+        resizeCanvas();
+
+        // Resize on window resize
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            if (gameActive && !gamePaused) {
+                draw(); // Redraw immediately
+            }
+        });
+
+        // Difficulty settings
         let gameActive = false;
         let gamePaused = false;
         let timeRemaining = 60;
@@ -596,7 +827,7 @@
 
         // Snakes
         let playerSnake = {
-            body: [{x: 10, y: 10}],
+            body: [{ x: 10, y: 10 }],
             dx: 0, dy: 0,
             nextDx: 0, nextDy: 0,
             color: '#4ade80',
@@ -605,7 +836,7 @@
         };
 
         let aiSnake = {
-            body: [{x: 20, y: 20}],
+            body: [{ x: 20, y: 20 }],
             dx: 0, dy: 0,
             color: '#ff6b6b',
             powerups: {},
@@ -770,7 +1001,7 @@
 
             // Reset snakes
             playerSnake = {
-                body: [{x: 10, y: 10}],
+                body: [{ x: 10, y: 10 }],
                 dx: 1, dy: 0,
                 nextDx: 1, nextDy: 0,
                 color: '#4ade80',
@@ -779,7 +1010,7 @@
             };
 
             aiSnake = {
-                body: [{x: 20, y: 20}],
+                body: [{ x: 20, y: 20 }],
                 dx: -1, dy: 0,
                 color: '#ff6b6b',
                 powerups: {},
@@ -1078,10 +1309,10 @@
 
         function getNeighbors(pos) {
             const neighbors = [];
-            const dirs = [{x: 0, y: -1}, {x: 0, y: 1}, {x: -1, y: 0}, {x: 1, y: 0}];
+            const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
 
             for (let dir of dirs) {
-                const neighbor = {x: pos.x + dir.x, y: pos.y + dir.y};
+                const neighbor = { x: pos.x + dir.x, y: pos.y + dir.y };
 
                 // Wrap around
                 if (neighbor.x < 0) neighbor.x = TILE_COUNT - 1;
@@ -1171,7 +1402,7 @@
 
                         // Random direction change
                         if (Math.random() < 0.1) {
-                            const dirs = [{dx: 1, dy: 0}, {dx: -1, dy: 0}, {dx: 0, dy: 1}, {dx: 0, dy: -1}];
+                            const dirs = [{ dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 }];
                             const dir = dirs[Math.floor(Math.random() * dirs.length)];
                             obstacle.dx = dir.dx;
                             obstacle.dy = dir.dy;
@@ -1214,13 +1445,13 @@
             for (let i = apples.length - 1; i >= 0; i--) {
                 const magnetRange = playerSnake.powerups.magnet ? 3 : 0;
                 const dist = Math.abs(apples[i].x - playerSnake.body[0].x) +
-                            Math.abs(apples[i].y - playerSnake.body[0].y);
+                    Math.abs(apples[i].y - playerSnake.body[0].y);
 
                 if (dist === 0 || (magnetRange > 0 && dist <= magnetRange)) {
                     const points = playerSnake.powerups.doublePoints ? 2 : 1;
                     playerScore += points;
                     totalApplesEaten++;
-                    playerSnake.body.push({...playerSnake.body[playerSnake.body.length - 1]});
+                    playerSnake.body.push({ ...playerSnake.body[playerSnake.body.length - 1] });
                     createScorePopup(apples[i].x, apples[i].y, `+${points}`);
                     createParticles(apples[i].x, apples[i].y, '#ffd93d');
                     apples.splice(i, 1);
@@ -1239,12 +1470,12 @@
             for (let i = apples.length - 1; i >= 0; i--) {
                 const magnetRange = aiSnake.powerups.magnet ? 3 : 0;
                 const dist = Math.abs(apples[i].x - aiSnake.body[0].x) +
-                            Math.abs(apples[i].y - aiSnake.body[0].y);
+                    Math.abs(apples[i].y - aiSnake.body[0].y);
 
                 if (dist === 0 || (magnetRange > 0 && dist <= magnetRange)) {
                     const points = aiSnake.powerups.doublePoints ? 2 : 1;
                     aiScore += points;
-                    aiSnake.body.push({...aiSnake.body[aiSnake.body.length - 1]});
+                    aiSnake.body.push({ ...aiSnake.body[aiSnake.body.length - 1] });
                     createParticles(apples[i].x, apples[i].y, '#ffd93d');
                     apples.splice(i, 1);
                     spawnApple();
@@ -1993,4 +2224,5 @@
         drawMinimap();
     </script>
 </body>
+
 </html>
